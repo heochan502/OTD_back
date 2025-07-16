@@ -1,0 +1,19 @@
+#constants:
+#  file:
+#    directory: D:\hc\backend\upload
+
+
+Spring:
+  application:
+    name: gallery
+  datasource:
+    url: jdbc:mariadb://localhost/projectotd
+    username: root
+    password: green502
+
+
+mybatis:
+  mapper-locations: mappers/**/*.xml
+
+  configuration:
+    map-underscore-to-camel-case: true
