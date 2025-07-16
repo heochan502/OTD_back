@@ -5,7 +5,7 @@
 
 Spring:
   application:
-    name: gallery
+    name: On_Two_Day
   datasource:
     url: jdbc:mariadb://localhost/projectotd
     username: root
