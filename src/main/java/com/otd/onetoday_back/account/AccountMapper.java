@@ -7,5 +7,5 @@ import org.apache.ibatis.annotations.Mapper;
 public interface AccountMapper {
 
     AccountLoginRes findByLogin( AccountLoginReq req);
-    int save(AccountJoinReq  req);
+    int save(AccountJoinReq req);
 }

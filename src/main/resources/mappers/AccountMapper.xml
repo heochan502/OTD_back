@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.otd.onetoday_back.account.AccountMapper">
+
+    <insert id="save" parameterType="com.otd.onetoday_back.account.model.AccountJoinReq">
+<!--        INSERT INTO member-->
+<!--        SET -->
+<!--          member_id = #{memberId},-->
+<!--          member_pw = #{memberPw},-->
+<!--          email = #{email},-->
+<!--          name = #{name},-->
+<!--          birth_date = #{birthDate},-->
+<!--          member_nick = #{memberNick}-->
+        INSERT INTO member (member_id,member_pw,email,name,birth_date,member_nick)
+        values (#{memberId},#{memberPw},#{email},#{name},#{birthDate}, #{memberNick})
+    </insert>
+
+    <select id="findByLoginId">
+        SELECT id, member_pw
+        FROM member
+        WHERE member_id = #{memberId}
+    </select>
+
+</mapper>

@@ -19,18 +19,21 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/otd/user")
+@RequestMapping("/api/OTD/user")
 public class AccountController {
     private final AccountService accountService;
 
+
     @PostMapping("/signup")
     public ResponseEntity<?> join(@RequestBody AccountJoinReq req) {
-        if(!StringUtils.hasLength(req.getName())
-                || !StringUtils.hasLength(req.getLoginId())
-                || !StringUtils.hasLength(req.getLoginPw())) {
+        if(!StringUtils.hasLength(req.getMemberId())
+                || !StringUtils.hasLength(req.getMemberPw())
+                || !StringUtils.hasLength(req.getEmail())
+                || !StringUtils.hasLength(req.getName())
+                || !StringUtils.hasLength(req.getMemberNick())) {
             return ResponseEntity.badRequest().build(); //state: 400
         }
-
+        log.info(" changed  : {}" ,req.getMemberNick());
         int result =  accountService.join(req);
         return ResponseEntity.ok(result); //state: 200
     }
@@ -42,7 +45,7 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
         //세션 처리
-        HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getAccountId());
+        HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberId());//확인하기
 
         return ResponseEntity.ok(result);
     }
