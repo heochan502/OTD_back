@@ -1,0 +1,21 @@
+
+constants:
+  file:
+    directory : /home/download
+
+
+
+
+Spring:
+  datasource:
+    url: jdbc:mariadb://112.222.157.157:5012/first_project
+    username: green2
+    password: msa502
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+
+
+mybatis:
+  mapper-locations: mappers/**/*.xml
+
+  configuration:
+    map-underscore-to-camel-case: true
