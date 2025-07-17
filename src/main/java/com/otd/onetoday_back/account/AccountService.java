@@ -16,8 +16,9 @@ public class AccountService {
 
     public int join (AccountJoinReq req)
     {
-        String hashedPw = BCrypt.hashpw(req.getLoginPw(), BCrypt.gensalt());
-        AccountJoinReq changedReq = new AccountJoinReq(req.getName(),req.getLoginId(),hashedPw);
+        String hashedPw = BCrypt.hashpw(req.getMemberPw(), BCrypt.gensalt());
+        AccountJoinReq changedReq = new AccountJoinReq(req.getMemberId(),req.getEmail(),req.getName(),req.getMemberNick(),req.getBirthDate(),hashedPw);
+        log.info(" changed2  : {}" ,req.getMemberNick());
         return accountMapper.save(changedReq);
     }
     public AccountLoginRes login(AccountLoginReq req)
@@ -25,7 +26,7 @@ public class AccountService {
         AccountLoginRes res = accountMapper.findByLogin(req);
         log.info("id 1212:" + res);
         //비밀번호 체크
-        if( res == null ||!BCrypt.checkpw(req.getLoginPw(), res.getLoginPw()))
+        if( res == null ||!BCrypt.checkpw(req.getMemberPw(), res.getMemberPw()))
         {
             return null; // 비밀번호가 다르면 null 처리
         }

@@ -14,7 +14,7 @@ public class HttpUtils {
         return req.getSession().getAttribute(key);
     }
 
-    // 세셩에 저장된 데이터 삭제
+    // 세션에 저장된 데이터 삭제
     public static void removeSessionValue(HttpServletRequest req, String key) {
         req.getSession().removeAttribute(key);
     }
