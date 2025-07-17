@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.otd.onetoday_back.health.ExerciseLogMapper">
+<!--운동기록 추가하기-->
+    <insert id="saveExerciseLog">
+        INSERT INTO exerciselog( exercise_id, member_no, exercise_datetime, exercise_kcal, exercise_duration, effort_level)
+        VALUES(
+              #{exerciseId}
+            , #{memberNo}
+            , #{exerciseDatetime}
+            , #{exerciseKcal}
+            , #{exerciseDuration}
+            , #{effortLevel}
+        )
+    </insert>
+
+
+</mapper>
