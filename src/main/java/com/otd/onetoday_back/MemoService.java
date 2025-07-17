@@ -24,7 +24,7 @@ public class MemoService {
     public int modify(MemoPutReq req) {
         return memoService.modify(req);
     }
-    public MemoGetRes deleteById(int id) {
+    public int deleteById(int id) {
         return memoService.deleteById(id);
     }
 }
