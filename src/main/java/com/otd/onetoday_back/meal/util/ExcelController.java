@@ -1,7 +1,8 @@
 package com.otd.onetoday_back.meal.util;
 
 
-import ch.qos.logback.core.model.Model;
+
+import org.springframework.ui.Model;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,7 @@ public class ExcelController {
     }
     @PostMapping ("/upload")
     public String upload(@RequestParam("file") MultipartFile file, Model model) {
-      return " " ;
+        String result = excelService.excelupload(file, model);
+      return result ;
     }
 }
