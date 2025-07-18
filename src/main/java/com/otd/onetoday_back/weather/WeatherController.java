@@ -1,5 +1,6 @@
 package com.otd.onetoday_back.weather;
 
+import com.otd.onetoday_back.weather.model.LocalNameGetReq;
 import com.otd.onetoday_back.weather.model.LocalNameGetRes;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import lombok.RequiredArgsConstructor;
@@ -13,13 +14,13 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/weather")
+@RequestMapping("/api/OTD/weather")
 public class WeatherController {
     private final WeatherService weatherService;
 
     @GetMapping
-    public ResponseEntity<?> localNameAll(){
-        List<LocalNameGetRes> localNameAll = weatherService.getLocalNameAll();
+    public ResponseEntity<?> localNameAll(LocalNameGetReq req){
+        List<LocalNameGetRes> localNameAll = weatherService.getLocalNameAll(req);
         return ResponseEntity.ok(localNameAll);
     }
 

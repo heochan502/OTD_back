@@ -1,7 +1,12 @@
 constants:
   file:
     directory : /home/download
-
+  # weather api
+  feign-client:
+    weather-api:
+      url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+      service-key: fte7et4WjQ2QQTSP51SJ6VZ%2FXA3aDUYv054aZFUsGdrVOKFJxQnmrKJGh%2Box%2FcnwsvpeJmLazXr4je1K01Uoow%3D%3D
+      data-type: json
 
 Spring:
   application:
@@ -22,10 +27,4 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
-# weather api
-constants:
-  feign-client:
-    weather-api:
-      url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
-      service-key: fte7et4WjQ2QQTSP51SJ6VZ%2FXA3aDUYv054aZFUsGdrVOKFJxQnmrKJGh%2Box%2FcnwsvpeJmLazXr4je1K01Uoow%3D%3D
-      data-type: json
+
