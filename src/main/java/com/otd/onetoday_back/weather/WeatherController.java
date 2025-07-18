@@ -1,13 +1,14 @@
 package com.otd.onetoday_back.weather;
 
-import com.otd.onetoday_back.weather.model.feignclient.ultraSrtFcst.WeatherUltraSrtFcstReq;
-import com.otd.onetoday_back.weather.model.feignclient.ultraSrtFcst.data.FcstResponseParent;
+import com.otd.onetoday_back.weather.model.LocalNameGetRes;
+import com.otd.onetoday_back.weather.model.WeatherDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,9 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class WeatherController {
     private final WeatherService weatherService;
 
-    @GetMapping("/ultra_srt_fcst")
-    public FcstResponseParent getUltraSrtFcst(@ModelAttribute WeatherUltraSrtFcstReq req) {
-        log.info("req: {}", req);
-        return weatherService.ultraSrtNcst(req);
+    @GetMapping
+    public ResponseEntity<?> localNameAll(){
+        List<LocalNameGetRes> localNameAll = weatherService.getLocalNameAll();
+        return ResponseEntity.ok(localNameAll);
     }
+
 }

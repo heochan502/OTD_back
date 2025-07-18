@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface WeatherFeignClient {
 
     @GetMapping("/getUltraSrtFcst")
-    FcstResponseParent getUltraSrtFcst(@RequestParam String serviceKey,
-                                       @RequestParam String dataType,
+    FcstResponseParent getUltraSrtFcst(@RequestParam("serviceKey") String serviceKey,
+                                       @RequestParam("dataType") String dataType,
                                        @RequestParam("base_date") String baseDate,
                                        @RequestParam("base_time") String baseTime,
-                                       @RequestParam int nx,
-                                       @RequestParam int ny);
+                                       @RequestParam("nx") int nx,
+                                       @RequestParam("ny") int ny);
 
 }

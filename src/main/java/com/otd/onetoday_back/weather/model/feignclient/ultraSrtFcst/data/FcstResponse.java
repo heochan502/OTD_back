@@ -7,5 +7,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FcstResponse {
-    private Body body;
+    private FcstBody body;
 }

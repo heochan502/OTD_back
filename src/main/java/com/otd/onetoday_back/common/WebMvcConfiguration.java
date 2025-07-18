@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Slf4j
 @Configuration //빈등록
-public class WebMvcConfiguration {
+public class WebMvcConfiguration implements WebMvcConfigurer {
 // 아래는 파일 경로 설정 시 사용
     //    private final String uploadPath;
 

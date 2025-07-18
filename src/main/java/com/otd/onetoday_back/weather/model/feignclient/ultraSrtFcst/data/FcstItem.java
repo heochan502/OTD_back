@@ -9,4 +9,5 @@ public class FcstItem {
     private String category;
     private String fcstDate;
     private int fcstTime;
+    private int fcstValue;
 }

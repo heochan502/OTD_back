@@ -1,4 +1,4 @@
-package com.otd.onetoday_back.weather.model.feignclient.ultraSrtFcst;
+package com.otd.onetoday_back.weather.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class WeatherUltraSrtFcstReq {
+public class LocalNameGetReq {
     private String baseDate;
     private String baseTime;
     private int nx;

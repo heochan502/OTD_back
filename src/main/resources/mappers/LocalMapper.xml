@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.otd.onetoday_back.weather.mapper.LocalMapper">
+    <select id="getLocalId" resultType="int">
+        SELECT local_id
+        FROM member_location
+        WHERE local_member_id = #{memberId}
+    </select>
+    
+    <select id="getLocalNameAll">
+        SELECT city, county, town
+        FROM locallist
+    </select>
+</mapper>
