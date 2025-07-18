@@ -1,18 +1,23 @@
-#constants:
-#  file:
-#    directory: D:\hc\backend\upload
+constants:
+  file:
+    directory : /home/download
 
 
 Spring:
   application:
     name: On_Two_Day
   datasource:
-    url: jdbc:mariadb://112.222.157.157:5012/first_project
+    url: jdbc:log4jdbc:mariadb://112.222.157.157:5012/first_project
     username: green2
     password: msa502
-
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+  servlet:
+    multipart:
+      max-file-size: 10MB #하나의 파일의 최대 크기
+      max-request-size: 30MB # 한번에 최대 업로드 가능 용량
 
 mybatis:
   mapper-locations: classpath:/mappers/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
