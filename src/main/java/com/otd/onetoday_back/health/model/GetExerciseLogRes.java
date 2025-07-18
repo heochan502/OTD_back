@@ -9,7 +9,6 @@ import lombok.ToString;
 @ToString
 public class GetExerciseLogRes {
     private int exerciselogId;
-    private int exerciseId;
     private int exerciseDuration;
     private String exerciseName;
     private String exerciseDatetime;
