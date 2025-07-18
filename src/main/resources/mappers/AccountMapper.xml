@@ -14,11 +14,11 @@
         INSERT INTO member (member_id,member_pw,email,name,birth_date,member_nick)
         values (#{memberId},#{memberPw},#{email},#{name},#{birthDate}, #{memberNick})
     </insert>
-
-    <select id="findByLoginId">
-        SELECT id, member_pw
+    <select id="findByLogin" parameterType="com.otd.onetoday_back.account.model.AccountLoginReq" resultType="com.otd.onetoday_back.account.model.AccountLoginRes">
+        SELECT member_id AS memberId, member_pw AS memberPw
         FROM member
         WHERE member_id = #{memberId}
+        AND member_pw = #{memberPw}
     </select>
 
 </mapper>

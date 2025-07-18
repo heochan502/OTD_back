@@ -9,25 +9,26 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Slf4j
 @Configuration //빈등록
-public class WebMvcConfiguration implements WebMvcConfigurer {
+public class WebMvcConfiguration {
 // 아래는 파일 경로 설정 시 사용
-    private final String uploadPath;
+    //    private final String uploadPath;
 
-    public WebMvcConfiguration(@Value("${file.upload-dir}") String uploadPath) {
-        this.uploadPath = uploadPath;
-        log.info("Upload Path: {}", uploadPath);
-    }
+//    public WebMvcConfiguration(@Value("${constants.file.directory}") String uploadPath) {
+//        this.uploadPath = uploadPath;
+//        log.info("Upload Path: {}", uploadPath);
+//    }
 
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry){
-        registry.addResourceHandler("/upload/**").addResourceLocations("file:"+uploadPath);
-    }
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry){
+//        registry.addResourceHandler("/pic/**").addResourceLocations("file:"+uploadPath);
+//    }
 
 
-    @Override
+//    @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("*");
     }
+
 }

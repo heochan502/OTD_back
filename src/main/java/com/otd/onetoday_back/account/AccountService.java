@@ -17,14 +17,14 @@ public class AccountService {
     public int join (AccountJoinReq req)
     {
         String hashedPw = BCrypt.hashpw(req.getMemberPw(), BCrypt.gensalt());
-        AccountJoinReq changedReq = new AccountJoinReq(req.getMemberId(),req.getEmail(),req.getName(),req.getMemberNick(),req.getBirthDate(),hashedPw);
+        AccountJoinReq changedReq = new AccountJoinReq(req.getMemberId(),hashedPw,req.getEmail(),req.getName(),req.getBirthDate(),req.getMemberNick());
         log.info(" changed2  : {}" ,req.getMemberNick());
         return accountMapper.save(changedReq);
     }
     public AccountLoginRes login(AccountLoginReq req)
     {
         AccountLoginRes res = accountMapper.findByLogin(req);
-        log.info("id 1212:" + res);
+        log.info("id:" + res);
         //비밀번호 체크
         if( res == null ||!BCrypt.checkpw(req.getMemberPw(), res.getMemberPw()))
         {

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/OTD/user")
 public class AccountController {
@@ -53,7 +53,7 @@ public class AccountController {
     @GetMapping("/check")
     public ResponseEntity<?> check(HttpServletRequest httpReq) {
         Integer id = (Integer)HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-//        log.info("id: {}", id);
+         log.info("id: {}", id);
         return ResponseEntity.ok(id);
     }
 
