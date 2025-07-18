@@ -24,11 +24,14 @@
     </select>
 
 <!-- 운동 목록 조회 -->
-    <select id="findAll">
-        SELECT  b.exercise_name, a.exercise_duration
+    <select id="findAllByMemberNoOrderByExerciselogIdDesc">
+        SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_datetime
         FROM exerciselog a
         JOIN exercise b
         ON a.exercise_id = b.exercise_id
+        WHERE a.member_no = #{memberNo}
+        ORDER BY a.exerciselog_id DESC
+
     </select>
 
 </mapper>
