@@ -8,6 +8,6 @@ import lombok.ToString;
 @Builder
 @ToString
 public class GetExerciseLogDetailReq {
-    private int exerciseLogId;
+    private int exerciselogId;
     private int memberNo;
 }

@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class GetExerciseLogRes {
-    private int exerciseLogId;
+    private int exerciselogId;
     private int exerciseId;
     private int exerciseDuration;
     private String exerciseName;
