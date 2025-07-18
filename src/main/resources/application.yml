@@ -1,7 +1,9 @@
 #constants:
 #  file:
-#    directory: D:\hc\backend\upload
+#    directory: C:\2025_swstudy\upload
 
+file:
+  upload-dir: C:\2025_swstudy\upload
 
 Spring:
   application:

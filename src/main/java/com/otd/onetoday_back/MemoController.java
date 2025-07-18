@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,10 +23,16 @@ public class MemoController {
 //        int result = memoService.save(req);
 //        return new ResultResponse<>("메모 저장 성공", result);
 //    }
-    @PostMapping("{memeId}")
+    @PostMapping(value = "/{userId}", consumes = {"multipart/form-data"})
     public ResultResponse<MemoPostAnduploadRes> postMemo(
-            @PathVariable int userId, @RequestBody MemoPostReq req) {
-        log.info("userId:{}, req:{}", userId, req);
+            @PathVariable int userId,
+//            @RequestBody MemoPostReq req,
+            @RequestPart("req") MemoPostReq req,
+            @RequestPart(value = "memoImageFile", required = false) MultipartFile memoImageFile)
+    {
+        log.info("userId:{}, req:{}, memoImageFile:{}",
+                userId, req, memoImageFile !=null ? memoImageFile.getOriginalFilename() : "No file");
+        req.setMemoImageFile(memoImageFile);
         MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, req);
         return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
     }
@@ -51,7 +58,7 @@ public class MemoController {
     }
     @DeleteMapping
     public ResultResponse<Integer> deleteMemo(@RequestParam(name = "id") int id) {
-        log.info("id={}", "id");
+        log.info("id={}", id);
         int result = memoService.deleteById(id);
         return new ResultResponse<>("메모 삭제 성공", result);
     }
