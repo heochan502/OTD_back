@@ -23,7 +23,7 @@ public class MemoService {
     private final MemoMapper memoMapper;
 
 //    public int save(MemoPostReq req) { return memoMapper.save(req); }
-    @Value("${file.upload-dir")
+    @Value("${file.upload-dir}")
     public String uploadDir;
     public MemoPostAnduploadRes saveMemoAndHandleUpload(int userId, MemoPostReq req) {
         int newMemoId = 111;
