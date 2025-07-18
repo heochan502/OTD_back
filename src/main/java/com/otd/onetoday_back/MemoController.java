@@ -16,12 +16,20 @@ import java.util.List;
 public class MemoController {
     private final MemoService memoService;
 
-    @PostMapping
-    public ResultResponse<Integer> postMemo(@RequestBody MemoPostReq req) {
-        log.info("req={}", req);
-        int result = memoService.save(req);
-        return new ResultResponse<>("메모 저장 성공", result);
+//    @PostMapping
+//    public ResultResponse<Integer> postMemo(@RequestBody MemoPostReq req) {
+//        log.info("req={}", req);
+//        int result = memoService.save(req);
+//        return new ResultResponse<>("메모 저장 성공", result);
+//    }
+    @PostMapping("{memeId}")
+    public ResultResponse<MemoPostAnduploadRes> postMemo(
+            @PathVariable int userId, @RequestBody MemoPostReq req) {
+        log.info("userId:{}, req:{}", userId, req);
+        MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, req);
+        return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
     }
+
     @GetMapping
     public ResultResponse<List<MemoGetRes>> getMemo(@ModelAttribute MemoGetReq req) {
         log.info("req={}", req);
