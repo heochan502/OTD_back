@@ -15,13 +15,12 @@
     </insert>
 
 <!--    운동 상세 조회 -->
-    <select id="findByExerciseIdAndMemberNo">
-        SELECT b.exercise_name, a.exercise_duration, a.exercise_kcal, a.effort_level
+    <select id="findByExerciseId">
+        SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_kcal, a.effort_level
           FROM exerciselog a
           JOIN exercise b
             ON a.exercise_id = b.exercise_id
          WHERE a.exerciselog_id = #{exerciselogId}
-           AND a.member_no = #{memberNo};
     </select>
 
 
