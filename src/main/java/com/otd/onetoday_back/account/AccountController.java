@@ -40,7 +40,9 @@ public class AccountController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
+        log.info(" changed  : {}" ,req);
         AccountLoginRes result = accountService.login(req);
+
         if(result == null) {
             return ResponseEntity.notFound().build();
         }
