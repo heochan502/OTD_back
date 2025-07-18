@@ -16,12 +16,19 @@
 
 <!--    운동 상세 조회 -->
     <select id="findByExerciseId">
-        SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_kcal, a.effort_level
+        SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_kcal, a.effort_level, a.exercise_datetime
           FROM exerciselog a
           JOIN exercise b
             ON a.exercise_id = b.exercise_id
          WHERE a.exerciselog_id = #{exerciselogId}
     </select>
 
+<!-- 운동 목록 조회 -->
+    <select id="findAll">
+        SELECT  b.exercise_name, a.exercise_duration
+        FROM exerciselog a
+        JOIN exercise b
+        ON a.exercise_id = b.exercise_id
+    </select>
 
 </mapper>

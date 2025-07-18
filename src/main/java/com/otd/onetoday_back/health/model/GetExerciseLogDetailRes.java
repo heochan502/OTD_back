@@ -16,4 +16,5 @@ public class GetExerciseLogDetailRes {
     private int exerciseDuration;
     private int exerciseKcal;
     private int effortLevel;
+    private String exerciseDatetime;
 }
