@@ -1,20 +1,17 @@
 package com.otd.onetoday_back.health.model;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.stereotype.Service;
 
 @Getter
-@Builder
 @Setter
 @ToString
-public class GetExerciseLogDetailRes {
+public class PutExerciseLogReq {
     private int exerciselogId;
-    private String exerciseName;
-    private int exerciseDuration;
-    private int exerciseKcal;
-    private int effortLevel;
+    private int exerciseId;
     private String exerciseDatetime;
+    private int exerciseKcal;
+    private int exerciseDuration;
+    private int effortLevel;
 }

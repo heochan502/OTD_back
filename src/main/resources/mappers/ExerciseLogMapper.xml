@@ -15,7 +15,7 @@
     </insert>
 
 <!--    운동 상세 조회 -->
-    <select id="findByExerciseId">
+    <select id="findByExerciselogId">
         SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_kcal, a.effort_level, a.exercise_datetime
           FROM exerciselog a
           JOIN exercise b
@@ -34,4 +34,20 @@
 
     </select>
 
+<!--    운동 목록 수정 -->
+<update id="modifyByExerciselogId">
+    UPDATE exerciselog
+    SET exercise_id = #{exerciseId}
+    , exercise_datetime = #{exerciseDatetime}
+    , exercise_kcal = #{exerciseKcal}
+    , exercise_duration = #{exerciseDuration}
+    , effort_level = #{effortLevel}
+    WHERE exerciselog_id = #{exerciselogId}
+</update>
+
+<!--    운동기록삭제-->
+    <delete id="deleteByExerciselogId">
+        DELETE FROM exerciselog
+        WHERE exerciselog_id = #{exerciselogId}
+    </delete>
 </mapper>
