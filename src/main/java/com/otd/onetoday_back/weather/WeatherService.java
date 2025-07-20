@@ -88,7 +88,7 @@ public class WeatherService {
             local.setTown(location.getTown());
 
             WeatherDto dto = new WeatherDto();
-            dto.setDate(baseDate + " " + baseTime);
+            dto.setBaseTime(baseDate + " " + baseTime);
             dto.setTemperature(temp);
             dto.setCondition(sky);
             dto.setLocalName(local.getCity() + " " + local.getCounty() + " "+ local.getTown());

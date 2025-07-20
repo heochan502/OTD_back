@@ -12,7 +12,7 @@ public class BaseTime {
         int minute = now.getMinute();
 
         // 30분 이전 -> 이전 데이터 사용
-        if (minute < 45) {
+        if (minute < 30) {
             hour -= 1;
         }
         // 00시 넘어가면 전 날 23시 데이터 사용
