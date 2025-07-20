@@ -1,12 +1,20 @@
 package com.otd.onetoday_back.weather;
 
-import com.otd.onetoday_back.weather.mapper.LocalMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otd.onetoday_back.weather.mapper.LocationMapper;
+import com.otd.onetoday_back.weather.mapper.WeatherMapper;
+import com.otd.onetoday_back.weather.model.dto.LocationDto;
 import com.otd.onetoday_back.weather.model.LocalNameGetReq;
 import com.otd.onetoday_back.weather.model.LocalNameGetRes;
+import com.otd.onetoday_back.weather.model.dto.WeatherDto;
+import com.otd.onetoday_back.weather.model.dto.json.Item;
+import com.otd.onetoday_back.weather.model.dto.json.ResponseParent;
+import com.otd.onetoday_back.weather.util.BaseTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 
@@ -15,9 +23,80 @@ import java.util.List;
 @Slf4j
 public class WeatherService {
 
-    private final LocalMapper localMapper;
+    private final LocationMapper locationMapper;
+    private final WeatherMapper weatherMapper;
+    private final WeatherFeignClient weatherFeignClient;
 
+    private final String API_KEY = "fte7et4WjQ2QQTSP51SJ6VZ%2FXA3aDUYv054aZFUsGdrVOKFJxQnmrKJGh%2Box%2FcnwsvpeJmLazXr4je1K01Uoow%3D%3D";
+
+    private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱용
+
+
+    // 지역 들고오기
     public List<LocalNameGetRes> getLocalNameAll(LocalNameGetReq req){
-        return localMapper.getLocalNameAll(req);
+        return locationMapper.getLocalNameAll(req);
+    }
+
+    private String Sky(String sky) {
+        return switch (sky) {
+            case "1" -> "맑음";
+            case "3" -> "구름 많음";
+            case "4" -> "흐림";
+            default -> "알 수 없음";
+        };
+    }
+
+    public WeatherDto getWeatherByMemberId(int memberId) {
+        LocationDto location = weatherMapper.findLocalByMemberId(memberId);
+
+        // 실시간 날짜/시간
+        String[] base = BaseTime.getBaseDateTime();
+
+        String baseDate = base[0];
+        String baseTime = base[1];
+
+        // Feign 호출
+        String response = weatherFeignClient.getUltraSrtFcst(
+                API_KEY,
+                "JSON",
+                baseDate,
+                baseTime,
+                location.getNx(),
+                location.getNy(),
+                1000,
+                1
+        );
+        try {
+            ResponseParent weatherApi = objectMapper.readValue(response, ResponseParent.class);
+            List<Item> items = weatherApi.getResponse().getBody().getItems().getItem();
+
+            String temp = "";
+            String sky = "";
+            log.info("items = {}", items);
+            for (Item item : items) {
+                if ("T1H".equals(item.getCategory())) {
+                    temp = item.getFcstValue();
+                }
+                if ("SKY".equals(item.getCategory())) {
+                    sky = Sky(item.getFcstValue());
+                }
+            }
+
+            LocationDto local = new LocationDto();
+            local.setCity(location.getCity());
+            local.setCounty(location.getCounty());
+            local.setTown(location.getTown());
+
+            WeatherDto dto = new WeatherDto();
+            dto.setDate(baseDate + " " + baseTime);
+            dto.setTemperature(temp);
+            dto.setCondition(sky);
+            dto.setLocalName(local.getCity() + " " + local.getCounty() + " "+ local.getTown());
+
+            return dto;
+
+        } catch (Exception e) {
+            throw new RuntimeException("날씨 API 파싱 실패", e);
+        }
     }
 }

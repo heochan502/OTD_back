@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.otd.onetoday_back.weather.mapper.LocalMapper">
+<mapper namespace="com.otd.onetoday_back.weather.mapper.LocationMapper">
     <select id="getLocalId" resultType="int">
         SELECT local_id
         FROM member_location

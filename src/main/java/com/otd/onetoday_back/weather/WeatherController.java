@@ -2,13 +2,12 @@ package com.otd.onetoday_back.weather;
 
 import com.otd.onetoday_back.weather.model.LocalNameGetReq;
 import com.otd.onetoday_back.weather.model.LocalNameGetRes;
-import com.otd.onetoday_back.weather.model.WeatherDto;
+import com.otd.onetoday_back.weather.model.dto.WeatherDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,4 +23,9 @@ public class WeatherController {
         return ResponseEntity.ok(localNameAll);
     }
 
+    @GetMapping("/{memberId}")
+    public WeatherDto getWeather(@PathVariable int memberId) {
+        log.info("memberId = {}", memberId);
+        return weatherService.getWeatherByMemberId(memberId);
+    }
 }
