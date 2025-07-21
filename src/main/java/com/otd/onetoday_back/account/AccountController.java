@@ -47,7 +47,8 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
         //세션 처리
-        HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberId());//확인하기
+        HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberNoLogin());//확인하기
+        log.info(" MEMBER_ID_NAME  : {}" , result.getMemberNoLogin());
 
         return ResponseEntity.ok(result);
     }
