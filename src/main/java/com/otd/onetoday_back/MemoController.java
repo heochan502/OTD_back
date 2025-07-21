@@ -25,7 +25,7 @@ public class MemoController {
 //    }
     @PostMapping(value = "/{userId}", consumes = {"multipart/form-data"})
     public ResultResponse<MemoPostAnduploadRes> postMemo(
-            @PathVariable int userId,
+            @PathVariable("userId") int userId,
             @RequestPart("req") MemoPostReq dto,
             @RequestPart(value = "memoImageFile", required = false) MultipartFile memoImageFile)
 {
