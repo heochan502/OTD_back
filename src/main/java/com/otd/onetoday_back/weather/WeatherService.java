@@ -15,7 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -63,22 +65,34 @@ public class WeatherService {
                 baseTime,
                 location.getNx(),
                 location.getNy(),
-                1000,
+                30,
                 1
         );
         try {
             ResponseParent weatherApi = objectMapper.readValue(response, ResponseParent.class);
             List<Item> items = weatherApi.getResponse().getBody().getItems().getItem();
 
-            String temp = "";
-            String sky = "";
+            String temp = null;
+            String sky = null;
             log.info("items = {}", items);
+
+            // 이미 수집된 자료는 더이상 받지 않는다
+            Set<String> fristIndex = new HashSet<>();
+
             for (Item item : items) {
-                if ("T1H".equals(item.getCategory())) {
-                    temp = item.getFcstValue();
-                }
-                if ("SKY".equals(item.getCategory())) {
-                    sky = Sky(item.getFcstValue());
+                switch (item.getCategory()) {
+                    case "T1H":
+                        if (!fristIndex.contains("T1H")) {
+                            temp = item.getFcstValue();
+                            fristIndex.add("T1H");
+                        }
+                        break;
+                    case "SKY":
+                        if (!fristIndex.contains("SKY")) {
+                            sky = Sky(item.getFcstValue());
+                            fristIndex.add("SKY");
+                        }
+                        break;
                 }
             }
 
@@ -96,7 +110,7 @@ public class WeatherService {
             return dto;
 
         } catch (Exception e) {
-            throw new RuntimeException("날씨 API 파싱 실패", e);
+            throw new RuntimeException("날씨 API 실패", e);
         }
     }
 }

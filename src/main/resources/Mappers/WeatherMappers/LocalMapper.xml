@@ -10,11 +10,11 @@
     <select id="getLocalNameAll">
         SELECT city, county, town, nx, ny
         FROM locallist
-            <if test="searchText != null and searchText != ''">
-                <bind name="pattern" value="'%' + _parameter.getSearchText() + '%'"/>
-                WHERE city LIKE #{pattern}
-                OR county LIKE #{pattern}
-                OR town LIKE #{pattern}
-            </if>
+<!--            <if test="searchText != null and searchText != ''">-->
+<!--                <bind name="pattern" value="'%' + _parameter.getSearchText() + '%'"/>-->
+<!--                WHERE city LIKE #{pattern}-->
+<!--                OR county LIKE #{pattern}-->
+<!--                OR town LIKE #{pattern}-->
+<!--            </if>-->
     </select>
 </mapper>
