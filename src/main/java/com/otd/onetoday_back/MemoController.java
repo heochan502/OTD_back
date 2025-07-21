@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/otd/memo")
+@RequestMapping("/api/otd/memo")
 public class MemoController {
     private final MemoService memoService;
 
@@ -26,16 +26,15 @@ public class MemoController {
     @PostMapping(value = "/{userId}", consumes = {"multipart/form-data"})
     public ResultResponse<MemoPostAnduploadRes> postMemo(
             @PathVariable int userId,
-//            @RequestBody MemoPostReq req,
-            @RequestPart("req") MemoPostReq req,
+            @RequestPart("req") MemoPostReq dto,
             @RequestPart(value = "memoImageFile", required = false) MultipartFile memoImageFile)
-    {
-        log.info("userId:{}, req:{}, memoImageFile:{}",
-                userId, req, memoImageFile !=null ? memoImageFile.getOriginalFilename() : "No file");
-        req.setMemoImageFile(memoImageFile);
-        MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, req);
-        return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
-    }
+{
+    log.info("userId:{}, req:{}, memoImageFile:{}",
+            userId, dto, memoImageFile != null ? memoImageFile.getOriginalFilename() : "No file");
+    dto.setMemoImageFile(memoImageFile);
+    MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, dto);
+    return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
+}
 
     @GetMapping
     public ResultResponse<List<MemoGetRes>> getMemo(@ModelAttribute MemoGetReq req) {
