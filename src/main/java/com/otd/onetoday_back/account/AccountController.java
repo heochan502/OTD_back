@@ -40,14 +40,14 @@ public class AccountController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
-        log.info(" changed  : {}" ,req);
+        log.info("changed  : {}" ,req);
         AccountLoginRes result = accountService.login(req);
 
         if(result == null) {
             return ResponseEntity.notFound().build();
         }
         //세션 처리
-        HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberId());//확인하기
+        HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberNoLogin());//확인하기
 
         return ResponseEntity.ok(result);
     }

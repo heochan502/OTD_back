@@ -1,4 +1,4 @@
-package com.otd.onetoday_back.weather.model;
+package com.otd.onetoday_back.weather.location.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +7,7 @@ import lombok.ToString;
 import java.beans.ConstructorProperties;
 
 @Getter
+@Setter
 @ToString
 public class LocalNameGetReq {
     private String searchText;

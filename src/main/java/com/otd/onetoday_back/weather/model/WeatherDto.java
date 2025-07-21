@@ -1,8 +1,6 @@
-package com.otd.onetoday_back.weather.model.dto;
+package com.otd.onetoday_back.weather.model;
 
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class WeatherDto {

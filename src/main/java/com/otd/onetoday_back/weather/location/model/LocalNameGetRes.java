@@ -1,7 +1,6 @@
-package com.otd.onetoday_back.weather.model;
+package com.otd.onetoday_back.weather.location.model;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class LocalNameGetRes {

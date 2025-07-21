@@ -1,14 +1,10 @@
 package com.otd.onetoday_back.weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.otd.onetoday_back.weather.mapper.LocationMapper;
-import com.otd.onetoday_back.weather.mapper.WeatherMapper;
-import com.otd.onetoday_back.weather.model.dto.LocationDto;
-import com.otd.onetoday_back.weather.model.LocalNameGetReq;
-import com.otd.onetoday_back.weather.model.LocalNameGetRes;
-import com.otd.onetoday_back.weather.model.dto.WeatherDto;
-import com.otd.onetoday_back.weather.model.dto.json.Item;
-import com.otd.onetoday_back.weather.model.dto.json.ResponseParent;
+import com.otd.onetoday_back.weather.location.model.LocationDto;
+import com.otd.onetoday_back.weather.model.WeatherDto;
+import com.otd.onetoday_back.weather.model.json.Item;
+import com.otd.onetoday_back.weather.model.json.ResponseParent;
 import com.otd.onetoday_back.weather.util.BaseTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,19 +21,12 @@ import java.util.Set;
 @Slf4j
 public class WeatherService {
 
-    private final LocationMapper locationMapper;
     private final WeatherMapper weatherMapper;
     private final WeatherFeignClient weatherFeignClient;
 
     private final String API_KEY = "fte7et4WjQ2QQTSP51SJ6VZ%2FXA3aDUYv054aZFUsGdrVOKFJxQnmrKJGh%2Box%2FcnwsvpeJmLazXr4je1K01Uoow%3D%3D";
 
     private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱용
-
-
-    // 지역 들고오기
-    public List<LocalNameGetRes> getLocalNameAll(LocalNameGetReq req){
-        return locationMapper.getLocalNameAll(req);
-    }
 
     private String Sky(String sky) {
         return switch (sky) {
@@ -50,7 +39,7 @@ public class WeatherService {
 
     public WeatherDto getWeatherByMemberId(int memberId) {
         LocationDto location = weatherMapper.findLocalByMemberId(memberId);
-
+        log.info("memberId:" + memberId);
         // 실시간 날짜/시간
         String[] base = BaseTime.getBaseDateTime();
 
