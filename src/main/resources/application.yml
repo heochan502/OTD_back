@@ -17,8 +17,7 @@ Spring:
       max-request-size: 30MB # 한번에 최대 업로드 가능 용량
 
 mybatis:
-  mapper-locations: mappers/**/*.xml
-
+  mapper-locations: classpath:/mappers/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
 

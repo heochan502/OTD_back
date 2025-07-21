@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 
 
 @Setter
@@ -14,9 +15,13 @@ import lombok.Setter;
 //@NoArgsConstructor
 @AllArgsConstructor
 public class AccountJoinReq {
+    private String memberId;
+    private String memberPw;
+    private String email;
     private String name;
-    private String loginId;
-    private String loginPw;
+    private String birthDate;
+    private String memberNick;
+
 
 
 }
