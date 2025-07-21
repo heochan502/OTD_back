@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReminderController {
     private final ReminderService reminderService;
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<?> postReminder(HttpServletRequest httpReq, @RequestBody ReminderPostReq req){
         log.info("req:{}", req);
         int memberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         req.setMemberId(memberId);
-        int rusult = reminderService.postReminder(req);
-        return ResponseEntity.ok(rusult);
+        int result = reminderService.postReminder(req);
+        return ResponseEntity.ok(result);
     }
 }
