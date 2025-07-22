@@ -1,19 +1,11 @@
 package com.otd.onetoday_back.weather;
 
-import com.otd.onetoday_back.account.etc.AccountConstants;
-import com.otd.onetoday_back.common.util.HttpUtils;
-import com.otd.onetoday_back.weather.location.LocationService;
-import com.otd.onetoday_back.weather.location.model.LocalNameGetReq;
-import com.otd.onetoday_back.weather.location.model.LocalNameGetRes;
 import com.otd.onetoday_back.weather.model.WeatherDto;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
