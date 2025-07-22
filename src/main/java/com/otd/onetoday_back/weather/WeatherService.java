@@ -66,20 +66,20 @@ public class WeatherService {
             log.info("items = {}", items);
 
             // 이미 수집된 자료는 더이상 받지 않는다
-            Set<String> fristIndex = new HashSet<>();
+            Set<String> firstIndex = new HashSet<>();
 
             for (Item item : items) {
                 switch (item.getCategory()) {
                     case "T1H":
-                        if (!fristIndex.contains("T1H")) {
+                        if (!firstIndex.contains("T1H")) {
                             temp = item.getFcstValue();
-                            fristIndex.add("T1H");
+                            firstIndex.add("T1H");
                         }
                         break;
                     case "SKY":
-                        if (!fristIndex.contains("SKY")) {
+                        if (!firstIndex.contains("SKY")) {
                             sky = Sky(item.getFcstValue());
-                            fristIndex.add("SKY");
+                            firstIndex.add("SKY");
                         }
                         break;
                 }

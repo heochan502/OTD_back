@@ -7,6 +7,7 @@ import com.otd.onetoday_back.weather.location.model.LocalNameGetReq;
 import com.otd.onetoday_back.weather.location.model.LocalNameGetRes;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +23,15 @@ public class WeatherController {
     private final WeatherService weatherService;
     private final LocationService locationService;
 
-    @GetMapping("/{memberId}")
-    public WeatherDto getWeather(@PathVariable int memberId) {
-        log.info("memberId = {}", memberId);
+//    @GetMapping("/{memberId}")
+//    public WeatherDto getWeather(@PathVariable int memberId) {
+//        log.info("memberId = {}", memberId);
+//        return weatherService.getWeatherByMemberId(memberId);
+//    }
+
+    @GetMapping
+    public WeatherDto getWeather(HttpSession session) {
+        Integer memberId = (Integer)session.getAttribute("memberId");
         return weatherService.getWeatherByMemberId(memberId);
     }
-
-//    @GetMapping
-//    public ResponseEntity<?> getWeather(HttpServletRequest req) {
-//        int logginedMemberId = (int)HttpUtils.getSessionValue(req, AccountConstants.MEMBER_ID_NAME);
-//        WeatherDto result = weatherService.getWeatherByMemberId(logginedMemberId);
-//        return ResponseEntity.ok(result);
-//    }
 }
