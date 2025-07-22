@@ -21,13 +21,6 @@ import java.util.List;
 @RequestMapping("/api/OTD/weather")
 public class WeatherController {
     private final WeatherService weatherService;
-    private final LocationService locationService;
-
-//    @GetMapping("/{memberId}")
-//    public WeatherDto getWeather(@PathVariable int memberId) {
-//        log.info("memberId = {}", memberId);
-//        return weatherService.getWeatherByMemberId(memberId);
-//    }
 
     @GetMapping
     public WeatherDto getWeather(HttpSession session) {
