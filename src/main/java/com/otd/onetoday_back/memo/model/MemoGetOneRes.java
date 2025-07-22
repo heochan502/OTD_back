@@ -1,4 +1,4 @@
-package com.otd.onetoday_back.model;
+package com.otd.onetoday_back.memo.model;
 
 public class MemoGetOneRes {
     private int id;

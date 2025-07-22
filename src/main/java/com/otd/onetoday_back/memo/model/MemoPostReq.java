@@ -1,4 +1,4 @@
-package com.otd.onetoday_back.model;
+package com.otd.onetoday_back.memo.model;
 
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,5 +10,4 @@ public class MemoPostReq {
     private String title;
     private String content;
     private MultipartFile memoImageFile;
-
 }

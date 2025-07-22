@@ -1,4 +1,4 @@
-package com.otd.onetoday_back.config.model;
+package com.otd.onetoday_back.memo.config.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

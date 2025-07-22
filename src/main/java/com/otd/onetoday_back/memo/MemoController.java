@@ -1,10 +1,9 @@
-package com.otd.onetoday_back;
-
-import com.otd.onetoday_back.config.model.ResultResponse;
-import com.otd.onetoday_back.model.*;
+package com.otd.onetoday_back.memo;
+import com.otd.onetoday_back.memo.MemoService;
+import com.otd.onetoday_back.memo.config.model.ResultResponse;
+import com.otd.onetoday_back.memo.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/otd/memo")
+@CrossOrigin(origins = "*")
 public class MemoController {
     private final MemoService memoService;
 

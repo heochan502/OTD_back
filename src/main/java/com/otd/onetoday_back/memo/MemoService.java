@@ -1,7 +1,7 @@
-package com.otd.onetoday_back;
+package com.otd.onetoday_back.memo;
 
 //import com.otd.onetoday_back.config.model.ResultResponse;
-import com.otd.onetoday_back.model.*;
+import com.otd.onetoday_back.memo.model.*;
 import lombok.RequiredArgsConstructor;
 //import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class MemoService {
 
 //    public int save(MemoPostReq req) { return memoMapper.save(req); }
     @Value("${file.upload-dir}")
-    public String uploadDir;
+    private String uploadDir;
     public MemoPostAnduploadRes saveMemoAndHandleUpload(int userId, MemoPostReq req) {
         int newMemoId = 111;
 

@@ -1,6 +1,6 @@
-package com.otd.onetoday_back;
+package com.otd.onetoday_back.memo;
 
-import com.otd.onetoday_back.model.*;
+import com.otd.onetoday_back.memo.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
