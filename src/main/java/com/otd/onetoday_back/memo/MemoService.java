@@ -28,38 +28,41 @@ public class MemoService {
     public MemoPostAnduploadRes saveMemoAndHandleUpload(int userId, MemoPostReq req) {
         int newMemoId = 111;
 
-        UploadResponse uploadResponse;
-        MultipartFile memoImageFile = req.getMemoImageFile();
+        UploadResponse uploadResponse = null;
+        List<MultipartFile> memoImageFiles = req.getMemoImageFiles();
 
-        if(memoImageFile != null && !memoImageFile.isEmpty()) {
+        if(memoImageFiles != null && !memoImageFiles.isEmpty()) {
             try {
                 Path uploadPath =  Paths.get(uploadDir);
                 if(!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                     log.info("업로드 디렉토리 생성: {}", uploadPath.toAbsolutePath());
                 }
-                String originalFilename = memoImageFile.getOriginalFilename();
-                String fileExtension = "";
+                for(MultipartFiles memoImageFiles : memoImageFiles) {
+                    if(file == null || file.isEmpty()) continue;
+
+                    String originalFilename = file.getOriginalFilename();
+                    String fileExtension = "";
                 if (originalFilename != null && originalFilename.contains(".")) {
                     fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 }
-                String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
-                Path filePath = uploadPath.resolve(uniqueFileName);
+                    String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+                    Path filePath = uploadPath.resolve(uniqueFileName);
+                    Files.copy(memoImageFiles.getInputStream(), filePath);
 
-                Files.copy(memoImageFile.getInputStream(), filePath);
+                    String fileUrl = "/uploads/" + uniqueFileName;
+                    uploadResponse = new List<UploadResponse>(fileUrl, originalFilename, "이미지 업로드 성공");
+                }
 
-                String fileUrl = "/uploads/" + uniqueFileName;
-
-                uploadResponse = new UploadResponse(fileUrl, originalFilename, "이미지 업로드 성공");
             } catch (IOException e) {
                 log.error("이미지 업로드 실패: {}", e.getMessage(), e);
-                uploadResponse = new UploadResponse(null, memoImageFile.getOriginalFilename(), "파일 업로드 실패: " + e.getMessage());
+                uploadResponse.add(new UploadResponse(null, null, "이미지 업로드 실패");
             }
         } else {
             log.error("업로드할 파일이 없거나 비어 있습니다");
-            uploadResponse = new UploadResponse(null, null, "파일 없음");
+            uploadResponse.add(new UploadResponse(null, null, "파일 없음"));
         }
-        return new MemoPostAnduploadRes(newMemoId, uploadResponse);
+        return new MemoPostAnduploadRes(newMemoId, uploadResponses);
     }
     public List<MemoGetRes> findAll(MemoGetReq req) {
         return memoMapper.findAll(req);

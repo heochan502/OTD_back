@@ -27,11 +27,15 @@ public class MemoController {
     public ResultResponse<MemoPostAnduploadRes> postMemo(
             @PathVariable("userId") int userId,
             @RequestPart("req") MemoPostReq dto,
-            @RequestPart(value = "memoImageFile", required = false) MultipartFile memoImageFile)
+            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles)
 {
-    log.info("userId:{}, req:{}, memoImageFile:{}",
-            userId, dto, memoImageFile != null ? memoImageFile.getOriginalFilename() : "No file");
-    dto.setMemoImageFile(memoImageFile);
+    log.info("userId:{}, req:{}, memoImageFiles:{}",
+            userId, dto, (memoImageFiles != null)
+                    ? memoImageFiles.stream()
+                    .map(MultipartFile:: getOriginalFilename)
+                    .toList()
+                    : "No files");
+    dto.setMemoImageFiles(memoImageFiles);
     MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, dto);
     return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
 }
