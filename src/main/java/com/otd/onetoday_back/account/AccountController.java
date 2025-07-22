@@ -40,7 +40,7 @@ public class AccountController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
-        log.info(" changed  : {}" ,req);
+        log.info("changed  : {}" ,req);
         AccountLoginRes result = accountService.login(req);
 
         if(result == null) {
@@ -48,7 +48,7 @@ public class AccountController {
         }
         //세션 처리
         HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberNoLogin());//확인하기
-        log.info(" MEMBER_ID_NAME  : {}" , result.getMemberNoLogin());
+
 
         return ResponseEntity.ok(result);
     }
