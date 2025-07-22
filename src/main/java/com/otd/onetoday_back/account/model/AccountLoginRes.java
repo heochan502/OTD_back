@@ -11,11 +11,6 @@ import java.util.Date;
 @Setter
 public class AccountLoginRes {
     private int memberNoLogin;
-    private String memberId;
-    private String email;
-    private String name;
-    private String birthDate;
-    private String memberNick;
     @JsonIgnore // 출력안됨
     private String memberPw;
 }

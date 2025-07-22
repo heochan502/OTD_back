@@ -8,4 +8,5 @@ public interface AccountMapper {
 
     AccountLoginRes findByLogin( AccountLoginReq req);
     int save(AccountJoinReq req);
+    AccountProfileRes findByMemberId(AccountProfileReq req);
 }

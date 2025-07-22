@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -24,6 +26,7 @@ public class AccountService {
     public AccountLoginRes login(AccountLoginReq req)
     {
         AccountLoginRes res = accountMapper.findByLogin(req);
+        log.info("AccountLoginRes: memberNoLogin={}, memberPw={}", res.getMemberNoLogin(), res.getMemberPw());
         log.info("id:" + req.getMemberId());
         //비밀번호 체크
         if( res == null ||!BCrypt.checkpw(req.getMemberPw(), res.getMemberPw()))
@@ -31,5 +34,9 @@ public class AccountService {
             return null; // 비밀번호가 다르면 null 처리
         }
         return res;
+    }
+    public AccountProfileRes profile(AccountProfileReq req) {
+        AccountProfileRes result = accountMapper.findByMemberId(req);
+        return result;
     }
 }

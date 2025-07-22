@@ -6,6 +6,7 @@ import com.otd.onetoday_back.common.util.HttpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -56,7 +57,7 @@ public class AccountController {
     @GetMapping("/check")
     public ResponseEntity<?> check(HttpServletRequest httpReq) {
         Integer id = (Integer)HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-         log.info("id: {}", id);
+        log.info("id: {}", id);
         return ResponseEntity.ok(id);
     }
 
@@ -65,5 +66,18 @@ public class AccountController {
         HttpUtils.removeSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         return ResponseEntity.ok(1);
     }
-
+    @GetMapping
+    public ResponseEntity<?> profile(HttpServletRequest httpReq) {
+        Integer id = (Integer)HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        log.info("프로필 요청 세션 id: {}", id);
+        if (id == null) {
+            log.warn("세션 아이디가 없습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        AccountProfileReq req = new AccountProfileReq();
+        req.setMemberNoLogin(id);
+        AccountProfileRes profile = accountService.profile(req);
+        log.info("프로필 데이터 반환: {}", profile);
+        return ResponseEntity.ok(profile);
+    }
 }
