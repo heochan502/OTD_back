@@ -9,15 +9,20 @@
         re_content = #{content},
         re_repeat = #{repeat},
         re_alarm = #{alarm}
-
-        <if test="#{repeat} == true">
-            ;
-            INSERT INTO reminder_repeat(re_id, rr_dow
-            VALUES
-            <foreach collection="repeatDow" item="dow" separator=",">
-                (#{id}, #{dow})
-            </foreach>
-
+        <if test="date != null and date != ''">
+            , re_date = #{date}
         </if>
     </insert>
+    <insert id="postDow">
+        INSERT INTO reminder_repeat(re_id, rr_dow)
+        VALUES
+        <foreach collection="repeatDow" item="dow" separator=",">
+            (#{id}, #{dow})
+        </foreach>
+    </insert>
+    <select id="findByMonth">
+        SELECT re_id AS id, re_title AS title, re_date AS date
+        FROM reminder
+        WHERE re_date LIKE CONCAT(#{year},'.'#{month},'.__') AND re_id = #{memberId}
+    </select>
 </mapper>

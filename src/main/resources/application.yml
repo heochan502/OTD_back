@@ -21,3 +21,9 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: false
