@@ -23,6 +23,7 @@ public class AccountService {
         log.info(" changed2  : {}" ,req.getMemberId());
         return accountMapper.save(changedReq);
     }
+
     public AccountLoginRes login(AccountLoginReq req)
     {
         AccountLoginRes res = accountMapper.findByLogin(req);
@@ -35,9 +36,15 @@ public class AccountService {
         }
         return res;
     }
+
     public AccountProfileRes getProfile(int memberNoLogin) {
         return accountMapper.findProfileById(memberNoLogin);
     }
+
+    public int updateProfile(AccountUpdateReq req) {
+        return accountMapper.updateProfile(req);
+    }
+
     public boolean existsByMemberId(String memberId) {
         return accountMapper.existsByMemberId(memberId) > 0;
     }
@@ -49,4 +56,5 @@ public class AccountService {
     public boolean existsByMemberNick(String memberNick) {
         return accountMapper.existsByMemberNick(memberNick) > 0;
     }
+
 }
