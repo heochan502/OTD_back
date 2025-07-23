@@ -14,7 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Slf4j
@@ -34,11 +35,59 @@ public class AccountController {
                 || !StringUtils.hasLength(req.getMemberNick())) {
             return ResponseEntity.badRequest().build(); //state: 400
         }
-        log.info(" changed  : {}" ,req.getMemberNick());
-        int result =  accountService.join(req);
-        return ResponseEntity.ok(result); //state: 200
+
+        if(accountService.existsByMemberId(req.getMemberId())) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "이미 사용중인 아이디입니다.");
+        return ResponseEntity.status(409).body(response);
     }
 
+        if(accountService.existsByEmail(req.getEmail())) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "이미 사용중인 이메일입니다.");
+        return ResponseEntity.status(409).body(response);
+    }
+
+        if(accountService.existsByMemberNick(req.getMemberNick())) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "이미 사용중인 닉네임입니다.");
+        return ResponseEntity.status(409).body(response);
+    }
+
+        log.info(" changed  : {}" ,req.getMemberNick());
+    int result =  accountService.join(req);
+        return ResponseEntity.ok(result);
+}
+
+
+@GetMapping("/check/id/{memberId}")
+public ResponseEntity<?> checkMemberId(@PathVariable String memberId) {
+    boolean exists = accountService.existsByMemberId(memberId);
+    Map<String, Object> response = new HashMap<>();
+    response.put("available", !exists);
+    response.put("message", exists ? "이미 사용중인 아이디입니다." : "사용 가능한 아이디입니다.");
+    return ResponseEntity.ok(response);
+}
+
+
+@GetMapping("/check/email/{email}")
+public ResponseEntity<?> checkEmail(@PathVariable String email) {
+    boolean exists = accountService.existsByEmail(email);
+    Map<String, Object> response = new HashMap<>();
+    response.put("available", !exists);
+    response.put("message", exists ? "이미 사용중인 이메일입니다." : "사용 가능한 이메일입니다.");
+    return ResponseEntity.ok(response);
+}
+
+
+@GetMapping("/check/nickname/{nickname}")
+public ResponseEntity<?> checkNickname(@PathVariable String nickname) {
+    boolean exists = accountService.existsByMemberNick(nickname);
+    Map<String, Object> response = new HashMap<>();
+    response.put("available", !exists);
+    response.put("message", exists ? "이미 사용중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
+    return ResponseEntity.ok(response);
+}
     @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
         log.info(" changed  : {}" ,req);
@@ -66,18 +115,17 @@ public class AccountController {
         HttpUtils.removeSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         return ResponseEntity.ok(1);
     }
-    @GetMapping
-    public ResponseEntity<?> profile(HttpServletRequest httpReq) {
-        Integer id = (Integer)HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        log.info("프로필 요청 세션 id: {}", id);
-        if (id == null) {
-            log.warn("세션 아이디가 없습니다.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @GetMapping("/profile")
+    public ResponseEntity<?> getMyProfile(HttpServletRequest httpReq) {
+        Integer memberNoLogin = (Integer)HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        if(memberNoLogin == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
         }
-        AccountProfileReq req = new AccountProfileReq();
-        req.setMemberNoLogin(id);
-        AccountProfileRes profile = accountService.profile(req);
-        log.info("프로필 데이터 반환: {}", profile);
+
+        AccountProfileRes profile = accountService.getProfile(memberNoLogin);
+        if(profile == null) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(profile);
     }
 }

@@ -8,5 +8,8 @@ public interface AccountMapper {
 
     AccountLoginRes findByLogin( AccountLoginReq req);
     int save(AccountJoinReq req);
-    AccountProfileRes findByMemberId(AccountProfileReq req);
+    AccountProfileRes findProfileById(int memberNoLogin);
+    int existsByMemberId(String memberId);
+    int existsByEmail(String email);
+    int existsByMemberNick(String memberNick);
 }

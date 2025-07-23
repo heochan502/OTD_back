@@ -16,7 +16,7 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
-    public int join (AccountJoinReq req)
+    public int join(AccountJoinReq req)
     {
         String hashedPw = BCrypt.hashpw(req.getMemberPw(), BCrypt.gensalt());
         AccountJoinReq changedReq = new AccountJoinReq(req.getMemberId(),hashedPw,req.getEmail(),req.getName(),req.getBirthDate(),req.getMemberNick());
@@ -35,8 +35,18 @@ public class AccountService {
         }
         return res;
     }
-    public AccountProfileRes profile(AccountProfileReq req) {
-        AccountProfileRes result = accountMapper.findByMemberId(req);
-        return result;
+    public AccountProfileRes getProfile(int memberNoLogin) {
+        return accountMapper.findProfileById(memberNoLogin);
+    }
+    public boolean existsByMemberId(String memberId) {
+        return accountMapper.existsByMemberId(memberId) > 0;
+    }
+
+    public boolean existsByEmail(String email) {
+        return accountMapper.existsByEmail(email) > 0;
+    }
+
+    public boolean existsByMemberNick(String memberNick) {
+        return accountMapper.existsByMemberNick(memberNick) > 0;
     }
 }

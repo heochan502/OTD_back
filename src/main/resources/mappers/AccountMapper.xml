@@ -12,10 +12,27 @@
         FROM member
         WHERE member_id = #{memberId}
     </select>
-    <select id="findByMemberId">
-        SELECT member_id, email, name, birth_date, member_nick
+    <select id="findProfileById" parameterType="int"
+            resultType="com.otd.onetoday_back.account.model.AccountProfileRes">
+        SELECT
+        member_no_login AS memberNoLogin,
+        member_id AS memberId,
+        email,
+        name,
+        birth_date AS birthDate,
+        member_nick AS memberNick
         FROM member
-        WHERE member_id = #{memberId}
-        AND member_no_login = #{memberNoLogin}
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
+    <select id="existsByMemberId" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM member WHERE member_id = #{memberId}
+    </select>
+
+    <select id="existsByEmail" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM member WHERE email = #{email}
+    </select>
+
+    <select id="existsByMemberNick" parameterType="string" resultType="int">
+        SELECT COUNT(*) FROM member WHERE member_nick = #{memberNick}
     </select>
 </mapper>
