@@ -56,4 +56,9 @@ public class ReminderController {
         log.info("result:{}", result);
         return ResponseEntity.ok(result);
     }
+
+    @PutMapping
+    public ResponseEntity<?> PutReminder(HttpServletRequest httpReq, int id){
+        return null;
+    }
 }
