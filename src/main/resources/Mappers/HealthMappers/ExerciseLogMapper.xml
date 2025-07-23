@@ -3,10 +3,9 @@
 <mapper namespace="com.otd.onetoday_back.health.ExerciseLogMapper">
 <!--운동기록 추가하기-->
     <insert id="saveExerciseLog">
-        INSERT INTO exerciselog( exercise_id, member_no, exercise_datetime, exercise_kcal, exercise_duration, effort_level)
+        INSERT INTO exerciselog( exercise_id, exercise_datetime, exercise_kcal, exercise_duration, effort_level)
         VALUES(
               #{exerciseId}
-            , #{memberNo}
             , #{exerciseDatetime}
             , #{exerciseKcal}
             , #{exerciseDuration}
@@ -21,15 +20,16 @@
           JOIN exercise b
             ON a.exercise_id = b.exercise_id
          WHERE a.exerciselog_id = #{exerciselogId}
+        AND a.member_no = #{memberId}
     </select>
 
 <!-- 운동 목록 조회 -->
-    <select id="findAllByMemberNoOrderByExerciselogIdDesc">
+    <select id="findAllByMemberIdOrderByExerciselogIdDesc">
         SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_datetime
         FROM exerciselog a
         JOIN exercise b
         ON a.exercise_id = b.exercise_id
-        WHERE a.member_no = #{memberNo}
+        WHERE a.member_no = #{memberId}
         ORDER BY a.exerciselog_id DESC
 
     </select>
@@ -43,11 +43,13 @@
     , exercise_duration = #{exerciseDuration}
     , effort_level = #{effortLevel}
     WHERE exerciselog_id = #{exerciselogId}
+    AND member_no = #{memberId}
 </update>
 
 <!--    운동기록삭제-->
     <delete id="deleteByExerciselogId">
         DELETE FROM exerciselog
         WHERE exerciselog_id = #{exerciselogId}
+        AND member_no = #{memberId}
     </delete>
 </mapper>
