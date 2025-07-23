@@ -1,35 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.otd.onetoday_back.MemoMapper">
+<mapper namespace="com.otd.onetoday_back.memo.MemoMapper">
     <insert id="save">
         INSERT INTO memo
-        SET title = #{title}, content = #{content}
-
+        (memo_name, memo_content)
+        VALUES (#{title}, #{content})
     </insert>
-    <select id="findAll">
-        SELECT id, title, content
-        FROM memo
-        <if test="searchText != null and searchText != '' ">
-            <bind name="pattern" value="'%' + _parameter.getSearchText() + '%'" />
-        WHERE title LIKE #{pattern}
-        OR content LIKE '%${searchText}%'
-        </if>
-        ORDER BY id DESC
 
+    <select id="findAll" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
+        SELECT
+            memo_id AS id,
+            memo_name AS title,
+            memo_content AS content,
+            created_at
+        FROM memo
+        <where>
+        <if test="searchText != null and searchText != '' ">
+            <bind name="pattern" value="'%' + searchText + '%'" />
+        (memo_name LIKE #{pattern}
+         OR memo_content LIKE #{pattern})
+        </if>
+        </where>
+        ORDER BY memo_id DESC
     </select>
-    <select id="findById">
-        FROM *
-        UPDATE memo
-        WHERE id=#{id}
+
+    <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
+        SELECT
+            memo_id AS id,
+            memo_name AS title,
+            memo_content AS content,
+            created_at
+        FROM memo
+        WHERE memo_id = #{id}
     </select>
     <update id="modify">
         UPDATE memo
-        SET title = #{title}, content = #{content}
-        WHERE id = #{id}
+        SET memo_name = #{title},
+            memo_content = #{content},
+            memo_image = #{image}
+        WHERE memo_id = #{id}
     </update>
 
     <delete id="deleteById">
         DELETE FROM memo
-        WHERE id = #{id}
+        WHERE memo_id = #{id}
     </delete>
 </mapper>

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +29,7 @@ public class MemoService {
     public MemoPostAnduploadRes saveMemoAndHandleUpload(int userId, MemoPostReq req) {
         int newMemoId = 111;
 
-        UploadResponse uploadResponse = null;
+        List<UploadResponse> uploadResponseList = new ArrayList<>();
         List<MultipartFile> memoImageFiles = req.getMemoImageFiles();
 
         if(memoImageFiles != null && !memoImageFiles.isEmpty()) {
@@ -38,7 +39,8 @@ public class MemoService {
                     Files.createDirectories(uploadPath);
                     log.info("업로드 디렉토리 생성: {}", uploadPath.toAbsolutePath());
                 }
-                for(MultipartFiles memoImageFiles : memoImageFiles) {
+
+                for(MultipartFile file : memoImageFiles) {
                     if(file == null || file.isEmpty()) continue;
 
                     String originalFilename = file.getOriginalFilename();
@@ -48,21 +50,21 @@ public class MemoService {
                 }
                     String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
                     Path filePath = uploadPath.resolve(uniqueFileName);
-                    Files.copy(memoImageFiles.getInputStream(), filePath);
+                    Files.copy(file.getInputStream(), filePath);
 
                     String fileUrl = "/uploads/" + uniqueFileName;
-                    uploadResponse = new List<UploadResponse>(fileUrl, originalFilename, "이미지 업로드 성공");
+                    uploadResponseList.add(new UploadResponse(fileUrl, originalFilename, "이미지 업로드 성공"));
                 }
 
             } catch (IOException e) {
                 log.error("이미지 업로드 실패: {}", e.getMessage(), e);
-                uploadResponse.add(new UploadResponse(null, null, "이미지 업로드 실패");
+                uploadResponseList.add(new UploadResponse(null, null, "이미지 업로드 실패"));
             }
         } else {
             log.error("업로드할 파일이 없거나 비어 있습니다");
-            uploadResponse.add(new UploadResponse(null, null, "파일 없음"));
+            uploadResponseList.add(new UploadResponse(null, null, "파일 없음"));
         }
-        return new MemoPostAnduploadRes(newMemoId, uploadResponses);
+        return new MemoPostAnduploadRes(newMemoId, uploadResponseList);
     }
     public List<MemoGetRes> findAll(MemoGetReq req) {
         return memoMapper.findAll(req);

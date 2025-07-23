@@ -26,17 +26,18 @@ public class MemoController {
     @PostMapping(value = "/{userId}", consumes = {"multipart/form-data"})
     public ResultResponse<MemoPostAnduploadRes> postMemo(
             @PathVariable("userId") int userId,
-            @RequestPart("req") MemoPostReq dto,
-            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles)
+            @ModelAttribute MemoPostReq req)
+//            @RequestPart("req") MemoPostReq dto,
+//            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles)
 {
-    log.info("userId:{}, req:{}, memoImageFiles:{}",
-            userId, dto, (memoImageFiles != null)
-                    ? memoImageFiles.stream()
+    log.info("userId:{}, req (title):{}, memoImageFiles:{}",
+            userId, req.getTitle(),
+            (req.getMemoImageFiles() != null)
+                    ? req.getMemoImageFiles().stream()
                     .map(MultipartFile:: getOriginalFilename)
                     .toList()
                     : "No files");
-    dto.setMemoImageFiles(memoImageFiles);
-    MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, dto);
+    MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, req);
     return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
 }
 
