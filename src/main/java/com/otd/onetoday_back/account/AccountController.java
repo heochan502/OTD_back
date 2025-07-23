@@ -49,7 +49,6 @@ public class AccountController {
         //세션 처리
         HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberNoLogin());//확인하기
 
-
         return ResponseEntity.ok(result);
     }
 

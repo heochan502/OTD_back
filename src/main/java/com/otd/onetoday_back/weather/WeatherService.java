@@ -1,6 +1,7 @@
 package com.otd.onetoday_back.weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otd.onetoday_back.weather.config.constants.ConstKma;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import com.otd.onetoday_back.weather.model.json.Item;
@@ -23,8 +24,7 @@ public class WeatherService {
 
     private final WeatherMapper weatherMapper;
     private final WeatherFeignClient weatherFeignClient;
-
-    private final String API_KEY = "fte7et4WjQ2QQTSP51SJ6VZ%2FXA3aDUYv054aZFUsGdrVOKFJxQnmrKJGh%2Box%2FcnwsvpeJmLazXr4je1K01Uoow%3D%3D";
+    private final ConstKma constKma;
 
     private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱용
 
@@ -39,7 +39,7 @@ public class WeatherService {
 
     public WeatherDto getWeatherByMemberId(int memberId) {
         LocationDto location = weatherMapper.findLocalByMemberId(memberId);
-        log.info("memberId:" + memberId);
+        log.info("memberId: {}", memberId);
         // 실시간 날짜/시간
         String[] base = BaseTime.getBaseDateTime();
 
@@ -48,8 +48,8 @@ public class WeatherService {
 
         // Feign 호출
         String response = weatherFeignClient.getUltraSrtFcst(
-                API_KEY,
-                "JSON",
+                constKma.getServiceKey(),
+                constKma.getDataType(),
                 baseDate,
                 baseTime,
                 location.getNx(),
