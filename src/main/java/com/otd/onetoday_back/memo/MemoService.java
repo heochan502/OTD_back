@@ -1,6 +1,5 @@
 package com.otd.onetoday_back.memo;
 
-//import com.otd.onetoday_back.config.model.ResultResponse;
 import com.otd.onetoday_back.memo.model.*;
 import lombok.RequiredArgsConstructor;
 //import lombok.Value;
@@ -76,8 +75,22 @@ public class MemoService {
         }
         return new MemoPostAnduploadRes(newMemoId, uploadResponseList);
     }
-    public List<MemoGetRes> findAll(MemoGetReq req) {
-        return memoMapper.findAll(req);
+    public MemoListRes findAll(MemoGetReq req) {
+        int actualCurrentPage = (req.getCurrentPage() != null && req.getCurrentPage() > 0) ? req.getCurrentPage() : 1;
+        int actualPageSize = (req.getPageSize() != null && req.getPageSize() > 0) ? req.getPageSize() : 5; // 기본값을 5로 설정
+
+        // Offset
+        int offset = (actualCurrentPage - 1) * actualPageSize;
+
+        // MemoGetReq 객체 실제 사용 값
+        req.setCurrentPage(actualCurrentPage);
+        req.setPageSize(actualPageSize);
+        req.setOffset(offset);
+
+        List<MemoGetRes> memoList = memoMapper.findAll(req);
+        int totalCount = memoMapper.getTotalCount(req);
+
+        return new MemoListRes(memoList, totalCount);
     }
     public MemoGetOneRes findById(int id) {
         return memoMapper.findById(id);

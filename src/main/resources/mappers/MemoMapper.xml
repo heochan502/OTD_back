@@ -1,43 +1,66 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.otd.onetoday_back.memo.MemoMapper">
-    <insert id="save">
-        INSERT INTO memo
-        (memo_name, memo_content)
-        VALUES (#{title}, #{content})
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO memo (
+        member_no_login,
+        memo_name,
+        memo_content
+        ) VALUES (
+        #{memberNoLogin},
+        #{title},
+        #{content}
+        )
     </insert>
+
+    <update id="updateMemoImage">
+        UPDATE memo
+        SET memo_image = #{memoImage}
+        WHERE memo_id = #{memoId}
+    </update>
 
     <select id="findAll" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
         SELECT
-            memo_id AS id,
-            memo_name AS title,
-            memo_content AS content,
-            created_at
+        memo_id AS id,
+        memo_name AS title,
+        memo_content AS content,
+        created_at
         FROM memo
         <where>
-        <if test="searchText != null and searchText != '' ">
-            <bind name="pattern" value="'%' + searchText + '%'" />
-        (memo_name LIKE #{pattern}
-         OR memo_content LIKE #{pattern})
-        </if>
+            <if test="searchText != null and searchText != '' ">
+                <bind name="pattern" value="'%' + searchText + '%'" />
+                (memo_name LIKE #{pattern}
+                OR memo_content LIKE #{pattern})
+            </if>
         </where>
-        ORDER BY memo_id DESC
-    </select>
+        ORDER BY created_at DESC, memo_id DESC  LIMIT #{pageSize} OFFSET #{offset}; </select>
 
-    <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
+    <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetOneRes">
         SELECT
-            memo_id AS id,
-            memo_name AS title,
-            memo_content AS content,
-            created_at
+        memo_id AS id,
+        memo_name AS title,
+        memo_content AS content,
+        created_at,
+        memo_image AS imageUrl
         FROM memo
         WHERE memo_id = #{id}
     </select>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*)
+        FROM memo
+        <where> <if test="searchText != null and searchText != '' ">
+            <bind name="pattern" value="'%' + searchText + '%'" />
+            (memo_name LIKE #{pattern}
+            OR memo_content LIKE #{pattern})
+        </if>
+        </where>
+    </select>
+
     <update id="modify">
         UPDATE memo
         SET memo_name = #{title},
-            memo_content = #{content},
-            memo_image = #{image}
+        memo_content = #{content}
         WHERE memo_id = #{id}
     </update>
 

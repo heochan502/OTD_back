@@ -46,17 +46,16 @@ public class MemoController {
 }
 
     @GetMapping
-    public ResultResponse<List<MemoGetRes>> getMemo(@ModelAttribute MemoGetReq req) {
+    public ResultResponse<MemoListRes> getMemo(@ModelAttribute MemoGetReq req) {
         log.info("req={}", req);
-        List<MemoGetRes> result = memoService.findAll(req);
-        String message = String.format("rows: %d", result.size());
-        return new ResultResponse<>(message, result);
+        MemoListRes result = memoService.findAll(req);
+        return new ResultResponse<>("모든 메모 조회 성공", result);
     }
     @GetMapping("{memoId}")
     public ResultResponse<MemoGetOneRes> getMemo(@PathVariable int memoId) {
         log.info("memoId={}", memoId);
         MemoGetOneRes result = memoService.findById(memoId);
-        return new ResultResponse<>("메모 조회 성공", result);
+        return new ResultResponse<>("단일 메모 조회 성공", result);
     }
     @PutMapping
     public ResultResponse<Integer> putMemo(@RequestBody MemoPutReq req) {
