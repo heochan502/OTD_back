@@ -1,7 +1,9 @@
 package com.otd.onetoday_back.common.util;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class HttpUtils {
     //세션 데이터 저장
     public static void setSession(HttpServletRequest req, String key, Object value) {

@@ -24,7 +24,8 @@ public class AccountService {
     public AccountLoginRes login(AccountLoginReq req)
     {
         AccountLoginRes res = accountMapper.findByLogin(req);
-        log.info("id:" + req.getMemberId());
+        log.info("id:{}", res.getMemberNoLogin());
+        log.info("res: {}", res);
         //비밀번호 체크
         if( res == null ||!BCrypt.checkpw(req.getMemberPw(), res.getMemberPw()))
         {

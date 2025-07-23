@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.otd.onetoday_back.weather.location.LocationMapper">
+    <select id="getLocalNameAll">
+        SELECT city, county, town, nx, ny
+        FROM locallist
+<!--            <if test="searchText != null and searchText != ''">-->
+<!--                <bind name="pattern" value="'%' + _parameter.getSearchText() + '%'"/>-->
+<!--                WHERE city LIKE #{pattern}-->
+<!--                OR county LIKE #{pattern}-->
+<!--                OR town LIKE #{pattern}-->
+<!--            </if>-->
+    </select>
+</mapper>
