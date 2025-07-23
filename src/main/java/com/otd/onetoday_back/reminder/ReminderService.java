@@ -1,6 +1,7 @@
 package com.otd.onetoday_back.reminder;
 
 import com.otd.onetoday_back.reminder.model.ReminderGetReq;
+import com.otd.onetoday_back.reminder.model.ReminderGetOneRes;
 import com.otd.onetoday_back.reminder.model.ReminderGetRes;
 import com.otd.onetoday_back.reminder.model.ReminderPostReq;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,11 @@ public class ReminderService {
         return reminderMapper.postDow(req);
     }
 
-    public List<ReminderGetRes> getMonth(ReminderGetReq req){
+    public List<ReminderGetOneRes> findByMonth(ReminderGetReq req){
         return reminderMapper.findByMonth(req);
+    }
+
+    public List<ReminderGetRes> findByDay(ReminderGetReq req){
+        return reminderMapper.findByDay(req);
     }
 }

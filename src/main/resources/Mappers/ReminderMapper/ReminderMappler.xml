@@ -23,6 +23,11 @@
     <select id="findByMonth">
         SELECT re_id AS id, re_title AS title, re_date AS date
         FROM reminder
-        WHERE re_date LIKE CONCAT(#{year},'.'#{month},'.__') AND re_id = #{memberId}
+        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-__') AND member_no_id = #{memberId}
+    </select>
+    <select id="findByDay">
+        SELECT re_id AS id, re_title AS title, re_date AS date
+        FROM reminder
+        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-',#{day}') AND member_no_id = #{memberId}
     </select>
 </mapper>
