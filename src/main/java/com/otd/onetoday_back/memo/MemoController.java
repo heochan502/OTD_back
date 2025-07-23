@@ -26,17 +26,21 @@ public class MemoController {
     @PostMapping(value = "/{userId}", consumes = {"multipart/form-data"})
     public ResultResponse<MemoPostAnduploadRes> postMemo(
             @PathVariable("userId") int userId,
-            @ModelAttribute MemoPostReq req)
-//            @RequestPart("req") MemoPostReq dto,
-//            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles)
+            @RequestPart("memoData") MemoPostReq req,
+            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles)
+//          @RequestPart("req") MemoPostReq dto,
 {
+    log.info("DEBUG: 컨트롤러에서 받은 MemoPostReq 객체 전체: {}", req);
+    log.info("DEBUG: req.getId(): {}, req.getMemberNoLogin(): {}, req.getTitle(): {}, req.getContent(): {}",
+            req.getId(), req.getMemberNoLogin(), req.getTitle(), req.getContent());
     log.info("userId:{}, req (title):{}, memoImageFiles:{}",
             userId, req.getTitle(),
-            (req.getMemoImageFiles() != null)
+            (memoImageFiles != null)
                     ? req.getMemoImageFiles().stream()
                     .map(MultipartFile:: getOriginalFilename)
                     .toList()
                     : "No files");
+    req.setMemoImageFiles(memoImageFiles);
     MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, req);
     return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
 }

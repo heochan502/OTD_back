@@ -27,7 +27,10 @@ public class MemoService {
     @Value("${file.upload-dir}")
     private String uploadDir;
     public MemoPostAnduploadRes saveMemoAndHandleUpload(int userId, MemoPostReq req) {
-        int newMemoId = 111;
+        req.setMemberNoLogin(userId);
+
+        memoMapper.save(req);
+        int newMemoId = req.getId();
 
         List<UploadResponse> uploadResponseList = new ArrayList<>();
         List<MultipartFile> memoImageFiles = req.getMemoImageFiles();
@@ -39,6 +42,8 @@ public class MemoService {
                     Files.createDirectories(uploadPath);
                     log.info("업로드 디렉토리 생성: {}", uploadPath.toAbsolutePath());
                 }
+                // 업로드된 파일 이름을 저장할 리스트 생성
+                List<String> uploadFileNames = new ArrayList<>();
 
                 for(MultipartFile file : memoImageFiles) {
                     if(file == null || file.isEmpty()) continue;
@@ -54,6 +59,11 @@ public class MemoService {
 
                     String fileUrl = "/uploads/" + uniqueFileName;
                     uploadResponseList.add(new UploadResponse(fileUrl, originalFilename, "이미지 업로드 성공"));
+                    uploadFileNames.add(uniqueFileName);
+                }
+                if(!uploadResponseList.isEmpty()) {
+                    String firstImageFileName = uploadResponseList.get(0).getFileName();
+                    memoMapper.updateMemoImage(newMemoId, firstImageFileName);
                 }
 
             } catch (IOException e) {

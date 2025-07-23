@@ -9,14 +9,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemoPostReq {
+    private Integer id;
+    private Integer memberNoLogin;
     private String title;
     private String content;
     private List<MultipartFile> memoImageFiles;
 
-    public List<MultipartFile> getMemoImageFiles() {
-        return memoImageFiles;
-    }
-    public void setMemoImageFiles(List<MultipartFile> memoImageFiles) {
-        this.memoImageFiles = memoImageFiles;
-    }
+//    public List<MultipartFile> getMemoImageFiles() {
+//        return memoImageFiles;
+//    }
+//    public void setMemoImageFiles(List<MultipartFile> memoImageFiles) {
+//        this.memoImageFiles = memoImageFiles;
+//    }
 }
