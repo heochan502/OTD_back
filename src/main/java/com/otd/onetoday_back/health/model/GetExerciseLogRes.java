@@ -2,7 +2,6 @@ package com.otd.onetoday_back.health.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
@@ -11,7 +10,6 @@ import lombok.ToString;
 public class GetExerciseLogRes {
     private int exerciselogId;
     private int exerciseDuration;
-    private String exerciseName;
+    private int exerciseId;
     private String exerciseDatetime;
-    private int memberId;
 }
