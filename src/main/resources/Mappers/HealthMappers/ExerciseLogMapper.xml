@@ -13,7 +13,7 @@
         )
     </insert>
 
-<!--    운동 상세 조회 -->
+<!--    운동기록 상세 조회 -->
     <select id="findByExerciselogId">
         SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_kcal, a.effort_level, a.exercise_datetime
           FROM exerciselog a
@@ -23,7 +23,7 @@
         AND a.member_no = #{memberId}
     </select>
 
-<!-- 운동 목록 조회 -->
+<!-- 운동기록 목록 조회 -->
     <select id="findAllByMemberIdOrderByExerciselogIdDesc">
         SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_datetime
         FROM exerciselog a
@@ -32,6 +32,12 @@
         WHERE a.member_no = #{memberId}
         ORDER BY a.exerciselog_id DESC
 
+    </select>
+
+<!--    운동 종류 -->
+    <select id="findAllByExercise">
+        SELECT *
+        FROM exercise;
     </select>
 
 <!--    운동 목록 수정 -->

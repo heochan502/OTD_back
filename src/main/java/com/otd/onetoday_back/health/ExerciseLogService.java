@@ -38,6 +38,10 @@ public class ExerciseLogService {
         return exerciseLogMapper.findAllByMemberIdOrderByExerciselogIdDesc(loggindMemberId);
     }
 
+//    운동종목
+    public List<GetExerciseRes> findAllExercise() {
+        return exerciseLogMapper.findAllByExercise();
+    }
 //    운동기록 수정
     public int modifyByExerciselogId(PutExerciseLogReq req, int logginedMemberId) {
         PutExerciseLogDto putExerciseLogDto = PutExerciseLogDto.builder()

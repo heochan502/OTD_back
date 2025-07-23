@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/OTD/health/elog")
+@RequestMapping("/api/OTD/health")
 public class ExerciseLogController {
     private final ExerciseLogService exerciseLogService;
 
@@ -28,7 +28,7 @@ public class ExerciseLogController {
     }
 
 //    운동기록 상세조회
-    @GetMapping("{exerciseLogId}")
+    @GetMapping("/elog/{exerciseLogId}")
     public ResponseEntity<GetExerciseLogDetailRes> getDetail(HttpServletRequest httpReq, @PathVariable int exerciseLogId) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         GetExerciseLogDetailReq req = GetExerciseLogDetailReq.builder()
@@ -41,12 +41,21 @@ public class ExerciseLogController {
     }
 
 //    운동기록 목록조회
-    @GetMapping
+    @GetMapping("/elog")
     public ResponseEntity<List<GetExerciseLogRes>> getAll(HttpServletRequest httpReq) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        log.info("logginedMemberId:{}", logginedMemberId);
         List<GetExerciseLogRes> result = exerciseLogService.findAllByMemberIdOrderByExerciselogIdDesc(logginedMemberId);
         return ResponseEntity.ok(result);
     }
+
+//    운동종목
+    @GetMapping
+    public ResponseEntity<List<GetExerciseRes>> getAllExercise() {
+        List<GetExerciseRes> result = exerciseLogService.findAllExercise();
+        return ResponseEntity.ok(result);
+    }
+
 
 //    운동기록 수정
     @PutMapping
