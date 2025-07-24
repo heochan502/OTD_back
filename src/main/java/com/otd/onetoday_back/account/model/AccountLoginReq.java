@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @ToString
 public class AccountLoginReq {
     private String memberId;
