@@ -27,21 +27,21 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file: C:/2025_swstudy/OTD_back/jin/src/main/resources/memo/uploads/");
 
-        registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/")
-                .resourceChain(true)
-                .addResolver(new PathResourceResolver() {
-                    @Override
-                    protected Resource getResource(String resourcecPath, Resource location) throws IOException {
-                        Resource resource = location.createRelative(resourcecPath);
-
-                        if(resource.exists() && resource.isReadable()) {
-                            return resource;
-                        }
-
-                        return new ClassPathResource("/static/index.html");
-                    }
-                });
+//        registry.addResourceHandler("/**")
+//                .addResourceLocations("classpath:/static/")
+//                .resourceChain(true)
+//                .addResolver(new PathResourceResolver() {
+//                    @Override
+//                    protected Resource getResource(String resourcecPath, Resource location) throws IOException {
+//                        Resource resource = location.createRelative(resourcecPath);
+//
+//                        if(resource.exists() && resource.isReadable()) {
+//                            return resource;
+//                        }
+//
+//                        return new ClassPathResource("/static/index.html");
+//                    }
+//                });
     }
 
     @Override
@@ -50,5 +50,4 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .allowedMethods("*");
     }
-
 }

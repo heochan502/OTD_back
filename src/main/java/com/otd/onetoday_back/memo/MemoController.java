@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/otd/memo")
+@RequestMapping("/api/OTD/memo")
 @CrossOrigin(origins = "*")
 public class MemoController {
     private final MemoService memoService;
@@ -49,6 +49,7 @@ public class MemoController {
     public ResultResponse<MemoListRes> getMemo(@ModelAttribute MemoGetReq req) {
         log.info("req={}", req);
         MemoListRes result = memoService.findAll(req);
+        log.info("Debug: MemoListRes object: {}", result);
         return new ResultResponse<>("모든 메모 조회 성공", result);
     }
     @GetMapping("{memoId}")
