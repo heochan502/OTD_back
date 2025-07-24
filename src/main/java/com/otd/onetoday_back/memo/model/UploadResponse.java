@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UploadResponse {
     private String fileUrl;
-    private String fileName;
+    private String originalFileName;
+    private String uniqueFileName;
     private String message; // UploadResponse(String, String, String) 형식
 }
