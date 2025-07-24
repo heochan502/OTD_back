@@ -1,7 +1,5 @@
 package com.otd.onetoday_back.weather.location;
 
-import com.otd.onetoday_back.weather.location.model.LocalNameGetReq;
-import com.otd.onetoday_back.weather.location.model.LocalNameGetRes;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +19,10 @@ public class LocationController {
 
     @PostMapping("/save")
     public ResponseEntity<?> insertLocation(HttpSession session,
-                                            @RequestParam("localId") int localId) {
+                                            @RequestBody LocationDto dto) {
         Integer memberId = (Integer)session.getAttribute("memberId");
-        int result = locationService.insertLocation(memberId, localId);
+        dto.setMemberId(memberId);
+        int result = locationService.insertLocation(dto);
         return ResponseEntity.ok(result);
     }
 
