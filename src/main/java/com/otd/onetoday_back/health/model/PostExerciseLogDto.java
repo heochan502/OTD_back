@@ -13,5 +13,5 @@ public class PostExerciseLogDto {
     private String exerciseDatetime;
     private int exerciseDuration;
     private int effortLevel;
-    private int memberNo;
+    private int memberId;
 }

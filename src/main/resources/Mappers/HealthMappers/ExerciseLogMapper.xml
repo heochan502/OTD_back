@@ -4,9 +4,10 @@
 
 <!--운동기록 추가하기-->
     <insert id="saveExerciseLog">
-        INSERT INTO exerciselog( exercise_id, exercise_datetime, exercise_kcal, exercise_duration, effort_level)
+        INSERT INTO exerciselog( member_no, exercise_id, exercise_datetime, exercise_kcal, exercise_duration, effort_level)
         VALUES(
-              #{exerciseId}
+            #{memberId}
+            , #{exerciseId}
             , #{exerciseDatetime}
             , #{exerciseKcal}
             , #{exerciseDuration}

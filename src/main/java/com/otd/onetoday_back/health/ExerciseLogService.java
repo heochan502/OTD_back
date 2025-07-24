@@ -21,7 +21,7 @@ public class ExerciseLogService {
                 .exerciseDatetime(req.getExerciseDatetime())
                 .exerciseDuration(req.getExerciseDuration())
                 .effortLevel(req.getEffortLevel())
-                .memberNo(logginedMemberId)
+                .memberId(logginedMemberId)
                 .build();
 
        return exerciseLogMapper.saveExerciseLog(postExerciseLogDto);

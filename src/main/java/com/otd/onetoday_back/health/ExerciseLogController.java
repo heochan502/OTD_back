@@ -20,8 +20,9 @@ public class ExerciseLogController {
 
     //    운동기록 생성
     @PostMapping
-    public ResponseEntity<Integer> save(HttpServletRequest httpReq, @RequestBody PostExerciseLogReq req) {
+    public ResponseEntity<?> save(HttpServletRequest httpReq, @RequestBody PostExerciseLogReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        log.info("logginedMemberId={}", logginedMemberId);
         log.info("req: {}", req);
         int result = exerciseLogService.saveExerciseLog(req, logginedMemberId);
         return ResponseEntity.ok(result);
@@ -29,7 +30,7 @@ public class ExerciseLogController {
 
 //    운동기록 상세조회
     @GetMapping("/elog/{exerciseLogId}")
-    public ResponseEntity<GetExerciseLogDetailRes> getDetail(HttpServletRequest httpReq, @PathVariable int exerciseLogId) {
+    public ResponseEntity<?> getDetail(HttpServletRequest httpReq, @PathVariable int exerciseLogId) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         GetExerciseLogDetailReq req = GetExerciseLogDetailReq.builder()
                 .exerciselogId(exerciseLogId)
@@ -60,7 +61,7 @@ public class ExerciseLogController {
 
 //    운동기록 수정
     @PutMapping
-    public ResponseEntity<Integer> update(HttpServletRequest httpReq, @RequestBody PutExerciseLogReq req) {
+    public ResponseEntity<?> update(HttpServletRequest httpReq, @RequestBody PutExerciseLogReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         int result = exerciseLogService.modifyByExerciselogId(req, logginedMemberId);
         return ResponseEntity.ok(result);
@@ -68,7 +69,7 @@ public class ExerciseLogController {
 
 //    운동기록 삭제
     @DeleteMapping
-    public ResponseEntity<Integer> delete(HttpServletRequest httpReq, @RequestParam("exerciselog_id") int exerciselogId) {
+    public ResponseEntity<?> delete(HttpServletRequest httpReq, @RequestParam("exerciselog_id") int exerciselogId) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         GetExerciseLogDetailReq req = GetExerciseLogDetailReq.builder()
                 .exerciselogId(exerciselogId)
