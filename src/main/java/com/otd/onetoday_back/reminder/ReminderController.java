@@ -33,6 +33,7 @@ public class ReminderController {
         int result2 = reminderService.postDow(req);
         return ResponseEntity.ok(result + result2);
         }
+        log.info("result:{}", result);
         return ResponseEntity.ok(result);
     }
 
@@ -42,7 +43,7 @@ public class ReminderController {
         Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         req.setMemberId(memberId);
         log.info("memberId:{}", memberId);
-        List<ReminderGetOneRes> result = reminderService.findByMonth(req);
+        List<ReminderGetRes> result = reminderService.findByMonth(req);
         log.info("result:{}", result);
         return ResponseEntity.ok(result);
     }
@@ -53,7 +54,7 @@ public class ReminderController {
         Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         req.setMemberId(memberId);
         log.info("memberId:{}", memberId);
-        List<ReminderGetRes> result = reminderService.findByDay(req);
+        List<ReminderGetOneRes> result = reminderService.findByDay(req);
         log.info("result:{}", result);
         return ResponseEntity.ok(result);
     }
@@ -66,8 +67,8 @@ public class ReminderController {
         log.info("memberId:{}", memberId);
         int result = reminderService.modify(req);
         if(req.isRepeat()){
-            int ruseult2 = reminderService.modifyDow(req);
-            return ResponseEntity.ok(result + ruseult2);
+            int result2 = reminderService.modifyDow(req);
+            return ResponseEntity.ok(result + result2);
         }
         return ResponseEntity.ok(result);
     }

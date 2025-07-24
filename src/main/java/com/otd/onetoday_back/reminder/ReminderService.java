@@ -24,11 +24,11 @@ public class ReminderService {
         return reminderMapper.postDow(req);
     }
 
-    public List<ReminderGetOneRes> findByMonth(ReminderGetReq req){
+    public List<ReminderGetRes> findByMonth(ReminderGetReq req){
         return reminderMapper.findByMonth(req);
     }
 
-    public List<ReminderGetRes> findByDay(ReminderGetReq req){
+    public List<ReminderGetOneRes> findByDay(ReminderGetReq req){
         return reminderMapper.findByDay(req);
     }
 

@@ -7,7 +7,7 @@
         member_no_login = #{memberId},
         re_title = #{title},
         re_content = #{content},
-        re_repeat = #{repeat},
+        `re_repeat` = #{repeat},
         re_alarm = #{alarm}
         <if test="date != null and date != ''">
             , re_date = #{date}
@@ -21,14 +21,25 @@
         </foreach>
     </insert>
     <select id="findByMonth">
-        SELECT re_id AS id, re_title AS title, re_date AS date
+        SELECT re_id AS id, re_title AS title, re_date AS date, re_alarm AS alarm, re_repeat AS `repeat`
         FROM reminder
-        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-__') AND member_no_login = #{memberId}
+        WHERE re_date IS NOT NULL
+        AND YEAR(re_date) = #{year}
+        AND MONTH(re_date) = #{month}
+        AND member_no_login = #{memberId}
+    </select>
+    <select id="findByMonthAndRepeatTrue">
+        SELECT re_id AS id, rr_dow AS repeatDow
+        WHERE
     </select>
     <select id="findByDay">
         SELECT re_id AS id, re_title AS title, re_date AS date
         FROM reminder
-        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-',#{day}) AND member_no_id = #{memberId}
+        WHERE re_date IS NOT NULL
+        AND YEAR(re_date) = #{year}
+        AND MONTH(re_date) = #{month}
+        AND DAY(re_date) = #{day}
+        AND member_no_login = #{memberId}
     </select>
     <update id="modify">
         UPDATE reminder
