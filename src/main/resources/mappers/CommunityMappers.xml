@@ -24,7 +24,7 @@
         )
     </insert>
 
-    <select id="findAll" resultType="com.otd.onetoday_back.community.dto.PostDto">
+    <select id="findAll" resultType="com.otd.onetoday_back.community.dto.CommunityPostRes">
         SELECT post_id, member_no_login, title, created_at, view_count, `like`
         FROM post
         <if test="searchText != null and searchText != ''">
@@ -34,7 +34,7 @@
         ORDER BY post_id DESC
     </select>
 
-    <select id="findById" resultType="com.otd.onetoday_back.community.dto.PostDto">
+    <select id="findById" resultType="com.otd.onetoday_back.community.dto.CommunityPostRes">
         SELECT *
         FROM post
         WHERE post_id = #{postId}
