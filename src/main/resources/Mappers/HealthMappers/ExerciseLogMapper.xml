@@ -17,12 +17,10 @@
 
 <!--    운동기록 상세 조회 -->
     <select id="findByExerciselogId">
-        SELECT a.exerciselog_id, b.exercise_name, a.exercise_duration, a.exercise_kcal, a.effort_level, a.exercise_datetime
-          FROM exerciselog a
-          JOIN exercise b
-            ON a.exercise_id = b.exercise_id
-         WHERE a.exerciselog_id = #{exerciselogId}
-        AND a.member_no = #{memberId}
+        SELECT exerciselog_id, exercise_id, exercise_duration, exercise_kcal, effort_level, exercise_datetime
+          FROM exerciselog
+         WHERE exerciselog_id = #{exerciselogId}
+           AND member_no = #{memberId}
     </select>
 
 <!-- 운동기록 목록 조회 -->
