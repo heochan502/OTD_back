@@ -25,14 +25,14 @@
         WHERE member_no_login = #{memberNoLogin}
     </select>
     <select id="existsByMemberId" parameterType="string" resultType="int">
-        SELECT * FROM member WHERE member_id = #{memberId}
+        SELECT count(*) FROM member WHERE member_id = #{memberId}
     </select>
 
     <select id="existsByEmail" parameterType="string" resultType="int">
-        SELECT * FROM member WHERE email = #{email}
+        SELECT count(*) FROM member WHERE email = #{email}
     </select>
 
     <select id="existsByMemberNick" parameterType="string" resultType="int">
-        SELECT * FROM member WHERE member_nick = #{memberNick}
+        SELECT count(*) FROM member WHERE member_nick = #{memberNick}
     </select>
 </mapper>
