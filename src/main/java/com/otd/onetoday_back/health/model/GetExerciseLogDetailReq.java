@@ -9,5 +9,5 @@ import lombok.ToString;
 @ToString
 public class GetExerciseLogDetailReq {
     private int exerciselogId;
-    private int memberNo;
+    private int memberId;
 }
