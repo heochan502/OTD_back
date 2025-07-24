@@ -8,11 +8,11 @@
     <resultMap id="CommunityPostResMap" type="com.otd.onetoday_back.community.dto.CommunityPostRes">
         <id property="postId" column="post_id" />
         <result property="memberNoLogin" column="member_no_login" />
-        <result property="memberNick" column="member_nick" />
-        <result property="memberImg" column="member_img" />
+        <result property="memberNick" column="memberNick" />
+        <result property="memberImg" column="memberImg" />
         <result property="title" column="title" />
         <result property="content" column="content" jdbcType="VARCHAR" />
-        <result property="filePath" column="filePath" />
+        <result property="filePath" column="file_path" />
         <result property="createdAt" column="created_at" />
         <result property="viewCount" column="view_count" />
         <result property="like" column="like" />
@@ -61,7 +61,7 @@
     </insert>
 
     <!-- 게시글 목록 조회 (대표 파일 1개 + 작성자 정보 포함) -->
-    <select id="findAll" resultType="com.otd.onetoday_back.community.dto.CommunityPostRes">
+    <select id="findAll" resultMap="CommunityPostResMap">
         SELECT
         p.post_id AS postId,
         p.member_no_login AS memberNoLogin,
@@ -91,7 +91,7 @@
     </select>
 
     <!-- 게시글 상세 조회 -->
-    <select id="findById" resultType="com.otd.onetoday_back.community.dto.CommunityPostRes">
+    <select id="findById" resultMap="CommunityPostResMap">
         SELECT
         p.post_id AS postId,
         p.member_no_login AS memberNoLogin,
@@ -174,19 +174,34 @@
         WHERE post_id = #{postId}
     </select>
 
-<!-- 좋아요 토글 -->
-    <update id="toggleLike">
-        UPDATE community_post
-        SET `like` = `like` + 1
-        WHERE post_id = #{postId}
-    </update>
-
-    <update id="updateLikeCount">
-        UPDATE community_post
-        SET `like` = #{count}
-        WHERE post_id = #{postId}
-    </update>
-
-
+    <select id="findAllWithPaging" resultMap="CommunityPostResMap">
+        SELECT
+        p.post_id AS postId,
+        p.member_no_login AS memberNoLogin,
+        m.member_nick AS memberNick,
+        m.member_img AS memberImg,
+        p.title,
+        p.content,
+        (
+        SELECT f.file_path
+        FROM community_postfile f
+        WHERE f.post_id = p.post_id
+        ORDER BY f.uploaded_at ASC
+        LIMIT 1
+        ) AS filePath,
+        p.created_at AS createdAt,
+        p.view_count AS viewCount,
+        p.`like` AS `like`
+        FROM community_post p
+        JOIN member m ON p.member_no_login = m.member_no_login
+        <where>
+            <if test="searchText != null and searchText != ''">
+                (p.title LIKE CONCAT('%', #{searchText}, '%')
+                OR p.content LIKE CONCAT('%', #{searchText}, '%'))
+            </if>
+        </where>
+        ORDER BY p.post_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
 
 </mapper>

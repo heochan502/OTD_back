@@ -48,5 +48,12 @@ public interface CommunityMapper {
     // 좋아요 토글
     void toggleLike(@Param("postId") int postId);
 
-    void updateLikeCount(int postId, int count);
+    void updateLikeCount(@Param("postId") int postId, @Param("count") int count);
+
+    List<CommunityPostRes> findAllWithPaging(
+            @Param("searchText") String searchText,
+            @Param("size") int size,
+            @Param("offset") int offset
+    );
+
 }

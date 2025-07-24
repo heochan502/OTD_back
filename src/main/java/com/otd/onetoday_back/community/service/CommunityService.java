@@ -58,21 +58,17 @@ public class CommunityService {
 
 
     }
-    public void toggleLike(int postId, int memberId) {
-        CommunityLike existing = likeMapper.findByPostIdAndMemberId(postId, memberId);
-
-        if (existing != null) {
-            likeMapper.deleteByPostIdAndMemberId(postId, memberId);
+    // Service
+    public void toggleLike(int postId, int memberNoLogin) {
+        if (likeMapper.exists(postId, memberNoLogin) > 0) {
+            likeMapper.unlike(postId, memberNoLogin);
         } else {
-            CommunityLike newLike = new CommunityLike();
-            newLike.setPostId(postId);
-            newLike.setMemberId(memberId);
-            likeMapper.insert(newLike);
+            likeMapper.like(postId, memberNoLogin);
         }
-
-        int updatedCount = likeMapper.countByPostId(postId);
-        communityMapper.updateLikeCount(postId, updatedCount);
+        int count = likeMapper.countLikes(postId);
+        communityMapper.updateLikeCount(postId, count);
     }
+
 
     public CommunityPostRes getPostById(int postId, int memberId) {
         CommunityPostRes res = communityMapper.findById(postId);
@@ -105,4 +101,11 @@ public class CommunityService {
     public void deletePost(int postId) {
         communityMapper.deleteById(postId);
     }
+
+    // 페이징 관련
+    public List<CommunityPostRes> getAllPosts(String searchText, int page, int size) {
+        int offset = (page - 1) * size;
+        return communityMapper.findAllWithPaging(searchText, size, offset);
+    }
+
 }

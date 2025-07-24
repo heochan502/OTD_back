@@ -36,11 +36,17 @@ public class CommunityController {
         return ResponseEntity.ok("등록 성공");
     }
 
+    //페이징 로직 추가
     @GetMapping("/list")
-    public ResponseEntity<List<CommunityPostRes>> getAllPosts(@RequestParam(required = false) String searchText) {
-        log.info("🔥 [GET] /api/OTD/community/list 호출됨 | searchText: {}", searchText);
-        return ResponseEntity.ok(communityService.getAllPosts(searchText));
+    public ResponseEntity<?> getPosts(
+            @RequestParam(required = false) String searchText,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        List<CommunityPostRes> posts = communityService.getAllPosts(searchText, page, size);
+        return ResponseEntity.ok(posts);
     }
+
 
     @GetMapping("/detail/{postId}")
     public ResponseEntity<CommunityPostRes> getPost(@PathVariable int postId, HttpServletRequest req) {
@@ -61,13 +67,20 @@ public class CommunityController {
         return ResponseEntity.ok().build();
     }
     @PostMapping("/like/{postId}")
-    public ResponseEntity<?> toggleLike(@PathVariable int postId, HttpServletRequest req) {
-        Integer memberId = (Integer) HttpUtils.getSessionValue(req, AccountConstants.MEMBER_ID_NAME);
+    public ResponseEntity<?> toggleLike(
+            @PathVariable int postId,
+            HttpServletRequest request
+    ) {
+        Integer memberId = (Integer) HttpUtils.getSessionValue(request, AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
+            return ResponseEntity.status(401).body("로그인 필요");
         }
 
         communityService.toggleLike(postId, memberId);
-        return ResponseEntity.ok("좋아요 상태 변경 완료");
+        return ResponseEntity.ok().build();
     }
+
+
+
+
 }

@@ -11,5 +11,9 @@ public interface CommunityLikeMapper {
     void insert(CommunityLike like);
     void deleteByPostIdAndMemberId(@Param("postId") int postId, @Param("memberId") int memberId);
     int countByPostId(@Param("postId") int postId);
+    int like(@Param("postId") int postId, @Param("memberNoLogin") int memberNoLogin);
+    void unlike(@Param("postId") int postId, @Param("memberNoLogin") int memberNoLogin);
+    int exists(@Param("postId") int postId, @Param("memberNoLogin") int memberNoLogin);
+    int countLikes(@Param("postId") int postId);
 
 }
