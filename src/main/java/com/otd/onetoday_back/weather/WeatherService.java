@@ -12,8 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+
 import java.util.*;
 
 
@@ -76,7 +75,7 @@ public class WeatherService {
                     location.getNx(),
                     location.getNy(),
                     1,
-                    300
+                    100
             );
 
             String villageTMX = weatherFeignClient.getVilageFcst(
@@ -87,7 +86,7 @@ public class WeatherService {
                     location.getNx(),
                     location.getNy(),
                     1,
-                    300
+                    100
             );
             // 단기예보 파싱
             Map<String, String> villageMap = new HashMap<>();

@@ -7,6 +7,4 @@ public class LocalNameGetRes {
     private String city;
     private String county;
     private String town;
-    private int nx;
-    private int ny;
 }

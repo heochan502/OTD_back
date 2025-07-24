@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.otd.onetoday_back.weather.location.LocationMapper">
-    <select id="getLocalNameAll">
-        SELECT city, county, town, nx, ny
+    <insert id="insertMemberLocation">
+        INSERT INTO member_location
+        SET local_memberId = #{memberId}
+        ,   local_id = #{localId}
+    </insert>
+    <select id="getLocalList" parameterType="com.otd.onetoday_back.weather.location.model.LocationDto"
+            resultType="com.otd.onetoday_back.weather.location.model.LocationDto">
+        SELECT city, county, town
         FROM locallist
-<!--            <if test="searchText != null and searchText != ''">-->
-<!--                <bind name="pattern" value="'%' + _parameter.getSearchText() + '%'"/>-->
-<!--                WHERE city LIKE #{pattern}-->
-<!--                OR county LIKE #{pattern}-->
-<!--                OR town LIKE #{pattern}-->
-<!--            </if>-->
+        WHERE REPLACE(CONCAT(city, county, town), ' ', '') LIKE CONCAT('%', REPLACE(#{keyword}, ' ', ''), '%')
     </select>
 </mapper>
