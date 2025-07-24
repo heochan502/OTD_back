@@ -26,11 +26,24 @@ public class MealController {
         Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         log.info("foodInfo: {}", foodInfo);
 
+        if (foodInfo.getFoodName() == null || foodInfo.getFoodName().isEmpty()) {
+            List<findFoodCategoryRes> res =  mealService.findFoodCategory(foodInfo);
+
+            return ResponseEntity.ok(res);
+        }
+        else if (foodInfo.getFoodCategory() == null || foodInfo.getFoodCategory().isEmpty()) {
+            List<findFoodNameRes> res =  mealService.findFoodName(foodInfo);
+            return ResponseEntity.ok(res);
+        }
+        else
+        {
+            List<findFoodNameRes> res  = mealService.findFoodName(foodInfo);
+            return ResponseEntity.ok(res);
+        }
 
 //        log.info("memeber id {} : foodname {}", memberId, foodName);
-        List<findFoodNameRes> res = mealService.findFoodName(foodInfo);
+//        List<findFoodNameRes> res = mealService.findFoodName(foodInfo);
 //        log.info("res : {}", res);
-        return ResponseEntity.ok(res);
 //        return null;
     }
 }

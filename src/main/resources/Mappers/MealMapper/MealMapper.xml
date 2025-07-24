@@ -9,7 +9,7 @@
     </select>
 
     <select id ="findFoodCategory">
-        SELECT food_category as food_name
+        SELECT food_category
         FROM meal_food_cate
         WHERE food_category LIKE '%${foodCategory}%'
         LIMIT 50;
@@ -19,7 +19,16 @@
     <select id ="findFoodNameForFoodNameAndCategory">
         SELECT food_name
         FROM meal_food_db
+        WHERE food_category LIKE '%${foodCategory}%' AND food_name LIKE '%${foodName}%'
+        LIMIT 100;
+    </select>
+
+    <select id ="findFoodNameAnd">
+        SELECT food_name,
+        FROM meal_food_db
         WHERE food_category = #{foodCategory} AND food_name LIKE '%${foodName}%'
         LIMIT 100;
     </select>
+
+
 </mapper>
