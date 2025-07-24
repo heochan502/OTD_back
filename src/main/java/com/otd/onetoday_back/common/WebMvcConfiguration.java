@@ -54,4 +54,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .allowedMethods("*");
     }
 
+
+
 }

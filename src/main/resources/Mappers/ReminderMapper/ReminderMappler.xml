@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.otd.onetoday_back.reminder.ReminderMapper">
-    <insert id="post">
+    <insert id="post" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO reminder
         SET
         member_no_login = #{memberId},
@@ -9,11 +9,54 @@
         re_content = #{content},
         re_repeat = #{repeat},
         re_alarm = #{alarm}
-
-        <if test="#{repeat} == false">
-            INSERT INTO reminder_repeat
-            SET
-
+        <if test="date != null and date != ''">
+            , re_date = #{date}
         </if>
     </insert>
+    <insert id="postDow">
+        INSERT INTO reminder_repeat(re_id, rr_dow)
+        VALUES
+        <foreach collection="repeatDow" item="dow" separator=",">
+            (#{id}, #{dow})
+        </foreach>
+    </insert>
+    <select id="findByMonth">
+        SELECT re_id AS id, re_title AS title, re_date AS date
+        FROM reminder
+        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-__') AND member_no_login = #{memberId}
+    </select>
+    <select id="findByDay">
+        SELECT re_id AS id, re_title AS title, re_date AS date
+        FROM reminder
+        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-',#{day}) AND member_no_id = #{memberId}
+    </select>
+    <update id="modify">
+        UPDATE reminder
+        SET
+        re_title = #{title},
+        re_content = #{content},
+        re_repeat = #{repeat},
+        re_alarm = #{alarm}
+        <if test="date != null and date != ''">
+            , re_date = #{date}
+        </if>
+        WHERE re_id = #{id}
+    </update>
+    <delete id="deleteDow">
+        DELETE
+        FROM reminder_repeat
+        WHERE re_id = #{id}
+    </delete>
+    <update id="modifyDow">
+        UPDATE reminder_repeat(re_id, rr_dow)
+        VALUES
+        <foreach collection="repeatDow" item="dow" separator=",">
+            (#{id}, #{dow})
+        </foreach>
+    </update>
+    <delete id="deleteById">
+        DELETE
+        FROM reminder
+        WHERE re_id = #{id}
+    </delete>
 </mapper>
