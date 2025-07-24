@@ -18,7 +18,7 @@ Spring:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
   servlet:
     multipart:
-      max-file-size: 10MB #하나의 파일의 최대 크기
+      max-file-size: 10MB #하나의 파일의 최대 크기 111
       max-request-size: 30MB # 한번에 최대 업로드 가능 용량
 
 mybatis:
