@@ -3,14 +3,6 @@
 <mapper namespace="com.otd.onetoday_back.account.AccountMapper">
 
     <insert id="save" parameterType="com.otd.onetoday_back.account.model.AccountJoinReq">
-<!--        INSERT INTO member-->
-<!--        SET -->
-<!--          member_id = #{memberId},-->
-<!--          member_pw = #{memberPw},-->
-<!--          email = #{email},-->
-<!--          name = #{name},-->
-<!--          birth_date = #{birthDate},-->
-<!--          member_nick = #{memberNick}-->
         INSERT INTO member (member_id,member_pw,email,name,birth_date,member_nick)
         values (#{memberId},#{memberPw},#{email},#{name},#{birthDate}, #{memberNick})
     </insert>
@@ -19,6 +11,27 @@
         FROM member
         WHERE member_id = #{memberId}
     </select>
+    <select id="findProfileById" parameterType="int"
+            resultType="com.otd.onetoday_back.account.model.AccountProfileRes">
+        SELECT
+        member_no_login AS memberNoLogin,
+        member_id AS memberId,
+        email,
+        name,
+        birth_date AS birthDate,
+        member_nick AS memberNick
+        FROM member
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
+    <select id="existsByMemberId" parameterType="string" resultType="int">
+        SELECT * FROM member WHERE member_id = #{memberId}
+    </select>
 
+    <select id="existsByEmail" parameterType="string" resultType="int">
+        SELECT * FROM member WHERE email = #{email}
+    </select>
 
+    <select id="existsByMemberNick" parameterType="string" resultType="int">
+        SELECT * FROM member WHERE member_nick = #{memberNick}
+    </select>
 </mapper>

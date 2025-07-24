@@ -1,7 +1,12 @@
 constants:
   file:
-    directory : C:/2025_swstudy/OTD_back/jin/src/main/resources/memo/uploads
-
+    directory : /home/download
+  # weather api
+  feign-client:
+    weather-api:
+      url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+      service-key: fte7et4WjQ2QQTSP51SJ6VZ%2FXA3aDUYv054aZFUsGdrVOKFJxQnmrKJGh%2Box%2FcnwsvpeJmLazXr4je1K01Uoow%3D%3D
+      data-type: json
 
 Spring:
   application:
@@ -11,11 +16,12 @@ Spring:
     username: green2
     password: msa502
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+  servlet:
+    multipart:
+      max-file-size: 10MB #하나의 파일의 최대 크기 111
+      max-request-size: 30MB # 한번에 최대 업로드 가능 용량
 
 mybatis:
-  mapper-locations: mappers/**/*.xml
-
+  mapper-locations: classpath:/mappers/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
-file:
-  upload-dir: C:/2025_swstudy/OTD_back/jin/src/main/resources/memo/uploads
