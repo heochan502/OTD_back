@@ -12,4 +12,7 @@ public class LocationDto {
     private String town;
     private int nx;
     private int ny;
+
+    // 검색기능
+    private String keyword;
 }

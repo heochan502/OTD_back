@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "weatherApi",
-            url = "https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0")
+            url = "${constants.feign-client.weather-api.url}")
 public interface WeatherFeignClient {
 
     @GetMapping("/getUltraSrtFcst")
@@ -17,19 +17,31 @@ public interface WeatherFeignClient {
             @RequestParam("base_time") String baseTime,
             @RequestParam("nx") int nx,
             @RequestParam("ny") int ny,
-            @RequestParam("numOfRows") int numOfRows,
-            @RequestParam("pageNo") int pageNo
+            @RequestParam("pageNo") int pageNo,
+            @RequestParam("numOfRows") int numOfRows
     );
 
     @GetMapping("/getVilageFcst")
-    String getVillageForecast(
+    String getVilageFcst(
             @RequestParam("serviceKey") String serviceKey,
             @RequestParam("dataType") String dataType,
             @RequestParam("base_date") String baseDate,
             @RequestParam("base_time") String baseTime,
             @RequestParam("nx") int nx,
             @RequestParam("ny") int ny,
-            @RequestParam("numOfRows") int numOfRows,
-            @RequestParam("pageNo") int pageNo
+            @RequestParam("pageNo") int pageNo,
+            @RequestParam("numOfRows") int numOfRows
+    );
+
+    @GetMapping("/getUltraSrtNcst")
+    String getUltraSrtNcst(
+            @RequestParam("serviceKey") String serviceKey,
+            @RequestParam("dataType") String dataType,
+            @RequestParam("base_date") String baseDate,
+            @RequestParam("base_time") String baseTime,
+            @RequestParam("nx") int nx,
+            @RequestParam("ny") int ny,
+            @RequestParam("pageNo") int pageNo,
+            @RequestParam("numOfRows") int numOfRows
     );
 }

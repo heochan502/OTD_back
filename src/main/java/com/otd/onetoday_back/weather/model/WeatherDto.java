@@ -4,9 +4,15 @@ import lombok.Data;
 
 @Data
 public class WeatherDto {
-    private String baseTime; // 기준 시각
-    private String temperature; // 기온
-    private String condition; // 날씨 상태
+    private String baseTime;
+    // 초단기실황(실시간)
+    private String tem; // 기온
+    private String reh; // 습도
     private String localName; // 지역명
-//    private String fcstTime; // 예보시간
+
+    // 단기예보
+    private String tmx; // 최고 기온
+    private String tmn; // 최저 기온
+    private String pop; // 강수 확률;
+    private String sky; //하늘 상태
 }

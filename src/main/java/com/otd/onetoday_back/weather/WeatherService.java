@@ -12,9 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 
 
 @Service
@@ -27,7 +26,6 @@ public class WeatherService {
     private final ConstKma constKma;
 
     private final ObjectMapper objectMapper = new ObjectMapper(); // JSON 파싱용
-
     private String Sky(String sky) {
         return switch (sky) {
             case "1" -> "맑음";
@@ -36,69 +34,108 @@ public class WeatherService {
             default -> "알 수 없음";
         };
     }
-
+    // 실시간 날짜/시간
+    String[] base = BaseTime.getBaseDateTime(); // 실황
+    String[] baseV = BaseTime.getBaseTimeV(); // 예보
+    // 실시간 날씨
     public WeatherDto getWeatherByMemberId(int memberId) {
         LocationDto location = weatherMapper.findLocalByMemberId(memberId);
         log.info("memberId: {}", memberId);
-        // 실시간 날짜/시간
-        String[] base = BaseTime.getBaseDateTime();
 
-        String baseDate = base[0];
-        String baseTime = base[1];
-
-        // Feign 호출
-        String response = weatherFeignClient.getUltraSrtFcst(
-                constKma.getServiceKey(),
-                constKma.getDataType(),
-                baseDate,
-                baseTime,
-                location.getNx(),
-                location.getNy(),
-                30,
-                1
-        );
         try {
-            ResponseParent weatherApi = objectMapper.readValue(response, ResponseParent.class);
-            List<Item> items = weatherApi.getResponse().getBody().getItems().getItem();
+            // FeignClient 초단기실황 호출
+            String ultraSrtNcstResponse = weatherFeignClient.getUltraSrtNcst(
+                    constKma.getServiceKey(),
+                    constKma.getDataType(),
+                    base[0],
+                    base[1],
+                    location.getNx(),
+                    location.getNy(),
+                    1,
+                    10
+            );
+            // 초단기실황 파싱
+            ResponseParent ultraWeatherApi = objectMapper.readValue(ultraSrtNcstResponse, ResponseParent.class);
+            List<Item> ultraItems = ultraWeatherApi.getResponse().getBody().getItems().getItem();
 
-            String temp = null;
-            String sky = null;
-            log.info("items = {}", items);
+            Map<String, String> ultraMap = new HashMap<>();
 
-            // 이미 수집된 자료는 더이상 받지 않는다
-            Set<String> firstIndex = new HashSet<>();
+            for (Item item : ultraItems) {
+                ultraMap.put(item.getCategory(), item.getObsrValue());
+            }
 
-            for (Item item : items) {
-                switch (item.getCategory()) {
-                    case "T1H":
-                        if (!firstIndex.contains("T1H")) {
-                            temp = item.getFcstValue();
-                            firstIndex.add("T1H");
-                        }
-                        break;
-                    case "SKY":
-                        if (!firstIndex.contains("SKY")) {
-                            sky = Sky(item.getFcstValue());
-                            firstIndex.add("SKY");
-                        }
-                        break;
+            log.info("ultraItems = {}", ultraMap);
+
+            // FeignClient 단기예보 호출
+            String villageTMN = weatherFeignClient.getVilageFcst(
+                    constKma.getServiceKey(),
+                    constKma.getDataType(),
+                    baseV[0],
+                    "0200",
+                    location.getNx(),
+                    location.getNy(),
+                    1,
+                    100
+            );
+
+            String villageTMX = weatherFeignClient.getVilageFcst(
+                    constKma.getServiceKey(),
+                    constKma.getDataType(),
+                    baseV[0],
+                    "1100",
+                    location.getNx(),
+                    location.getNy(),
+                    1,
+                    100
+            );
+            // 단기예보 파싱
+            Map<String, String> villageMap = new HashMap<>();
+
+            ResponseParent tmnVillageApi = objectMapper.readValue(villageTMN, ResponseParent.class);
+            for (Item item : tmnVillageApi.getResponse().getBody().getItems().getItem()) {
+                if (item.getFcstDate().equals(baseV[0])
+                    && item.getCategory().equals("TMN")
+                    && item.getFcstTime().equals("0600")) {
+                    villageMap.put("TMN", item.getFcstValue());
+                    break;
                 }
             }
 
+            ResponseParent tmxVillageApi = objectMapper.readValue(villageTMX, ResponseParent.class);
+            for (Item item : tmxVillageApi.getResponse().getBody().getItems().getItem()) {
+                if (!item.getFcstDate().equals(baseV[0])) continue;
+                String category = item.getCategory();
+
+                if (category.equals("TMX") && item.getFcstTime().equals("1500")) {
+                    villageMap.put("TMX", item.getFcstValue());
+                } else if ((category.equals("POP") || category.equals("SKY")) && !villageMap.containsKey(category)) {
+                    villageMap.put(category, item.getFcstValue());
+                }
+            }
+
+
+            log.info("villageItems = {}", villageMap);
+            // 값 저장
             LocationDto local = new LocationDto();
             local.setCity(location.getCity());
             local.setCounty(location.getCounty());
             local.setTown(location.getTown());
 
             WeatherDto dto = new WeatherDto();
-            dto.setBaseTime(baseDate + " " + baseTime);
-            dto.setTemperature(temp);
-            dto.setCondition(sky);
+            dto.setBaseTime(base[0] + " " + base[1]);
+            dto.setTem(ultraMap.get("T1H"));
+            dto.setReh(ultraMap.get("REH"));
             dto.setLocalName(local.getCity() + " " + local.getCounty() + " "+ local.getTown());
+
+            dto.setTmx(villageMap.get("TMX"));
+            dto.setTmn(villageMap.get("TMN"));
+            dto.setPop(villageMap.get("POP"));
+            dto.setSky(Sky(villageMap.get("SKY")));
 
             return dto;
 
         } catch (Exception e) {
+            log.error("날씨 API 실패", e);
             throw new RuntimeException("날씨 API 실패", e);
         }
     }
