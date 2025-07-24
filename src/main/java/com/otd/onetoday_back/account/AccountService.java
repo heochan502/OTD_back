@@ -41,10 +41,6 @@ public class AccountService {
         return accountMapper.findProfileById(memberNoLogin);
     }
 
-    public int updateProfile(AccountUpdateReq req) {
-        return accountMapper.updateProfile(req);
-    }
-
     public boolean existsByMemberId(String memberId) {
         return accountMapper.existsByMemberId(memberId) > 0;
     }

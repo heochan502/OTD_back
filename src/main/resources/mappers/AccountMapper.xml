@@ -24,15 +24,6 @@
         FROM member
         WHERE member_no_login = #{memberNoLogin}
     </select>
-    <update id="updateProfile" parameterType="com.otd.onetoday_back.account.model.AccountUpdateReq">
-        UPDATE member
-        SET
-        email = #{email},
-        name = #{name},
-        birth_date = #{birthDate},
-        member_nick = #{memberNick}
-        WHERE member_no_login = #{memberNoLogin}
-    </update>
     <select id="existsByMemberId" parameterType="string" resultType="int">
         SELECT * FROM member WHERE member_id = #{memberId}
     </select>
