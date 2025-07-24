@@ -1,0 +1,73 @@
+package com.otd.onetoday_back.memo;
+import com.otd.onetoday_back.memo.MemoService;
+import com.otd.onetoday_back.memo.config.model.ResultResponse;
+import com.otd.onetoday_back.memo.model.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+@Slf4j
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/api/OTD/memo")
+@CrossOrigin(origins = "*")
+public class MemoController {
+    private final MemoService memoService;
+
+//    @PostMapping
+//    public ResultResponse<Integer> postMemo(@RequestBody MemoPostReq req) {
+//        log.info("req={}", req);
+//        int result = memoService.save(req);
+//        return new ResultResponse<>("메모 저장 성공", result);
+//    }
+    @PostMapping(value = "/{userId}", consumes = {"multipart/form-data"})
+    public ResultResponse<MemoPostAnduploadRes> postMemo(
+            @PathVariable("userId") int userId,
+            @RequestPart("memoData") MemoPostReq req,
+            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles)
+//          @RequestPart("req") MemoPostReq dto,
+{
+    log.info("DEBUG: 컨트롤러에서 받은 MemoPostReq 객체 전체: {}", req);
+    log.info("DEBUG: req.getId(): {}, req.getMemberNoLogin(): {}, req.getTitle(): {}, req.getContent(): {}",
+            req.getId(), req.getMemberNoLogin(), req.getTitle(), req.getContent());
+    log.info("userId:{}, req (title):{}, memoImageFiles:{}",
+            userId, req.getTitle(),
+            (memoImageFiles != null)
+                    ? req.getMemoImageFiles().stream()
+                    .map(MultipartFile:: getOriginalFilename)
+                    .toList()
+                    : "No files");
+    req.setMemoImageFiles(memoImageFiles);
+    MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(userId, req);
+    return new ResultResponse<>("메모 등록, 파일 업로드 성공", result);
+}
+
+    @GetMapping
+    public ResultResponse<MemoListRes> getMemo(@ModelAttribute MemoGetReq req) {
+        log.info("req={}", req);
+        MemoListRes result = memoService.findAll(req);
+        log.info("Debug: MemoListRes object: {}", result);
+        return new ResultResponse<>("모든 메모 조회 성공", result);
+    }
+    @GetMapping("{memoId}")
+    public ResultResponse<MemoGetOneRes> getMemo(@PathVariable int memoId) {
+        log.info("memoId={}", memoId);
+        MemoGetOneRes result = memoService.findById(memoId);
+        return new ResultResponse<>("단일 메모 조회 성공", result);
+    }
+    @PutMapping
+    public ResultResponse<Integer> putMemo(@RequestBody MemoPutReq req) {
+        log.info("req={}", req);
+        int result = memoService.modify(req);
+        return new ResultResponse<>("메모 수정 성공", result);
+    }
+    @DeleteMapping
+    public ResultResponse<Integer> deleteMemo(@RequestParam(name = "id") int id) {
+        log.info("id={}", id);
+        int result = memoService.deleteById(id);
+        return new ResultResponse<>("메모 삭제 성공", result);
+    }
+}
