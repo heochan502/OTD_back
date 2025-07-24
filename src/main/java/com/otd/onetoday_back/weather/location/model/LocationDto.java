@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data //getter, setter, ToString, RAC 포함
 public class LocationDto {
-    private int membersId;
+    private int memberId;
     // 지역정보
     private int localId;
     private String city;

@@ -1,7 +1,5 @@
 package com.otd.onetoday_back.weather.location;
 
-import com.otd.onetoday_back.weather.location.model.LocalNameGetReq;
-import com.otd.onetoday_back.weather.location.model.LocalNameGetRes;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +13,11 @@ import java.util.List;
 public class LocationService {
     private final LocationMapper locationMapper;
 
-    public int insertLocation(int memberId, int localId) {
-        return locationMapper.insertMemberLocation(localId, memberId);
+    public int insertLocation(LocationDto dto) {
+        return locationMapper.insertMemberLocation(dto);
     }
 
-    public List<LocationDto> getLocalList(LocationDto keyword) {
-        return locationMapper.getLocalList(keyword);
+    public List<LocationDto> getLocalList(LocationDto dto) {
+        return locationMapper.getLocalList(dto);
     }
 }
