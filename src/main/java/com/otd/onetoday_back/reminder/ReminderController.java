@@ -5,7 +5,7 @@ import com.otd.onetoday_back.common.util.HttpUtils;
 import com.otd.onetoday_back.reminder.model.ReminderGetReq;
 import com.otd.onetoday_back.reminder.model.ReminderGetOneRes;
 import com.otd.onetoday_back.reminder.model.ReminderGetRes;
-import com.otd.onetoday_back.reminder.model.ReminderPostReq;
+import com.otd.onetoday_back.reminder.model.ReminderPostPutReq;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +22,13 @@ public class ReminderController {
     private final ReminderService reminderService;
 
     @PostMapping()
-    public ResponseEntity<?> postReminder(HttpServletRequest httpReq, @RequestBody ReminderPostReq req){
+    public ResponseEntity<?> postReminder(HttpServletRequest httpReq, @RequestBody ReminderPostPutReq req){
         log.info("req:{}", req);
         Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         req.setMemberId(memberId);
         log.info("memberId:{}", memberId);
         int result = reminderService.postReminder(req);
+
         if(req.isRepeat()){
         int result2 = reminderService.postDow(req);
         return ResponseEntity.ok(result + result2);
@@ -46,7 +47,7 @@ public class ReminderController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping
+    @GetMapping("/today")
     public ResponseEntity<?> getDayReminder(HttpServletRequest httpReq, @ModelAttribute ReminderGetReq req){
         log.info("req:{}", req);
         Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
@@ -58,7 +59,22 @@ public class ReminderController {
     }
 
     @PutMapping
-    public ResponseEntity<?> PutReminder(HttpServletRequest httpReq, int id){
-        return null;
+    public ResponseEntity<?> PutReminder(HttpServletRequest httpReq, @RequestBody ReminderPostPutReq req){
+        log.info("req:{}", req);
+        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        req.setMemberId(memberId);
+        log.info("memberId:{}", memberId);
+        int result = reminderService.modify(req);
+        if(req.isRepeat()){
+            int ruseult2 = reminderService.modifyDow(req);
+            return ResponseEntity.ok(result + ruseult2);
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> DeleteReminder(int id){
+        int result = reminderService.deleteById(id);
+        return ResponseEntity.ok(result);
     }
 }

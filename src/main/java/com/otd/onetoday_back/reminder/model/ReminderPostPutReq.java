@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @ToString
 
-public class ReminderPostReq {
+public class ReminderPostPutReq {
     private int id;
     private int memberId;
     private String title;
