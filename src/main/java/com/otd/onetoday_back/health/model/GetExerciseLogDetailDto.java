@@ -7,9 +7,12 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
-public class GetExerciseLogRes {
+public class GetExerciseLogDetailDto {
     private int exerciselogId;
+    private String exerciseName;
     private int exerciseDuration;
-    private int exerciseId;
+    private int exerciseKcal;
+    private int effortLevel;
     private String exerciseDatetime;
+    private int memberId;
 }

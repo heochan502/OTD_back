@@ -8,7 +8,6 @@ import lombok.ToString;
 @ToString
 public class PostExerciseLogReq {
     private int exerciseId;
-    private int memberNo;
     private int exerciseKcal;
     private String exerciseDatetime;
     private int exerciseDuration;
