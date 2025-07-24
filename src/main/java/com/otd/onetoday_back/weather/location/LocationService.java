@@ -1,7 +1,6 @@
 package com.otd.onetoday_back.weather.location;
 
-import com.otd.onetoday_back.weather.location.model.LocalNameGetReq;
-import com.otd.onetoday_back.weather.location.model.LocalNameGetRes;
+import com.otd.onetoday_back.weather.location.model.LocationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,8 +13,11 @@ import java.util.List;
 public class LocationService {
     private final LocationMapper locationMapper;
 
-    // 지역 들고오기
-    public List<LocalNameGetRes> getLocalNameAll(LocalNameGetReq req){
-        return locationMapper.getLocalNameAll(req);
+    public int insertLocation(LocationDto dto) {
+        return locationMapper.insertMemberLocation(dto);
+    }
+
+    public List<LocationDto> getLocalList(LocationDto dto) {
+        return locationMapper.getLocalList(dto);
     }
 }

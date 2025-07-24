@@ -6,5 +6,6 @@
         FROM member_location m
         JOIN locallist l ON m.local_id = l.local_id
         WHERE m.local_member_id = #{memberId}
+        ORDER BY m.local_id LIMIT 1
     </select>
 </mapper>
