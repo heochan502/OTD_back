@@ -40,7 +40,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                         if(resource.exists() && resource.isReadable()) {
                             return resource;
                         }
-
                         return new ClassPathResource("/static/index.html");
                     }
                 });
