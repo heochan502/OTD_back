@@ -8,6 +8,7 @@ import lombok.Setter;
 import java.util.Date;
 
 @Getter
+@Setter
 public class AccountLoginRes {
     private int memberNoLogin;
     @JsonIgnore // 출력안됨
