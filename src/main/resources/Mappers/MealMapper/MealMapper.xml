@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.otd.onetoday_back.meal.MealMapper">
+    <select id ="findFoodNameForFoodName">
+        SELECT food_name
+        FROM meal_food_db
+        WHERE food_name LIKE '%${foodName}%'
+        LIMIT 100;
+    </select>
+
+    <select id ="findFoodCategory">
+        SELECT food_category as food_name
+        FROM meal_food_cate
+        WHERE food_category LIKE '%${foodCategory}%'
+        LIMIT 50;
+    </select>
+
+
+    <select id ="findFoodNameForFoodNameAndCategory">
+        SELECT food_name
+        FROM meal_food_db
+        WHERE food_category = #{foodCategory} AND food_name LIKE '%${foodName}%'
+        LIMIT 100;
+    </select>
+</mapper>
