@@ -31,4 +31,10 @@ public class LocationController {
         List<LocationDto> list = locationService.getLocalList(keyword);
         return ResponseEntity.ok(list);
     }
+    @GetMapping
+    public ResponseEntity<?> getLocalList(HttpSession session) {
+       Integer memberId = (Integer)session.getAttribute("memberId");
+       List<LocationDto> list = locationService.getLocalListByMemberId(memberId);
+       return ResponseEntity.ok(list);
+    }
 }

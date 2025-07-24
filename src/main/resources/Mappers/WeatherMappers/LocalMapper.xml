@@ -12,4 +12,10 @@
         FROM locallist
         WHERE REPLACE(CONCAT(city, county, town), ' ', '') LIKE CONCAT('%', REPLACE(#{keyword}, ' ', ''), '%')
     </select>
+    <select id="getLocalListByMemberId">
+        SELECT l.*
+        FROM locallist l
+        JOIN member_location m ON l.local_id = m.local_id
+        WHERE m.local_member_id = #{memberId}
+    </select>
 </mapper>

@@ -10,4 +10,5 @@ public interface LocationMapper {
 
     int insertMemberLocation(LocationDto dto);
     List<LocationDto> getLocalList(LocationDto keyword);
+    List<LocationDto> getLocalListByMemberId(int memberId);
 }

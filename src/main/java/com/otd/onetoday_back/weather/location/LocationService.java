@@ -20,4 +20,7 @@ public class LocationService {
     public List<LocationDto> getLocalList(LocationDto dto) {
         return locationMapper.getLocalList(dto);
     }
+    public List<LocationDto> getLocalListByMemberId(int memberId) {
+        return locationMapper.getLocalListByMemberId(memberId);
+    }
 }
