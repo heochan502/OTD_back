@@ -19,17 +19,12 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-
 public class MemoService {
-    @Value("${constants.file.directory}")
-    private String uploadDir;
-
-    private static final String IMAGE_BASE_URL = "/uploads/";
-
     private final MemoMapper memoMapper;
 
 //    public int save(MemoPostReq req) { return memoMapper.save(req); }
-
+    @Value("${constants.file.directory}")
+    private String uploadDir;
     public MemoPostAnduploadRes saveMemoAndHandleUpload(int userId, MemoPostReq req) {
         req.setMemberNoLogin(userId);
 
@@ -39,8 +34,6 @@ public class MemoService {
         List<UploadResponse> uploadResponseList = new ArrayList<>();
         List<MultipartFile> memoImageFiles = req.getMemoImageFiles();
 
-        List<String> uploadedUniqueFileNameForDb = new ArrayList<>();
-
         if(memoImageFiles != null && !memoImageFiles.isEmpty()) {
             try {
                 Path uploadPath =  Paths.get(uploadDir);
@@ -49,8 +42,10 @@ public class MemoService {
                     log.info("업로드 디렉토리 생성: {}", uploadPath.toAbsolutePath());
                 }
                 // 업로드된 파일 이름을 저장할 리스트 생성
+                List<String> uploadFileNames = new ArrayList<>();
+
                 for(MultipartFile file : memoImageFiles) {
-                    if (file == null || file.isEmpty()) continue;
+                    if(file == null || file.isEmpty()) continue;
 
                     String originalFilename = file.getOriginalFilename();
                     String fileExtension = "";
@@ -61,28 +56,25 @@ public class MemoService {
                     Path filePath = uploadPath.resolve(uniqueFileName);
                     Files.copy(file.getInputStream(), filePath);
 
-                    String fileUrl = IMAGE_BASE_URL + uniqueFileName;
-                    uploadResponseList.add(new UploadResponse(fileUrl, originalFilename, uniqueFileName, "이미지 업로드 성공"));
-                    uploadedUniqueFileNameForDb.add(uniqueFileName);
+                    String fileUrl = "/uploads/" + uniqueFileName;
+                    uploadResponseList.add(new UploadResponse(fileUrl, originalFilename, "이미지 업로드 성공"));
+                    uploadFileNames.add(uniqueFileName);
                 }
-                if(!uploadedUniqueFileNameForDb.isEmpty()) {
-                    String firstUniqueFileNameForDb = uploadedUniqueFileNameForDb.get(0);
-                    memoMapper.updateMemoImage(newMemoId, firstUniqueFileNameForDb);
-                    log.info("메모 {}에 첫 번째 이미지 {}를 업데이트했습니다.", newMemoId, firstUniqueFileNameForDb);
-                } else {
-                    log.info("업로드된 유효한 이미지 파일이 없습니다. 메모 ID: {}", newMemoId);
+                if(!uploadResponseList.isEmpty()) {
+                    String firstImageFileName = uploadResponseList.get(0).getFileName();
+                    memoMapper.updateMemoImage(newMemoId, firstImageFileName);
                 }
 
             } catch (IOException e) {
-                log.error("이미지 업로드 처리 중 오류 발생: {}", newMemoId, e.getMessage(), e);
-                uploadResponseList.add(new UploadResponse(null, null, null, "이미지 업로드 실패"));
+                log.error("이미지 업로드 실패: {}", e.getMessage(), e);
+                uploadResponseList.add(new UploadResponse(null, null, "이미지 업로드 실패"));
             }
-            } else {
-            log.info("업로드할 파일이 없거나 비어 있습니다. 메모 ID {}", newMemoId);
-            }
-            return new MemoPostAnduploadRes(newMemoId, uploadResponseList);
-            }
-
+        } else {
+            log.error("업로드할 파일이 없거나 비어 있습니다");
+            uploadResponseList.add(new UploadResponse(null, null, "파일 없음"));
+        }
+        return new MemoPostAnduploadRes(newMemoId, uploadResponseList);
+    }
     public MemoListRes findAll(MemoGetReq req) {
         int actualCurrentPage = (req.getCurrentPage() != null && req.getCurrentPage() > 0) ? req.getCurrentPage() : 1;
         int actualPageSize = (req.getPageSize() != null && req.getPageSize() > 0) ? req.getPageSize() : 5; // 기본값을 5로 설정
