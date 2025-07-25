@@ -94,8 +94,8 @@ public class WeatherService {
             ResponseParent tmnVillageApi = objectMapper.readValue(villageTMN, ResponseParent.class);
             for (Item item : tmnVillageApi.getResponse().getBody().getItems().getItem()) {
                 if (item.getFcstDate().equals(baseV[0])
-                    && item.getCategory().equals("TMN")
-                    && item.getFcstTime().equals("0600")) {
+                        && item.getCategory().equals("TMN")
+                        && item.getFcstTime().equals("0600")) {
                     villageMap.put("TMN", item.getFcstValue());
                     break;
                 }

@@ -57,7 +57,7 @@ public class MemoService {
                     Files.copy(file.getInputStream(), filePath);
 
                     String fileUrl = "/uploads/" + uniqueFileName;
-                    uploadResponseList.add(new UploadResponse(fileUrl, originalFilename, "이미지 업로드 성공"));
+                    uploadResponseList.add(new UploadResponse(uniqueFileName, originalFilename, "이미지 업로드 성공"));
                     uploadFileNames.add(uniqueFileName);
                 }
                 if(!uploadResponseList.isEmpty()) {
