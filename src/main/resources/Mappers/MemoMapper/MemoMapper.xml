@@ -12,6 +12,14 @@
         #{content}
         )
     </insert>
+    <insert id="insertMemoImage">
+        INSERT INTO memo_image (memo_id, file_name)
+        VALUES (#{memoId}, #{fileName})
+    </insert>
+
+    <select id="findImagesByMemoId" resultType="string">
+        SELECT file_name FROM memo_image WHERE memo_id = #{memoId}
+    </select>
 
     <update id="updateMemoImage">
         UPDATE memo
@@ -57,12 +65,6 @@
         </if>
         </where>
     </select>
-
-    <update id="updateMemoImage">
-        UPDATE memo
-        SET memo_image = #{memoImage},
-        WHERE memo_id = #{memoId}
-    </update>
 
     <update id="modify">
         UPDATE memo

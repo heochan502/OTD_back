@@ -10,6 +10,7 @@ import java.util.List;
 public interface MemoMapper {
     void save(MemoPostReq req);
     void updateMemoImage(@Param("memoId") int memoId, @Param("memoImage") String memoImage);
+    List<String> findImagesByMemoId(int memoId);
     List<MemoGetRes> findAll(MemoGetReq req);
     int getTotalCount(MemoGetReq req);
     MemoGetOneRes findById(int id);

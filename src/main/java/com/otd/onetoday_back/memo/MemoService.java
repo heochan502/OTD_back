@@ -56,7 +56,7 @@ public class MemoService {
                     Path filePath = uploadPath.resolve(uniqueFileName);
                     Files.copy(file.getInputStream(), filePath);
 
-                    String fileUrl = "/uploads/" + uniqueFileName;
+                    String fileUrl = "/pic/" + uniqueFileName;
                     uploadResponseList.add(new UploadResponse(uniqueFileName, originalFilename, "이미지 업로드 성공"));
                     uploadFileNames.add(uniqueFileName);
                 }
