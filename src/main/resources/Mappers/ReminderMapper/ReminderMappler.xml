@@ -23,7 +23,9 @@
     <select id="findByMonth">
         SELECT re_id AS id, re_title AS title, re_date AS date
         FROM reminder
-        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-__') AND member_no_login = #{memberId}
+        WHERE r_date IS NOT NULL
+        AND YEAR(r_date) = #{year}
+        AND MONTH(r_date) = #{month}
     </select>
     <select id="findByDay">
         SELECT re_id AS id, re_title AS title, re_date AS date
