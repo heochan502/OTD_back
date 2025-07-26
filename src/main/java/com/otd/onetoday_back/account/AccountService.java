@@ -29,12 +29,24 @@ public class AccountService {
         AccountLoginRes res = accountMapper.findByLogin(req);
         log.info("AccountLoginRes: memberNoLogin={}, memberPw={}", res.getMemberNoLogin(), res.getMemberPw());
         log.info("id:" + req.getMemberId());
-        //비밀번호 체크
         if( res == null ||!BCrypt.checkpw(req.getMemberPw(), res.getMemberPw()))
         {
-            return null; // 비밀번호가 다르면 null 처리
+            return null;
         }
         return res;
+    }
+    public AccountProfileRes updateProfile(Long memberNoLogin, memberUpdateDto dto) {
+        AccountProfileRes res = accountMapper.findProfileById(memberNoLogin.intValue());
+        if (res == null) {
+            return null;
+        }
+
+        dto.setMemberNoLogin(memberNoLogin);
+        int result = accountMapper.updateProfile(dto);
+        if (result > 0) {
+            return accountMapper.findProfileById(memberNoLogin.intValue());
+        }
+        return null;
     }
 
     public AccountProfileRes getProfile(int memberNoLogin) {

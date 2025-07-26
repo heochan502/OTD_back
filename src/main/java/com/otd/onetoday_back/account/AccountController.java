@@ -4,6 +4,7 @@ import com.otd.onetoday_back.account.model.*;
 import com.otd.onetoday_back.account.etc.*;
 import com.otd.onetoday_back.common.util.HttpUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,7 +45,7 @@ public class AccountController {
     public ResponseEntity<?> getMyProfile(HttpServletRequest httpReq) {
         Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         if (memberNoLogin == null) {
-            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+            return ResponseEntity.status(401).build();
         }
 
         AccountProfileRes profile = accountService.getProfile(memberNoLogin);
@@ -54,8 +55,23 @@ public class AccountController {
         return ResponseEntity.ok(profile);
     }
 
+    @PostMapping("/profile")
+    public ResponseEntity<?> updateProfile(
+            HttpServletRequest httpReq,
+            @RequestBody memberUpdateDto dto) {
 
-    @PostMapping("/login")
+        Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        if (memberNoLogin == null) {
+            return ResponseEntity.status(401).build();
+        }
+        AccountProfileRes result = accountService.updateProfile(memberNoLogin.longValue(), dto);
+        if (result != null) {
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+@PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
 
         log.info(" changed  : {}", req);
