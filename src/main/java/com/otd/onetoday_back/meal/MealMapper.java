@@ -1,12 +1,11 @@
 package com.otd.onetoday_back.meal;
 
 
-import com.otd.onetoday_back.meal.model.findFoodCategoryRes;
-import com.otd.onetoday_back.meal.model.findFoodNameReq;
-import com.otd.onetoday_back.meal.model.findFoodNameRes;
-import lombok.extern.slf4j.Slf4j;
+import com.otd.onetoday_back.meal.model.FindFoodCategoryRes;
+import com.otd.onetoday_back.meal.model.FindFoodNameReq;
+import com.otd.onetoday_back.meal.model.FindFoodNameRes;
+import com.otd.onetoday_back.meal.model.FindMealCalorieRes;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
@@ -15,9 +14,9 @@ import java.util.List;
 
 public interface MealMapper {
 
-    List<findFoodNameRes> findFoodNameForFoodName(String foodName);
+//    List<FindFoodNameRes> findFoodNameForFoodName(String foodName);
     // 객체 재사용이라 이름이 같음  list안에 이름
-    List<findFoodCategoryRes> findFoodCategory(String foodCategory);
-    List<findFoodNameRes> findFoodNameForFoodNameAndCategory(findFoodNameReq foodName);
-
+    List<FindFoodCategoryRes> findFoodCategory(String foodCategory);
+    List<FindFoodNameRes> findFoodNameForFoodNameAndCategory(FindFoodNameReq foodName);
+    FindMealCalorieRes findMealCalorie(FindFoodNameReq foodName);
 }

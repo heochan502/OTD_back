@@ -21,25 +21,38 @@ public class MealController {
 
 
     @GetMapping()
-    public ResponseEntity<?> findFood(HttpServletRequest httpReq, @ModelAttribute findFoodNameReq foodInfo)
+    public ResponseEntity<?> findFood(HttpServletRequest httpReq, @ModelAttribute FindFoodNameReq foodInfo)
+    {
+//        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+//        log.info("foodInfo: {}", foodInfo);
+
+        if (foodInfo.getFoodName() == null || foodInfo.getFoodName().isEmpty()) {
+            List<FindFoodCategoryRes> res =  mealService.findFoodCategory(foodInfo);
+
+            return ResponseEntity.ok(res);
+        }
+//        else  (foodInfo.getFoodCategory() == null || foodInfo.getFoodCategory().isEmpty()) {
+        else {
+            List<FindFoodNameRes> res =  mealService.findFoodName(foodInfo);
+            return ResponseEntity.ok(res);
+        }
+//        else
+//        {
+//            List<FindFoodNameRes> res  = mealService.findFoodName(foodInfo);
+//            return ResponseEntity.ok(res);
+//        }
+//        log.info("memeber id {} : foodname {}", memberId, foodName);
+//        List<findFoodNameRes> res = mealService.findFoodName(foodInfo);
+//        log.info("res : {}", res);
+//        return null;
+    }
+    @GetMapping("/calcul")
+    public ResponseEntity<?> mealCalculation(HttpServletRequest httpReq, @ModelAttribute FindFoodNameReq foodInfo)
     {
         Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         log.info("foodInfo: {}", foodInfo);
-
-        if (foodInfo.getFoodName() == null || foodInfo.getFoodName().isEmpty()) {
-            List<findFoodCategoryRes> res =  mealService.findFoodCategory(foodInfo);
-
-            return ResponseEntity.ok(res);
-        }
-        else if (foodInfo.getFoodCategory() == null || foodInfo.getFoodCategory().isEmpty()) {
-            List<findFoodNameRes> res =  mealService.findFoodName(foodInfo);
-            return ResponseEntity.ok(res);
-        }
-        else
-        {
-            List<findFoodNameRes> res  = mealService.findFoodName(foodInfo);
-            return ResponseEntity.ok(res);
-        }
+        FindMealCalorieRes res = mealService.findMealCalorie(foodInfo);
+        return ResponseEntity.ok(res);
 
 //        log.info("memeber id {} : foodname {}", memberId, foodName);
 //        List<findFoodNameRes> res = mealService.findFoodName(foodInfo);
