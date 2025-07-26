@@ -12,6 +12,7 @@ public interface LocationMapper {
     int insertMemberLocation(LocationDto dto);
     List<LocationDto> getLocalList(LocationDto keyword);
     List<LocationDto> getLocalListByMemberId(int memberId);
-    void unselectAllByMemberId(@Param("memberId") int memberId);
-    void updateSelectedLocation(@Param("memberId") int memberId, @Param("localId") int localId);
+    int unselectAllByMemberId(@Param("memberId") int memberId);
+    int updateSelectedLocation(@Param("memberId") int memberId, @Param("localId") int localId);
+    int deleteLocation(int memberId, int localId);
 }

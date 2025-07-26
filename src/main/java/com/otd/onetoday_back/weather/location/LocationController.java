@@ -39,14 +39,19 @@ public class LocationController {
     }
 
     @PutMapping("/select")
-    public ResponseEntity<Void> selectLocation(HttpSession session,
+    public ResponseEntity<?> selectLocation(HttpSession session,
                                                @RequestBody LocationDto dto) {
-        Integer memberId = (Integer) session.getAttribute("memberId");
+        Integer memberId = (Integer)session.getAttribute("memberId");
         dto.setMemberId(memberId);
-        locationService.selectLocation(memberId, dto.getLocalId());
-        return ResponseEntity.ok().build();
+        boolean result = locationService.selectLocation(memberId, dto.getLocalId());
+        return ResponseEntity.ok(result);
     }
 
-//    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/{localId}")
+    public ResponseEntity<?> deleteLocation(HttpSession session, @PathVariable int localId){
+        Integer memberId = (Integer)session.getAttribute("memberId");
+        int result = locationService.deleteLocation(memberId, localId);
+        return ResponseEntity.ok(result);
+    }
 
 }

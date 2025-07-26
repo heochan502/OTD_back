@@ -25,11 +25,14 @@ public class LocationService {
         return locationMapper.getLocalListByMemberId(memberId);
     }
     @Transactional
-    public void selectLocation(int memberId, int localId) {
+    public boolean selectLocation(int memberId, int localId) {
         // 기존 선택된 지역 전부 false 처리
         locationMapper.unselectAllByMemberId(memberId);
-
         // 새로 선택한 지역 true 처리
-        locationMapper.updateSelectedLocation(memberId, localId);
+        int update = locationMapper.updateSelectedLocation(memberId, localId);
+        return update > 0;
+    }
+    public int deleteLocation(int memberId, int localId) {
+        return locationMapper.deleteLocation(memberId, localId);
     }
 }

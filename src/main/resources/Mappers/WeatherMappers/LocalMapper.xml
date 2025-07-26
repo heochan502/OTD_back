@@ -32,4 +32,9 @@
         WHERE local_member_id = #{memberId}
         AND local_id = #{localId}
     </update>
+    <delete id="deleteLocation">
+        DELETE FROM member_location
+        WHERE local_member_id = #{memberId}
+        AND local_id = #{localId}
+    </delete>
 </mapper>
