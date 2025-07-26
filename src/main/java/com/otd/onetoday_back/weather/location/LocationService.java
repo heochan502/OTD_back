@@ -4,6 +4,7 @@ import com.otd.onetoday_back.weather.location.model.LocationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,5 +20,19 @@ public class LocationService {
 
     public List<LocationDto> getLocalList(LocationDto dto) {
         return locationMapper.getLocalList(dto);
+    }
+    public List<LocationDto> getLocalListByMemberId(int memberId) {
+        return locationMapper.getLocalListByMemberId(memberId);
+    }
+    @Transactional
+    public boolean selectLocation(int memberId, int localId) {
+        // 기존 선택된 지역 전부 false 처리
+        locationMapper.unselectAllByMemberId(memberId);
+        // 새로 선택한 지역 true 처리
+        int update = locationMapper.updateSelectedLocation(memberId, localId);
+        return update > 0;
+    }
+    public int deleteLocation(int memberId, int localId) {
+        return locationMapper.deleteLocation(memberId, localId);
     }
 }

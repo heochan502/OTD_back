@@ -31,4 +31,27 @@ public class LocationController {
         List<LocationDto> list = locationService.getLocalList(keyword);
         return ResponseEntity.ok(list);
     }
+    @GetMapping
+    public ResponseEntity<?> getLocalList(HttpSession session) {
+       Integer memberId = (Integer)session.getAttribute("memberId");
+       List<LocationDto> list = locationService.getLocalListByMemberId(memberId);
+       return ResponseEntity.ok(list);
+    }
+
+    @PutMapping("/select")
+    public ResponseEntity<?> selectLocation(HttpSession session,
+                                               @RequestBody LocationDto dto) {
+        Integer memberId = (Integer)session.getAttribute("memberId");
+        dto.setMemberId(memberId);
+        boolean result = locationService.selectLocation(memberId, dto.getLocalId());
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/delete/{localId}")
+    public ResponseEntity<?> deleteLocation(HttpSession session, @PathVariable int localId){
+        Integer memberId = (Integer)session.getAttribute("memberId");
+        int result = locationService.deleteLocation(memberId, localId);
+        return ResponseEntity.ok(result);
+    }
+
 }
