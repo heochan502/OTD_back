@@ -7,12 +7,13 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class AccountProfileRes {
+public class memberUpdateDto {
     private long memberNoLogin;
     private String memberId;
     private String email;
     private String name;
     private String birthDate;
     private String memberNick;
+    private String memberImg;
 
 }
