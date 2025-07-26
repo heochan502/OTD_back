@@ -46,12 +46,5 @@
     <select id="existsByMemberNick" parameterType="string" resultType="int">
         SELECT count(*) FROM member WHERE member_nick = #{memberNick}
     </select>
-<<<<<<< HEAD
-</mapper>
-=======
 
 </mapper>
-
-
-
->>>>>>> 194e6fe1c755b2386ede6ee349fb11972276c034
