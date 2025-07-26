@@ -6,6 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class findFoodCategoryRes {
-    private String foodCategory;
+public class FindFoodNameRes {
+    private String foodName;
+    private int calorie;
 }
