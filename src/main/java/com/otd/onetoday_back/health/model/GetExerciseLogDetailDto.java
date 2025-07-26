@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class GetExerciseLogDetailDto {
     private int exerciselogId;
-    private String exerciseName;
+    private int exerciseId;
     private int exerciseDuration;
     private int exerciseKcal;
     private int effortLevel;
