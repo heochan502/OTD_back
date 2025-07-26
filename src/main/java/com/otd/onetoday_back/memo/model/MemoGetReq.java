@@ -4,12 +4,12 @@ import lombok.*;
 
 import java.beans.ConstructorProperties;
 
-@Getter
-@Setter
+@Data
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemoGetReq {
+    private Integer memberNoLogin;
     private String searchText;
     private Integer currentPage;
     private Integer pageSize;

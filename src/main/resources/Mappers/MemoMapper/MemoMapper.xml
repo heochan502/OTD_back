@@ -36,10 +36,13 @@
         memo_image AS imageFileName
         FROM memo
         <where>
+            member_no_login = #{memberNoLogin}
             <if test="searchText != null and searchText != '' ">
                 <bind name="pattern" value="'%' + searchText + '%'" />
+                AND (
                 (memo_name LIKE #{pattern}
                 OR memo_content LIKE #{pattern})
+                )
             </if>
         </where>
         ORDER BY created_at DESC, memo_id DESC  LIMIT #{pageSize} OFFSET #{offset}; </select>
@@ -50,7 +53,8 @@
         memo_name AS title,
         memo_content AS content,
         created_at,
-        memo_image AS imageFileName
+        memo_image AS imageFileName,
+        member_no_login AS memberNoLogin
         FROM memo
         WHERE memo_id = #{id}
     </select>
