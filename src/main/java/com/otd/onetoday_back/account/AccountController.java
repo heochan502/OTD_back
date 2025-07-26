@@ -71,7 +71,7 @@ public class AccountController {
         return ResponseEntity.badRequest().build();
     }
 
-@PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
 
         log.info(" changed  : {}", req);
