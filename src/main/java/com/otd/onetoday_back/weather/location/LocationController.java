@@ -37,4 +37,13 @@ public class LocationController {
        List<LocationDto> list = locationService.getLocalListByMemberId(memberId);
        return ResponseEntity.ok(list);
     }
+
+    @PutMapping("/select")
+    public ResponseEntity<Void> selectLocation(HttpSession session,
+                                               @RequestBody LocationDto dto) {
+        Integer memberId = (Integer) session.getAttribute("memberId");
+        dto.setMemberId(memberId);
+        locationService.selectLocation(memberId, dto.getLocalId());
+        return ResponseEntity.ok().build();
+    }
 }
