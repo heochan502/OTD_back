@@ -45,7 +45,7 @@
                 )
             </if>
         </where>
-        ORDER BY created_at DESC, memo_id DESC  LIMIT #{pageSize} OFFSET #{offset}; </select>
+        ORDER BY created_at DESC, memo_id DESC  LIMIT #{pageSize} OFFSET #{offset} </select>
 
     <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetOneRes">
         SELECT
@@ -62,10 +62,14 @@
     <select id="getTotalCount" resultType="int">
         SELECT COUNT(*)
         FROM memo
-        <where> <if test="searchText != null and searchText != '' ">
+        <where>
+            member_no_login = #{memberNoLogin}
+            <if test="searchText != null and searchText.trim() != ''">
             <bind name="pattern" value="'%' + searchText + '%'" />
-            (memo_name LIKE #{pattern}
-            OR memo_content LIKE #{pattern})
+            AND (
+            memo_name LIKE #{pattern}
+            OR memo_content LIKE #{pattern}
+            )
         </if>
         </where>
     </select>

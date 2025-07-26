@@ -12,6 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class MemoListRes {
-    private List<MemoGetRes> resultData;
+    private List<MemoGetRes> memoList;
     private int totalCount;
 }
