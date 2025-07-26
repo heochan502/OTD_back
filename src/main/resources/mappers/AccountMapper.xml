@@ -24,15 +24,30 @@
         FROM member
         WHERE member_no_login = #{memberNoLogin}
     </select>
+    <update id="updateProfile" parameterType="com.otd.onetoday_back.account.model.memberUpdateDto">
+        UPDATE member
+        SET
+        member_id = #{mamberId}
+        email = #{email},
+        name = #{name},
+        birth_date = #{birthDate},
+        member_nick = #{memberNick},
+        member_img = #{memberImg},
+        WHERE member_no_login = #{memberNoLogin}
+    </update>
     <select id="existsByMemberId" parameterType="string" resultType="int">
-        SELECT * FROM member WHERE member_id = #{memberId}
+        SELECT count(*) FROM member WHERE member_id = #{memberId}
     </select>
 
     <select id="existsByEmail" parameterType="string" resultType="int">
-        SELECT * FROM member WHERE email = #{email}
+        SELECT count(*) FROM member WHERE email = #{email}
     </select>
 
     <select id="existsByMemberNick" parameterType="string" resultType="int">
-        SELECT * FROM member WHERE member_nick = #{memberNick}
+        SELECT count(*) FROM member WHERE member_nick = #{memberNick}
     </select>
+
 </mapper>
+
+
+

@@ -12,22 +12,22 @@
         SELECT food_category
         FROM meal_food_cate
         WHERE food_category LIKE '%${foodCategory}%'
-        LIMIT 50;
+        LIMIT 30;
     </select>
 
 
     <select id ="findFoodNameForFoodNameAndCategory">
-        SELECT food_name
+        SELECT food_name ,calorie
         FROM meal_food_db
         WHERE food_category LIKE '%${foodCategory}%' AND food_name LIKE '%${foodName}%'
-        LIMIT 100;
+        LIMIT 30;
     </select>
 
-    <select id ="findFoodNameAnd">
-        SELECT food_name,
+    <select id ="findMealCalorie">
+        SELECT food_name, food_db_id, calorie
         FROM meal_food_db
-        WHERE food_category = #{foodCategory} AND food_name LIKE '%${foodName}%'
-        LIMIT 100;
+        WHERE food_category LIKE '%${foodCategory}%' AND food_name LIKE '%${foodName}%'
+
     </select>
 
 
