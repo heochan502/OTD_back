@@ -12,4 +12,29 @@
         FROM locallist
         WHERE REPLACE(CONCAT(city, county, town), ' ', '') LIKE CONCAT('%', REPLACE(#{keyword}, ' ', ''), '%')
     </select>
+    <select id="getLocalListByMemberId">
+        SELECT l.*
+        FROM locallist l
+        JOIN member_location m ON l.local_id = m.local_id
+        WHERE m.local_member_id = #{memberId}
+    </select>
+    <!-- 전체 선택 해제 -->
+    <update id="unselectAllByMemberId">
+        UPDATE member_location
+        SET is_selected = FALSE
+        WHERE local_member_id = #{memberId}
+    </update>
+
+    <!-- 특정 지역 선택 -->
+    <update id="updateSelectedLocation">
+        UPDATE member_location
+        SET is_selected = TRUE
+        WHERE local_member_id = #{memberId}
+        AND local_id = #{localId}
+    </update>
+    <delete id="deleteLocation">
+        DELETE FROM member_location
+        WHERE local_member_id = #{memberId}
+        AND local_id = #{localId}
+    </delete>
 </mapper>
