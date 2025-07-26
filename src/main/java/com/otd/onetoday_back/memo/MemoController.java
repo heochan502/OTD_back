@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/OTD/memo")
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
 public class MemoController {
 
     private final MemoService memoService;
@@ -46,21 +46,15 @@ public class MemoController {
     public ResultResponse<MemoListRes> getMemo(@ModelAttribute MemoGetReq req, HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            // 프론트에서 memoList를 무조건 기대하기 때문에, 빈 값 전달
             MemoListRes empty = MemoListRes.builder()
                     .memoList(Collections.emptyList())
                     .totalCount(0)
                     .build();
-            return ResultResponse.fail("로그인이 필요합니다.", empty, 401);
+            return ResultResponse.fail("로그인이 필요합니다.", empty, 401); // ✅ data는 null 아님
         }
 
         req.setMemberNoLogin(memberId);
         MemoListRes result = memoService.findAll(req);
-
-        if (result.getMemoList().isEmpty()) {
-            log.info("사용자 {}의 등록된 메모가 없습니다.", memberId);
-        }
-
         return ResultResponse.ok("사용자 메모 조회 성공", result);
     }
 

@@ -37,8 +37,8 @@
         FROM memo
         <where>
             member_no_login = #{memberNoLogin}
-            <if test="searchText != null and searchText != '' ">
-                <bind name="pattern" value="'%' + searchText + '%'" />
+            <if test="searchText != null and searchText.trim() != ''">
+            <bind name="pattern" value="'%' + searchText + '%'" />
                 AND (
                 (memo_name LIKE #{pattern}
                 OR memo_content LIKE #{pattern})
