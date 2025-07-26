@@ -1,5 +1,6 @@
 package com.otd.onetoday_back.memo;
 
+import com.otd.onetoday_back.memo.config.model.CustomException;
 import com.otd.onetoday_back.memo.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,9 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,23 +39,21 @@ public class MemoService {
                     log.info("업로드 디렉토리 생성: {}", uploadPath.toAbsolutePath());
                 }
 
-                List<String> uploadFileNames = new ArrayList<>();
-
                 for (MultipartFile file : memoImageFiles) {
                     if (file == null || file.isEmpty()) continue;
 
                     String originalFilename = file.getOriginalFilename();
                     String fileExtension = "";
+
                     if (originalFilename != null && originalFilename.contains(".")) {
                         fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
                     }
+
                     String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
                     Path filePath = uploadPath.resolve(uniqueFileName);
                     Files.copy(file.getInputStream(), filePath);
 
-                    String fileUrl = "/pic/" + uniqueFileName;
                     uploadResponseList.add(new UploadResponse(uniqueFileName, originalFilename, "이미지 업로드 성공"));
-                    uploadFileNames.add(uniqueFileName);
                 }
 
                 if (!uploadResponseList.isEmpty()) {
@@ -77,29 +74,50 @@ public class MemoService {
     }
 
     public MemoListRes findAll(MemoGetReq req) {
-        int actualCurrentPage = (req.getCurrentPage() != null && req.getCurrentPage() > 0) ? req.getCurrentPage() : 1;
-        int actualPageSize = (req.getPageSize() != null && req.getPageSize() > 0) ? req.getPageSize() : 5;
+        int actualCurrentPage = (req.getCurrentPage() > 0) ? req.getCurrentPage() : 1;
+        int actualPageSize = (req.getPageSize() > 0) ? req.getPageSize() : 5;
         int offset = (actualCurrentPage - 1) * actualPageSize;
 
         req.setCurrentPage(actualCurrentPage);
         req.setPageSize(actualPageSize);
         req.setOffset(offset);
 
-        List<MemoGetRes> memoList = memoMapper.findAll(req);
+        List<MemoGetRes> memoList = Optional.ofNullable(memoMapper.findAll(req)).orElse(new ArrayList<>());
         int totalCount = memoMapper.getTotalCount(req);
 
         return new MemoListRes(memoList, totalCount);
     }
 
-    public MemoGetOneRes findById(int id) {
-        return memoMapper.findById(id);
+    public MemoGetOneRes findOwnedMemoById(int memoId, int memberId) {
+        MemoGetOneRes memo = Optional.ofNullable(memoMapper.findById(memoId))
+                .orElseThrow(() -> new CustomException("해당 메모가 존재하지 않습니다.", 404));
+
+        if (memo.getMemberNoLogin() != memberId) {
+            throw new CustomException("권한이 없습니다.", 403);
+        }
+
+        return memo;
     }
 
     public int modify(MemoPutReq req) {
+        MemoGetOneRes memo = Optional.ofNullable(memoMapper.findById(req.getId()))
+                .orElseThrow(() -> new CustomException("해당 메모가 존재하지 않습니다.", 404));
+
+        if (memo.getMemberNoLogin() != req.getMemberNoLogin()) {
+            throw new CustomException("권한이 없습니다.", 403);
+        }
+
         return memoMapper.modify(req);
     }
 
-    public int deleteById(int id) {
-        return memoMapper.deleteById(id);
+    public int deleteById(int memoId, int memberId) {
+        MemoGetOneRes memo = Optional.ofNullable(memoMapper.findById(memoId))
+                .orElseThrow(() -> new CustomException("해당 메모가 존재하지 않습니다.", 404));
+
+        if (memo.getMemberNoLogin() != memberId) {
+            throw new CustomException("권한이 없습니다.", 403);
+        }
+
+        return memoMapper.deleteById(memoId);
     }
 }

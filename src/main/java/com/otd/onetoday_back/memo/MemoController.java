@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -28,72 +29,72 @@ public class MemoController {
 
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            return new ResultResponse<>("로그인이 필요합니다.", null);
+            return ResultResponse.fail("로그인이 필요합니다.", null, 401);
         }
 
         req.setMemberNoLogin(memberId);
         req.setMemoImageFiles(memoImageFiles);
 
-        log.info("\uD83D\uDD0D [Memo 등록] userId: {}, title: {}, imageCount: {}",
+        log.info("📝 [메모 등록] userId: {}, title: {}, imageCount: {}",
                 memberId, req.getTitle(), memoImageFiles != null ? memoImageFiles.size() : 0);
 
         MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(memberId, req);
-        return new ResultResponse<>("메모 등록 및 파일 업로드 성공", result);
+        return ResultResponse.ok("메모 등록 및 파일 업로드 성공", result);
     }
 
     @GetMapping
     public ResultResponse<MemoListRes> getMemo(@ModelAttribute MemoGetReq req, HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            return new ResultResponse<>("로그인이 필요합니다.", null);
+            // 프론트에서 memoList를 무조건 기대하기 때문에, 빈 값 전달
+            MemoListRes empty = MemoListRes.builder()
+                    .memoList(Collections.emptyList())
+                    .totalCount(0)
+                    .build();
+            return ResultResponse.fail("로그인이 필요합니다.", empty, 401);
         }
+
         req.setMemberNoLogin(memberId);
         MemoListRes result = memoService.findAll(req);
+
         if (result.getMemoList().isEmpty()) {
             log.info("사용자 {}의 등록된 메모가 없습니다.", memberId);
         }
-        return new ResultResponse<>("사용자 메모 조회 성공", result);
+
+        return ResultResponse.ok("사용자 메모 조회 성공", result);
     }
 
     @GetMapping("{memoId}")
     public ResultResponse<MemoGetOneRes> getMemo(@PathVariable int memoId, HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            return new ResultResponse<>("로그인이 필요합니다.", null);
+            return ResultResponse.fail("로그인이 필요합니다.", null, 401);
         }
 
-        MemoGetOneRes result = memoService.findById(memoId);
-        if (result == null) {
-            return new ResultResponse<>("해당 메모가 존재하지 않습니다.", null);
-        }
-        if (!memberId.equals(result.getMemberNoLogin())) {
-            return new ResultResponse<>("권한이 없습니다.", null);
-        }
-
-        return new ResultResponse<>("단일 메모 조회 성공", result);
+        MemoGetOneRes result = memoService.findOwnedMemoById(memoId, memberId);
+        return ResultResponse.ok("단일 메모 조회 성공", result);
     }
 
     @PutMapping
     public ResultResponse<Integer> putMemo(@RequestBody MemoPutReq req, HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            return new ResultResponse<>("로그인이 필요합니다.", null);
+            return ResultResponse.fail("로그인이 필요합니다.", null, 401);
         }
 
-        log.info("\uD83D\uDCCB [메모 수정 요청] memoId: {}, title: {}", req.getId(), req.getTitle());
+        req.setMemberNoLogin(memberId); // 반드시 필요!
         int result = memoService.modify(req);
-        return new ResultResponse<>("메모 수정 성공", result);
+        return ResultResponse.ok("메모 수정 성공", result);
     }
 
     @DeleteMapping
     public ResultResponse<Integer> deleteMemo(@RequestParam(name = "id") int id, HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            return new ResultResponse<>("로그인이 필요합니다.", null);
+            return ResultResponse.fail("로그인이 필요합니다.", null, 401);
         }
 
-        log.info("\u274C [메모 삭제 요청] memoId: {} by userId: {}", id, memberId);
-        int result = memoService.deleteById(id);
-        return new ResultResponse<>("메모 삭제 성공", result);
+        int result = memoService.deleteById(id, memberId);
+        return ResultResponse.ok("메모 삭제 성공", result);
     }
 }

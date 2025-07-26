@@ -9,8 +9,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemoPostReq {
-    private Integer id;
-    private Integer memberNoLogin;
+    private int id;
+    private int memberNoLogin;
     private String title;
     private String content;
     private List<MultipartFile> memoImageFiles;

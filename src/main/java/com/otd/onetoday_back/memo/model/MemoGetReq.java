@@ -9,9 +9,9 @@ import java.beans.ConstructorProperties;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemoGetReq {
-    private Integer memberNoLogin;
+    private int memberNoLogin;
     private String searchText;
-    private Integer currentPage;
-    private Integer pageSize;
-    private Integer offset;
+    private int currentPage;
+    private int pageSize;
+    private int offset;
 }

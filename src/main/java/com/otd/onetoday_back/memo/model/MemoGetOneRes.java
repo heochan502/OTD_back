@@ -12,5 +12,5 @@ public class MemoGetOneRes {
     private String content;
     private String createdAt;
     private String imageFileName;
-    private Integer memberNoLogin;
+    private int memberNoLogin;
 }
