@@ -46,4 +46,7 @@ public class LocationController {
         locationService.selectLocation(memberId, dto.getLocalId());
         return ResponseEntity.ok().build();
     }
+
+//    @DeleteMapping("/delete")
+
 }
