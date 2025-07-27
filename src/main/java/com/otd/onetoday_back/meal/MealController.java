@@ -6,6 +6,7 @@ import com.otd.onetoday_back.common.util.HttpUtils;
 import com.otd.onetoday_back.meal.model.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -56,4 +57,35 @@ public class MealController {
 //        log.info("res : {}", res);
 //        return null;
     }
+
+    @GetMapping("/getMeal")
+    public ResponseEntity<?> getMealList (HttpServletRequest httpReq, @ModelAttribute GetMealListReq getData)
+    {
+        Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        if (memberNoLogin == null) {
+            return ResponseEntity.ok("로그인 안함");
+        }
+
+        getData.setMemberNoLogin(memberNoLogin);
+
+        log.info("getMealList: {}", getData);
+        List<GetMealListRes> result = mealService.getDataByMemberNoId(getData);
+        log.info("result: {}", result);
+        return ResponseEntity.ok(result);
+
+    }
+    @PutMapping("/modifyMeal")
+    public ResponseEntity<?> modifyMeal(HttpServletRequest httpReq, @RequestBody findFoodDetailInfoReq mealInfo)
+    {
+        Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        //들어오는 날짜 데이터 변조
+        log.info("foodInfo: {}", mealInfo);
+
+//        return ResponseEntity.ok(res);
+        int result = mealService.modifyMeal( memberNoLogin,mealInfo);
+        log.info("result: {}", result);
+        return ResponseEntity.ok(result);
+//
+    }
+
 }
