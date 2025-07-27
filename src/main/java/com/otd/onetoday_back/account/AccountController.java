@@ -55,7 +55,7 @@ public class AccountController {
         return ResponseEntity.ok(profile);
     }
 
-    @PostMapping("/profile")
+    @PutMapping("/profile/detail")
     public ResponseEntity<?> updateProfile(
             HttpServletRequest httpReq,
             @RequestBody memberUpdateDto dto) {
@@ -64,12 +64,15 @@ public class AccountController {
         if (memberNoLogin == null) {
             return ResponseEntity.status(401).build();
         }
-        AccountProfileRes result = accountService.updateProfile(memberNoLogin.longValue(), dto);
+
+        // Integer를 int로 변환하여 서비스 호출
+        AccountProfileRes result = accountService.updateProfile(memberNoLogin.intValue(), dto);
         if (result != null) {
             return ResponseEntity.ok(result);
         }
         return ResponseEntity.badRequest().build();
     }
+
 
 @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
