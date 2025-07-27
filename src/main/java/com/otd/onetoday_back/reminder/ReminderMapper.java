@@ -11,9 +11,7 @@ import java.util.List;
 public interface ReminderMapper {
     int post(ReminderPostPutReq req);
     int postDow(ReminderPostPutReq req);
-    List<ReminderGetRes> findByMonth(ReminderGetReq req);
-    List<ReminderGetDow> findByMonthAndRepeatTrue(int id);
-    List<ReminderGetOneRes> findByDay(ReminderGetReq req);
+    List<ReminderGetRes> findByYearAndMonth(ReminderGetReq req);
     int modify(ReminderPostPutReq req);
     int deleteDow(int id);
     int deleteById(int id);
