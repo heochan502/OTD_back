@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 public class MemoGetOneRes {
     private int id;
-    private String title;
-    private String content;
-    private String createdAt;
-    private String imageFileName;
     private int memberNoLogin;
+    private String memoName;
+    private String memoContent;
+    private String imageFileName;
+    private LocalDateTime createdAt;
 }

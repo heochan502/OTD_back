@@ -1,6 +1,6 @@
 package com.otd.onetoday_back.memo;
 
-import com.otd.onetoday_back.memo.config.model.CustomException;
+import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.memo.model.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,10 +82,16 @@ public class MemoService {
         req.setPageSize(actualPageSize);
         req.setOffset(offset);
 
-        List<MemoGetRes> memoList = Optional.ofNullable(memoMapper.findAll(req)).orElse(new ArrayList<>());
+        MemoListRes response = new MemoListRes();
+        List<MemoGetRes> memoList = memoMapper.findAll(req);
         int totalCount = memoMapper.getTotalCount(req);
 
-        return new MemoListRes(memoList, totalCount);
+        if (memoList != null) {
+            response.setMemoList(memoList);
+        }
+        response.setTotalCount(totalCount);
+
+        return response;
     }
 
     public MemoGetOneRes findOwnedMemoById(int memoId, int memberId) {
