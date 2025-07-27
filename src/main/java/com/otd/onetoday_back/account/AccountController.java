@@ -64,8 +64,6 @@ public class AccountController {
         if (memberNoLogin == null) {
             return ResponseEntity.status(401).build();
         }
-
-        // Integer를 int로 변환하여 서비스 호출
         AccountProfileRes result = accountService.updateProfile(memberNoLogin.intValue(), dto);
         if (result != null) {
             return ResponseEntity.ok(result);
@@ -84,7 +82,6 @@ public class AccountController {
         if (result == null) {
             return ResponseEntity.notFound().build();
         }
-        //세션 처리
         HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberNoLogin());//확인하기
 
         log.info(" MEMBER_ID_NAME  : {}", result.getMemberNoLogin());

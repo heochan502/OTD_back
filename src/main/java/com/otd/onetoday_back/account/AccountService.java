@@ -36,19 +36,14 @@ public class AccountService {
         return res;
     }
     public AccountProfileRes updateProfile(int memberNoLogin, memberUpdateDto dto) {
-        // 현재 프로필 존재 여부 확인
         AccountProfileRes currentProfile = accountMapper.findProfileById(memberNoLogin);
         if (currentProfile == null) {
             return null;
         }
-
-        // DTO에 회원 번호 설정
         dto.setMemberNoLogin(memberNoLogin);
 
-        // 프로필 업데이트 실행
         int result = accountMapper.updateProfile(dto);
         if (result > 0) {
-            // 업데이트 성공시 최신 데이터 반환
             return accountMapper.findProfileById(memberNoLogin);
         }
         return null;
