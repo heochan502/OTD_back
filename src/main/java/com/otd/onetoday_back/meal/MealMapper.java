@@ -1,10 +1,7 @@
 package com.otd.onetoday_back.meal;
 
 
-import com.otd.onetoday_back.meal.model.FindFoodCategoryRes;
-import com.otd.onetoday_back.meal.model.FindFoodNameReq;
-import com.otd.onetoday_back.meal.model.FindFoodNameRes;
-import com.otd.onetoday_back.meal.model.FindMealCalorieRes;
+import com.otd.onetoday_back.meal.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -18,5 +15,9 @@ public interface MealMapper {
     // 객체 재사용이라 이름이 같음  list안에 이름
     List<FindFoodCategoryRes> findFoodCategory(String foodCategory);
     List<FindFoodNameRes> findFoodNameForFoodNameAndCategory(FindFoodNameReq foodName);
-    FindMealCalorieRes findMealCalorie(FindFoodNameReq foodName);
+    int inputDayMealData ( InputMealCategoryReq mealInfo);
+    List<GetFoodInfoAllRes>  getDetailFoodInfo(List<Integer>foodDbId);
+
+    int inputTotalCalorie (InpuMealDetailDto sumData);
+
 }

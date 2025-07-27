@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.otd.onetoday_back.meal.MealMapper">
-    <select id ="findFoodNameForFoodName">
-        SELECT food_name
-        FROM meal_food_db
-        WHERE food_name LIKE '%${foodName}%'
-        LIMIT 100;
-    </select>
 
     <select id ="findFoodCategory">
         SELECT food_category
@@ -17,18 +11,52 @@
 
 
     <select id ="findFoodNameForFoodNameAndCategory">
-        SELECT food_name ,calorie
+        SELECT food_db_id, food_name ,calorie
         FROM meal_food_db
         WHERE food_category LIKE '%${foodCategory}%' AND food_name LIKE '%${foodName}%'
         LIMIT 30;
     </select>
 
-    <select id ="findMealCalorie">
-        SELECT food_name, food_db_id, calorie
-        FROM meal_food_db
-        WHERE food_category LIKE '%${foodCategory}%' AND food_name LIKE '%${foodName}%'
+    <insert id="inputDayMealData">
+        INSERT INTO meal_category
+        (member_no_login, food_db_id, meal_time)
+        VALUES
+        <foreach collection="foodDbId" item="foodDbId" separator=",">
+         (#{memberNoLogin}, #{foodDbId},  #{mealDay})
+        </foreach>
+    </insert>
+
+    <select id="getDetailFoodInfo"  >
+        SELECT  calorie , protein, fat, carbohydrate, sugar, natrium
+        FROM  meal_food_db
+        WHERE food_db_id IN
+        <foreach collection="foodDbId" item="foodId"  open="(" separator="," close=")">
+             #{foodId}
+        </foreach>
 
     </select>
 
+    <insert id="inputTotalCalorie">
+<!--        INSERT INTO meal_total_calorie-->
+<!--        (member_no_login, meal_day, meal_br_lu_di, total_calorie , total_protein, total_fat, total_carbohydrate, total_sugar,-->
+<!--        total_natrium)-->
+<!--        VALUES-->
+<!--        ( memberNoLogin, mealDay, mealBrLuDi,-->
+<!--            (<foreach collection="foodDbId" item="foodId, amount" separator=",">-->
+<!--                SELECT  sum(calorie * #{amount}) , sum(protein * #{amount}), sum(fat * #{amount}), sum(carbohydrate * #{amount}), sum(sugar * #{amount}), sum(natrium * #{amount})-->
+<!--                FROM  meal_food_db-->
+<!--                WHERE food_db_id in-->
+<!--&lt;!&ndash;                    <foreach collection="foodDbId" item="foodId" separator=",">&ndash;&gt;-->
+<!--                        #{foodId}-->
+<!--                    </foreach>-->
+<!--            )-->
+<!--        )-->
 
-</mapper>
+        INSERT INTO meal_total_calo
+            (member_no_login, meal_day, meal_br_lu_di, total_calorie , total_protein, total_fat, total_carbohydrate, total_sugar, total_natrium)
+        VALUES (#{memberNoLogin}, #{mealDay}, #{mealBrLuDi}, #{totalCalorie},  #{totalProtein}, #{totalFat}, #{totalCarbohydrate}, #{totalSugar},#{totalNatrium} )
+
+            </insert>
+
+
+        </mapper>
