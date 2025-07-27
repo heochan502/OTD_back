@@ -1,5 +1,6 @@
 package com.otd.onetoday_back.weather;
 
+import com.otd.onetoday_back.weather.location.LocationService;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/OTD/weather")
 public class WeatherController {
     private final WeatherService weatherService;
+    private final LocationService locationService;
 
     @GetMapping
     public WeatherDto getWeather(HttpSession session) {

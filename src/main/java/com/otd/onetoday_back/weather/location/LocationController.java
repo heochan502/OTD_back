@@ -1,7 +1,5 @@
 package com.otd.onetoday_back.weather.location;
 
-import com.otd.onetoday_back.weather.location.model.LocalNameGetReq;
-import com.otd.onetoday_back.weather.location.model.LocalNameGetRes;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +19,10 @@ public class LocationController {
 
     @PostMapping("/save")
     public ResponseEntity<?> insertLocation(HttpSession session,
-                                            @RequestParam("localId") int localId) {
+                                            @RequestBody LocationDto dto) {
         Integer memberId = (Integer)session.getAttribute("memberId");
-        int result = locationService.insertLocation(memberId, localId);
+        dto.setMemberId(memberId);
+        int result = locationService.insertLocation(dto);
         return ResponseEntity.ok(result);
     }
 
@@ -32,4 +31,27 @@ public class LocationController {
         List<LocationDto> list = locationService.getLocalList(keyword);
         return ResponseEntity.ok(list);
     }
+    @GetMapping
+    public ResponseEntity<?> getLocalList(HttpSession session) {
+       Integer memberId = (Integer)session.getAttribute("memberId");
+       List<LocationDto> list = locationService.getLocalListByMemberId(memberId);
+       return ResponseEntity.ok(list);
+    }
+
+    @PutMapping("/select")
+    public ResponseEntity<?> selectLocation(HttpSession session,
+                                               @RequestBody LocationDto dto) {
+        Integer memberId = (Integer)session.getAttribute("memberId");
+        dto.setMemberId(memberId);
+        boolean result = locationService.selectLocation(memberId, dto.getLocalId());
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/delete/{localId}")
+    public ResponseEntity<?> deleteLocation(HttpSession session, @PathVariable int localId){
+        Integer memberId = (Integer)session.getAttribute("memberId");
+        int result = locationService.deleteLocation(memberId, localId);
+        return ResponseEntity.ok(result);
+    }
+
 }
