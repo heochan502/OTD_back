@@ -6,7 +6,6 @@ import com.otd.onetoday_back.common.util.HttpUtils;
 import com.otd.onetoday_back.meal.model.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,7 @@ public class MealController {
     @GetMapping()
     public ResponseEntity<?> findFood(HttpServletRequest httpReq, @ModelAttribute FindFoodNameReq foodInfo)
     {
-//        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
 //        log.info("foodInfo: {}", foodInfo);
 
         if (foodInfo.getFoodName() == null || foodInfo.getFoodName().isEmpty()) {

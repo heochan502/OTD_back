@@ -19,10 +19,9 @@ public class MealService {
 
 
     private InpuMealDetailDto  calculateTotal (findFoodDetailInfoReq mealInfo, int memberNoLogin ) {
-        InpuMealDetailDto sumData = new InpuMealDetailDto();
+        InpuMealDetailDto sumData = new InpuMealDetailDto();// 필드에 할당
         List<GetFoodInfoAllRes> result = mealMapper.getDetailFoodInfo(mealInfo.getFoodDbId());
 
-        sumData = new InpuMealDetailDto(); // 필드에 할당
         sumData.setMealDay(mealInfo.getMealDay());
         sumData.setMemberNoLogin(memberNoLogin);
         sumData.setMealBrLuDi(mealInfo.getMealBrLuDi());
@@ -119,7 +118,7 @@ public class MealService {
     List<GetMealListRes> getDataByMemberNoId(GetMealListReq getData){
 
         return mealMapper.getDataByMemberNoId(getData);
-    };
+    }
 
     int modifyMeal (Integer memberNoLogin , findFoodDetailInfoReq mealInfo)
     {
