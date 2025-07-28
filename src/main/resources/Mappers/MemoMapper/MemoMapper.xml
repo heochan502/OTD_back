@@ -5,69 +5,69 @@
 
 <mapper namespace="com.otd.onetoday_back.memo.MemoMapper">
 
-    <!-- ✅ 메모 등록 -->
+    <!-- 등록 -->
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO memo (
             member_no_login,
             memo_name,
             memo_content,
-            memo_image_file_name,
+            memo_image,
             created_at
-        )
-        VALUES (
-                   #{memberNoLogin},
-                   #{memoName},
-                   #{memoContent},
-                   #{memoImageFileName},
-                   NOW()
-               )
+        ) VALUES (
+            #{memberNoLogin},
+            #{memoName},
+            #{memoContent},
+            #{memoImageFileName},
+            NOW()
+            )
     </insert>
 
-    <!-- ✅ 전체 목록 조회 (페이징) -->
+    <!-- 메모 목록 조회 (페이징 포함) -->
     <select id="findAll" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
         SELECT
             memo_id AS id,
             member_no_login,
             memo_name,
             memo_content,
-            memo_image_file_name,
+            memo_image AS memo_image_file_name,
             created_at
         FROM memo
         WHERE member_no_login = #{memberNoLogin}
         ORDER BY memo_id DESC
-            LIMIT #{pageSize} OFFSET #{offset}
+            LIMIT #{limit} OFFSET #{offset}
     </select>
 
-    <!-- ✅ 전체 개수 조회 (페이징용) -->
+    <!-- 전체 개수 조회 -->
     <select id="getTotalCount" resultType="int">
-        SELECT COUNT(*) FROM memo
+        SELECT COUNT(*)
+        FROM memo
         WHERE member_no_login = #{memberNoLogin}
     </select>
 
-    <!-- ✅ ID로 단건 조회 -->
+    <!-- 단건 조회 -->
     <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
         SELECT
             memo_id AS id,
             member_no_login,
             memo_name,
             memo_content,
-            memo_image,
+            memo_image AS memo_image_file_name,
             created_at
         FROM memo
         WHERE memo_id = #{id}
     </select>
 
-    <!-- ✅ 수정 -->
+    <!-- 수정 -->
     <update id="modify">
         UPDATE memo
         SET
             memo_name = #{memoName},
             memo_content = #{memoContent},
-            memo_image_file_name = #{memoImageFileName}
+            memo_image = #{memoImageFileName}
         WHERE memo_id = #{id}
     </update>
 
-    <!-- ✅ 삭제 -->
+    <!-- 삭제 -->
     <delete id="deleteById">
         DELETE FROM memo
         WHERE memo_id = #{id}

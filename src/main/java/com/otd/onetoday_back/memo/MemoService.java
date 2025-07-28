@@ -39,10 +39,9 @@ public class MemoService {
         if (memo == null) {
             throw new CustomException("해당 메모가 존재하지 않습니다.", 404);
         }
-        if (memo.getMemberNoLogin() != memberId) { // ← 여기 memo로 수정
+        if (memo.getMemberNoLogin() != memberId) {
             throw new CustomException("해당 메모에 접근할 수 없습니다.", 403);
         }
-
         return memo;
     }
 
@@ -53,7 +52,7 @@ public class MemoService {
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
             MultipartFile file = imageFiles.get(0);
             String fileName = saveFile(file);
-            req.setMemoImage(fileName); // DB에 저장할 대표 이미지 파일명
+            req.setMemoImageFileName(fileName);
         }
 
         memoMapper.save(req);
@@ -61,9 +60,9 @@ public class MemoService {
 
         return new MemoPostAnduploadRes(
                 newMemoId,
-                req.getMemoImage() != null
+                req.getMemoImageFileName() != null
                         ? Collections.singletonList(new UploadResponse(
-                        req.getMemoImage(),
+                        req.getMemoImageFileName(),
                         imageFiles.get(0).getOriginalFilename(),
                         "업로드 성공"))
                         : Collections.emptyList()
@@ -79,7 +78,16 @@ public class MemoService {
             throw new CustomException("수정 권한이 없습니다.", 403);
         }
 
-        // memoImage 포함하여 업데이트
+        List<MultipartFile> imageFiles = req.getMemoImageFiles();
+        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
+            MultipartFile file = imageFiles.get(0);
+            String fileName = saveFile(file);
+            req.setMemoImageFileName(fileName);
+            if (existing.getMemoImageFileName() != null) {
+                deleteFileIfExists(existing.getMemoImageFileName());
+            }
+        }
+
         memoMapper.modify(req);
     }
 
@@ -92,8 +100,8 @@ public class MemoService {
             throw new CustomException("삭제 권한이 없습니다.", 403);
         }
 
-        if (existing.getMemoImage() != null) {
-            deleteFileIfExists(existing.getMemoImage());
+        if (existing.getMemoImageFileName() != null) {
+            deleteFileIfExists(existing.getMemoImageFileName());
         }
 
         memoMapper.deleteById(id);
@@ -105,12 +113,15 @@ public class MemoService {
             String ext = (originalFilename != null && originalFilename.contains("."))
                     ? originalFilename.substring(originalFilename.lastIndexOf("."))
                     : ".bin";
-
             String safeFileName = UUID.randomUUID().toString() + ext;
-            Path target = Paths.get(uploadDir).resolve(safeFileName).normalize();
+
+            // uploadDir에 trim() 적용해서 공백 제거
+            String trimmedUploadDir = uploadDir.trim();
+            Path target = Paths.get(trimmedUploadDir).resolve(safeFileName).normalize();
 
             Files.createDirectories(target.getParent());
-            file.transferTo(target.toFile()); // 또는 Files.copy(file.getInputStream(), target);
+            file.transferTo(target.toFile());
+
             return safeFileName;
         } catch (IOException e) {
             log.error("파일 저장 실패: {}", e.getMessage());
@@ -119,7 +130,8 @@ public class MemoService {
     }
 
     private void deleteFileIfExists(String fileName) {
-        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
+        String trimmedUploadDir = uploadDir.trim();
+        Path path = Paths.get(trimmedUploadDir).resolve(fileName).normalize();
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {

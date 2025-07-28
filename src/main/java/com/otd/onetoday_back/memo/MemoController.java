@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +17,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/OTD/memo")
+@RequestMapping("/api/OTD/memoAndDiary/memo")
 public class MemoController {
 
     private final MemoService memoService;
@@ -38,7 +39,6 @@ public class MemoController {
         Integer memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
 
-        // ✅ 잘못된 요청 방지
         if (req.getCurrentPage() <= 0) req.setCurrentPage(1);
         if (req.getPageSize() <= 0) req.setPageSize(10);
 
@@ -57,7 +57,7 @@ public class MemoController {
         return ResultResponse.success(result, request.getRequestURI());
     }
 
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultResponse<?> postMemo(
             HttpSession session,
             @RequestPart("memoData") MemoPostReq req,
@@ -72,13 +72,17 @@ public class MemoController {
         return ResultResponse.success(result, request.getRequestURI());
     }
 
-    @PutMapping
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultResponse<?> updateMemo(
             HttpSession session,
-            @RequestBody MemoPutReq req,
+            @RequestPart("memoData") MemoPutReq req,
+            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles,
             HttpServletRequest request) {
 
         Integer memberId = getLoggedInMemberId(session);
+        req.setMemberNoLogin(memberId);
+        req.setMemoImageFiles(memoImageFiles);
+
         memoService.updateMemo(req, memberId);
         return ResultResponse.success("수정 완료", request.getRequestURI());
     }

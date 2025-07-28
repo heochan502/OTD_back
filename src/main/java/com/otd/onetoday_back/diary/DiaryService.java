@@ -24,6 +24,7 @@ public class DiaryService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+    // ✅ 전체 조회
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
         req.setOffset(offset);
@@ -34,6 +35,7 @@ public class DiaryService {
         return new DiaryListRes(diaryList, totalCount);
     }
 
+    // ✅ 단건 조회
     public DiaryGetRes findById(int id, int memberId) {
         DiaryGetRes diary = diaryMapper.findById(id);
         if (diary == null) {
@@ -45,52 +47,32 @@ public class DiaryService {
         return diary;
     }
 
-    public DiaryPostAndUploadRes updateDiaryAndHandleUpload(int memberId, DiaryPutReq req) {
-        // 1. 기존 일기 조회 및 권한 검사
-        DiaryGetRes existing = diaryMapper.findById(req.getId());
-        if (existing == null) {
-            throw new CustomException("수정할 일기가 존재하지 않습니다.", 404);
-        }
-        if (existing.getMemberNoLogin() != memberId) {
-            throw new CustomException("수정 권한이 없습니다.", 403);
-        }
+    // ✅ 등록 (multipart/form-data)
+    public DiaryPostAndUploadRes saveDiaryAndHandleUpload(int memberId, DiaryPostReq req) {
+        req.setMemberNoLogin(memberId);
 
-        // 2. 이미지 처리
         List<MultipartFile> imageFiles = req.getDiaryImageFiles();
-        UploadResponse uploadResponse = null;
-
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
             MultipartFile file = imageFiles.get(0);
-
-            // 기존 이미지가 있다면 삭제
-            if (existing.getImageFileName() != null) {
-                deleteFileIfExists(existing.getImageFileName());
-            }
-
-            // 새 이미지 저장
-            String uploadedFileName = saveFile(file);
-            req.setImageFileName(uploadedFileName);
-
-            uploadResponse = new UploadResponse(
-                    uploadedFileName,
-                    file.getOriginalFilename(),
-                    "업로드 성공"
-            );
-        } else {
-            // 이미지가 없으면 null 처리
-            req.setImageFileName(null);
+            String fileName = saveFile(file);
+            req.setImageFileName(fileName);
         }
 
-        // 3. DB 수정
-        diaryMapper.modify(req);
+        diaryMapper.save(req);
+        int newDiaryId = req.getId();
 
-        // 4. 결과 반환
         return new DiaryPostAndUploadRes(
-                req.getId(),
-                uploadResponse != null ? List.of(uploadResponse) : Collections.emptyList()
+                newDiaryId,
+                req.getImageFileName() != null
+                        ? Collections.singletonList(new UploadResponse(
+                        req.getImageFileName(),
+                        imageFiles.get(0).getOriginalFilename(),
+                        "업로드 성공"))
+                        : Collections.emptyList()
         );
     }
 
+    // ✅ 수정 (application/json 또는 multipart)
     public void updateDiary(DiaryPutReq req, int memberId) {
         DiaryGetRes existing = diaryMapper.findById(req.getId());
         if (existing == null) {
@@ -103,6 +85,48 @@ public class DiaryService {
         diaryMapper.modify(req);
     }
 
+    // ✅ 수정 + 이미지 업로드
+    public DiaryPostAndUploadRes updateDiaryAndHandleUpload(int memberId, DiaryPutReq req) {
+        DiaryGetRes existing = diaryMapper.findById(req.getId());
+        if (existing == null) {
+            throw new CustomException("수정할 일기가 존재하지 않습니다.", 404);
+        }
+        if (existing.getMemberNoLogin() != memberId) {
+            throw new CustomException("수정 권한이 없습니다.", 403);
+        }
+
+        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
+        String uploadedFileName = null;
+        UploadResponse uploadResponse = null;
+
+        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
+            MultipartFile file = imageFiles.get(0);
+
+            if (existing.getImageFileName() != null) {
+                deleteFileIfExists(existing.getImageFileName());
+            }
+
+            uploadedFileName = saveFile(file);
+            req.setImageFileName(uploadedFileName);
+
+            uploadResponse = new UploadResponse(
+                    uploadedFileName,
+                    file.getOriginalFilename(),
+                    "업로드 성공"
+            );
+        } else {
+            req.setImageFileName(null);
+        }
+
+        diaryMapper.modify(req);
+
+        return new DiaryPostAndUploadRes(
+                req.getId(),
+                uploadResponse != null ? List.of(uploadResponse) : Collections.emptyList()
+        );
+    }
+
+    // ✅ 삭제
     public void deleteDiary(int id, int memberId) {
         DiaryGetRes existing = diaryMapper.findById(id);
         if (existing == null) {
@@ -119,18 +143,21 @@ public class DiaryService {
         diaryMapper.deleteById(id);
     }
 
+    // ✅ 파일 저장
     private String saveFile(MultipartFile file) {
         try {
             String originalFilename = file.getOriginalFilename();
             String ext = (originalFilename != null && originalFilename.contains("."))
                     ? originalFilename.substring(originalFilename.lastIndexOf("."))
                     : ".bin";
-
             String safeFileName = UUID.randomUUID().toString() + ext;
-            Path target = Paths.get(uploadDir).resolve(safeFileName).normalize();
+
+            String trimmedUploadDir = uploadDir.trim();
+            Path target = Paths.get(trimmedUploadDir).resolve(safeFileName).normalize();
 
             Files.createDirectories(target.getParent());
             file.transferTo(target.toFile());
+
             return safeFileName;
         } catch (IOException e) {
             log.error("파일 저장 실패: {}", e.getMessage());
@@ -138,8 +165,10 @@ public class DiaryService {
         }
     }
 
+    // ✅ 파일 삭제
     private void deleteFileIfExists(String fileName) {
-        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
+        String trimmedUploadDir = uploadDir.trim();
+        Path path = Paths.get(trimmedUploadDir).resolve(fileName).normalize();
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {
