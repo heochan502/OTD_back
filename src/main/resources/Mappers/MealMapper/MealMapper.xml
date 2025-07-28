@@ -6,7 +6,7 @@
         SELECT food_category
         FROM meal_food_cate
         WHERE food_category LIKE '%${foodCategory}%'
-        LIMIT 30;
+        LIMIT 30
     </select>
 
 
@@ -14,7 +14,7 @@
         SELECT food_db_id, food_name ,calorie
         FROM meal_food_db
         WHERE food_category LIKE '%${foodCategory}%' AND food_name LIKE '%${foodName}%'
-        LIMIT 50;
+        LIMIT 50
     </select>
 
     <insert id="inputDayMealData">
@@ -75,8 +75,6 @@
         SET  total_calorie= #{totalCalorie} , total_protein =#{totalProtein}, total_fat= #{totalFat}, total_carbohydrate=#{totalCarbohydrate}, total_sugar=#{totalSugar}, total_natrium=#{totalNatrium}
         WHERE meal_br_lu_di = #{mealBrLuDi} AND member_no_login =  #{memberNoLogin} and DATE(meal_day) = #{mealDay}
     </update>
-
-
 
     <select id="getDataByMemberNoId">
         SELECT mf.food_name, mf.calorie, mc.meal_time ,mc.food_db_id, mc.food_amount as amount, mt.total_calorie as all_day_calorie, mt.meal_br_lu_di, mt.total_fat, mt.total_carbohydrate, mt.total_protein
