@@ -8,11 +8,10 @@ import org.springframework.stereotype.Service;
 
 @Getter
 @Builder
-@Setter
 @ToString
 public class GetExerciseLogDetailRes {
     private int exerciselogId;
-    private String exerciseName;
+    private int exerciseId;
     private int exerciseDuration;
     private int exerciseKcal;
     private int effortLevel;
