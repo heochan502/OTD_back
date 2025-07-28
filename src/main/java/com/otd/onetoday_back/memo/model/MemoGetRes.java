@@ -9,7 +9,14 @@ public class MemoGetRes {
     private int id;
     private String memoName;
     private String memoContent;
-    private String memoImage;
-    private int memberNoLogin;
-    private LocalDateTime createdAt;
+    private String createdAt;
+    private String imageFileName;
+    private Integer memberNoLogin;
+
+    public String getMemoImage() {
+        return memoImage;
+    }
+    public void setMemoImage(String memoImage) {
+        this.memoImage = memoImage;
+    }
 }

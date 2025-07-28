@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class DiaryPostAndUploadRes {
     private int id;
-    private String diaryImage;
+    private List<UploadResponse> uploadedFiles;
 }

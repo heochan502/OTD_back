@@ -5,45 +5,18 @@
 
 <mapper namespace="com.otd.onetoday_back.memo.MemoMapper">
 
-    <!-- 메모 저장 -->
+    <!-- 메모 등록 -->
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO memo (
-            member_no_login,
-            memo_name,
-            memo_content,
-            memo_image,
-            created_at
-        )
-        VALUES (
-                   #{memberNoLogin},
-                   #{memoName},
-                   #{memoContent},
-                   #{memoImage},
-                   NOW()
-               )
+        INSERT INTO memo (member_no_login, memo_name, memo_content, memo_image, created_at)
+        VALUES (#{memberNoLogin}, #{memoName}, #{memoContent},
+        <choose>
+            <when test="memoImageFiles != null and !memoImageFiles.isEmpty()">
+                #{memoImageFiles[0].originalFilename}
+            </when>
+            <otherwise>null</otherwise>
+        </choose>,
+        NOW())
     </insert>
-
-    <!-- 메모 전체 조회 (페이징) -->
-    <select id="findAll" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
-        SELECT
-            memo_id AS id,
-            member_no_login,
-            memo_name,
-            memo_content,
-            memo_image,
-            created_at
-        FROM memo
-        WHERE member_no_login = #{memberNoLogin}
-        ORDER BY created_at DESC
-            LIMIT #{pageSize} OFFSET #{offset}
-    </select>
-
-    <!-- 전체 개수 (페이징용) -->
-    <select id="getTotalCount" resultType="int">
-        SELECT COUNT(*)
-        FROM memo
-        WHERE member_no_login = #{memberNoLogin}
-    </select>
 
     <!-- 메모 단건 조회 -->
     <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
@@ -52,26 +25,51 @@
             member_no_login,
             memo_name,
             memo_content,
-            memo_image,
+            memo_image AS imageFileName,
             created_at
         FROM memo
         WHERE memo_id = #{id}
     </select>
 
     <!-- 메모 수정 -->
-    <update id="modify">
+    <update id="update">
         UPDATE memo
-        SET
-            memo_name = #{memoName},
-            memo_content = #{memoContent},
-            memo_image = #{memoImage}
-        WHERE memo_id = #{id}
+        SET memo_name = #{memoName},
+            memo_content = #{memoContent}
+        WHERE memo_id = #{id} AND member_no_login = #{memberNoLogin}
     </update>
 
     <!-- 메모 삭제 -->
-    <delete id="deleteById">
+    <delete id="delete">
         DELETE FROM memo
         WHERE memo_id = #{id}
     </delete>
+
+    <!-- 메모 목록 조회 (페이징) -->
+    <select id="findAll" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
+        SELECT
+            memo_id AS id,
+            memo_name,
+            memo_content,
+            memo_image AS imageFileName,
+            created_at
+        FROM memo
+        WHERE member_no_login = #{memberNoLogin}
+        ORDER BY created_at DESC
+            LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 메모 개수 -->
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*)
+        FROM memo
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*)
+        FROM memo
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
 
 </mapper>

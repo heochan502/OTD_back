@@ -8,15 +8,15 @@ import java.util.List;
 @Mapper
 public interface DiaryMapper {
 
-    int save(DiaryPostReq req);
+    void save(DiaryPostReq req);
 
     List<DiaryGetRes> findAll(DiaryGetReq req);
 
     int getTotalCount(DiaryGetReq req);
 
-    DiaryGetRes findById(int id);
+    DiaryGetRes findById(int id); // memberId 체크는 서비스단에서 처리
 
-    int modify(DiaryPutReq req);
+    void modify(DiaryPutReq req);
 
-    int deleteById(int id);
+    void deleteById(int id);
 }

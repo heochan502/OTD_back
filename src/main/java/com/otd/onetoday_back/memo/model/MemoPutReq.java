@@ -1,15 +1,13 @@
 package com.otd.onetoday_back.memo.model;
 
-import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-
-@Data
+@Getter
+@Setter
 public class MemoPutReq {
-    private int id;
+    private int id; // 수정할 메모의 ID
     private String memoName;
     private String memoContent;
-    private String memoImage; // 덮어쓸 이미지 파일명
-    private List<MultipartFile> memoImageFiles; // 수정 시 새 파일 업로드용 (선택)
+    private String memoImage; // 이미지 파일명 (기존 이미지 유지하거나 새로 설정)
 }

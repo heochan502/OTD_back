@@ -1,17 +1,18 @@
 package com.otd.onetoday_back.memo.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 public class MemoPostReq {
-    private int id;
+    private int id; // 저장된 후 반환될 ID
+    private int memberNoLogin;
     private String memoName;
     private String memoContent;
-    private int memberNoLogin;
-    private String memoImage; // 저장할 대표 이미지 파일명
-    private List<MultipartFile> memoImageFiles; // 프론트에서 업로드되는 이미지들
+    private String memoImage; // 대표 이미지 파일명
+    private List<MultipartFile> memoImageFiles;
 }

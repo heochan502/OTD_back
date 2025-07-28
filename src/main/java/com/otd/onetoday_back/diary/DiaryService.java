@@ -6,12 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -20,111 +21,105 @@ public class DiaryService {
 
     private final DiaryMapper diaryMapper;
 
-    @Value("${constants.file.directory}")
+    @Value("${file.upload-dir}")
     private String uploadDir;
 
-    /**
-     * 일기 등록 + 이미지 업로드
-     */
-    @Transactional
-    public DiaryPostAndUploadRes saveDiaryAndHandleUpload(int userId, DiaryPostReq req) {
-        req.setMemberNoLogin(userId);
-
-        String savedFileName = handleSingleFileUpload(req.getDiaryImageFiles());
-        req.setDiaryImage(savedFileName);
-
-        diaryMapper.save(req);
-        return new DiaryPostAndUploadRes(req.getId(), savedFileName);
-    }
-
-    /**
-     * 일기 목록 + 페이징
-     */
     public DiaryListRes findAll(DiaryGetReq req) {
-        int page = Math.max(req.getCurrentPage(), 1);
-        int size = Math.max(req.getPageSize(), 5);
-        int offset = (page - 1) * size;
-
-        req.setCurrentPage(page);
-        req.setPageSize(size);
+        int offset = (req.getCurrentPage() - 1) * req.getPageSize();
         req.setOffset(offset);
 
-        List<DiaryGetRes> list = diaryMapper.findAll(req);
-        int count = diaryMapper.getTotalCount(req);
+        List<DiaryGetRes> diaryList = diaryMapper.findAll(req);
+        int totalCount = diaryMapper.getTotalCount(req);
 
-        return new DiaryListRes(list, count);
+        return new DiaryListRes(diaryList, totalCount);
     }
 
-    /**
-     * 일기 단건 조회 (로그인 사용자 소유 확인 포함)
-     */
-    public DiaryGetRes findOwnedDiaryById(int id, int userId) {
+    public DiaryGetRes findById(int id, int memberId) {
         DiaryGetRes diary = diaryMapper.findById(id);
         if (diary == null) {
-            throw new CustomException("일기 없음", 404);
+            throw new CustomException("해당 일기가 존재하지 않습니다.", 404);
         }
-        if (diary.getMemberNoLogin() != userId) {
-            throw new CustomException("권한 없음", 403);
+        if (diary.getMemberNoLogin() != memberId) {
+            throw new CustomException("해당 일기에 접근할 수 없습니다.", 403);
         }
         return diary;
     }
 
-    /**
-     * 일기 수정 + 이미지 변경
-     */
-    @Transactional
-    public int modify(DiaryPutReq req) {
-        DiaryGetRes existing = findOwnedDiaryById(req.getId(), req.getMemberNoLogin());
+    public DiaryPostAndUploadRes saveDiaryAndHandleUpload(int memberId, DiaryPostReq req) {
+        req.setMemberNoLogin(memberId);
 
-        // 기존 이미지 삭제
-        deleteFileIfExists(existing.getDiaryImage());
+        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
+        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
+            MultipartFile file = imageFiles.get(0);
+            String fileName = saveFile(file);
+            req.setDiaryImage(fileName);
+        }
 
-        // 새 이미지 업로드
-        String newSaved = handleSingleFileUpload(req.getDiaryImageFiles());
-        req.setDiaryImage(newSaved);
+        diaryMapper.save(req);
+        int newDiaryId = req.getId();
 
-        return diaryMapper.modify(req);
+        return new DiaryPostAndUploadRes(
+                newDiaryId,
+                req.getDiaryImage() != null
+                        ? Collections.singletonList(new UploadResponse(
+                        req.getDiaryImage(),
+                        imageFiles.get(0).getOriginalFilename(),
+                        "업로드 성공"))
+                        : Collections.emptyList()
+        );
     }
 
-    /**
-     * 일기 삭제 + 이미지 삭제
-     */
-    @Transactional
-    public int deleteById(int id, int userId) {
-        DiaryGetRes existing = findOwnedDiaryById(id, userId);
-        deleteFileIfExists(existing.getDiaryImage());
-        return diaryMapper.deleteById(id);
+    public void updateDiary(DiaryPutReq req, int memberId) {
+        DiaryGetRes existing = diaryMapper.findById(req.getId());
+        if (existing == null) {
+            throw new CustomException("수정할 일기가 존재하지 않습니다.", 404);
+        }
+        if (existing.getMemberNoLogin() != memberId) {
+            throw new CustomException("수정 권한이 없습니다.", 403);
+        }
+
+        diaryMapper.modify(req);
     }
 
-    /**
-     * 단일 파일 업로드 처리
-     */
-    private String handleSingleFileUpload(List<MultipartFile> files) {
-        if (files == null || files.isEmpty()) return null;
+    public void deleteDiary(int id, int memberId) {
+        DiaryGetRes existing = diaryMapper.findById(id);
+        if (existing == null) {
+            throw new CustomException("삭제할 일기가 존재하지 않습니다.", 404);
+        }
+        if (existing.getMemberNoLogin() != memberId) {
+            throw new CustomException("삭제 권한이 없습니다.", 403);
+        }
 
-        MultipartFile file = files.get(0);
-        if (file == null || file.isEmpty()) return null;
+        if (existing.getDiaryImage() != null) {
+            deleteFileIfExists(existing.getDiaryImage());
+        }
 
+        diaryMapper.deleteById(id);
+    }
+
+    private String saveFile(MultipartFile file) {
         try {
-            return saveFile(file);
+            String originalFilename = file.getOriginalFilename();
+            String ext = (originalFilename != null && originalFilename.contains("."))
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".bin";
+
+            String safeFileName = UUID.randomUUID().toString() + ext;
+            Path target = Paths.get(uploadDir).resolve(safeFileName).normalize();
+
+            Files.createDirectories(target.getParent());
+            file.transferTo(target.toFile());
+            return safeFileName;
         } catch (IOException e) {
-            log.error("파일 업로드 실패", e);
-            throw new CustomException("파일 업로드 실패", 500);
+            log.error("파일 저장 실패: {}", e.getMessage());
+            throw new CustomException("파일 저장 중 오류가 발생했습니다.", 500);
         }
     }
 
-    private String saveFile(MultipartFile file) throws IOException {
-        Files.createDirectories(Paths.get(uploadDir));
-        String uniqueName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path target = Paths.get(uploadDir).resolve(uniqueName);
-        file.transferTo(target.toFile());
-        return uniqueName;
-    }
-
     private void deleteFileIfExists(String fileName) {
-        if (fileName == null || fileName.isBlank()) return;
+        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
         try {
-            Files.deleteIfExists(Paths.get(uploadDir).resolve(fileName));
+            Files.deleteIfExists(path);
         } catch (IOException e) {
             log.warn("파일 삭제 실패: {}", fileName);
         }

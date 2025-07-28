@@ -5,67 +5,57 @@
 
 <mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
 
+    <!-- 일기 저장 -->
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO diary (
-            member_no_login, diary_name, diary_content, diary_image, created_at
-        ) VALUES (
-                     #{memberNoLogin}, #{diaryName}, #{diaryContent}, #{diaryImage}, NOW()
-                 )
+        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, created_at)
+        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{diaryImage}, NOW())
     </insert>
 
+    <!-- 일기 목록 -->
     <select id="findAll" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
         SELECT
-        diary_id AS id,
-        diary_name,
-        diary_content,
-        diary_image,
-        created_at,
-        member_no_login AS memberNoLogin
-        FROM diary
-        <where>
-            member_no_login = #{memberNoLogin}
-            <if test="searchText != null and searchText.trim() != ''">
-                <bind name="pattern" value="'%' + searchText + '%'" />
-                AND (diary_name LIKE #{pattern} OR diary_content LIKE #{pattern})
-            </if>
-        </where>
-        ORDER BY created_at DESC
-        LIMIT #{pageSize} OFFSET #{offset}
-    </select>
-
-    <select id="getTotalCount" resultType="int">
-        SELECT COUNT(*)
-        FROM diary
-        <where>
-            member_no_login = #{memberNoLogin}
-            <if test="searchText != null and searchText.trim() != ''">
-                <bind name="pattern" value="'%' + searchText + '%'" />
-                AND (diary_name LIKE #{pattern} OR diary_content LIKE #{pattern})
-            </if>
-        </where>
-    </select>
-
-    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT
             diary_id AS id,
+            member_no_login,
             diary_name,
             diary_content,
             diary_image,
-            created_at,
-            member_no_login AS memberNoLogin
+            created_at
+        FROM diary
+        WHERE member_no_login = #{memberNoLogin}
+        ORDER BY diary_id DESC
+            LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 일기 총 개수 -->
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*)
+        FROM diary
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
+
+    <!-- ID로 단일 조회 -->
+    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT
+            diary_id AS id,
+            member_no_login,
+            diary_name,
+            diary_content,
+            diary_image,
+            created_at
         FROM diary
         WHERE diary_id = #{id}
     </select>
 
+    <!-- 수정 -->
     <update id="modify">
         UPDATE diary
-        SET
-            diary_name = #{diaryName},
+        SET diary_name = #{diaryName},
             diary_content = #{diaryContent},
             diary_image = #{diaryImage}
         WHERE diary_id = #{id}
     </update>
 
+    <!-- 삭제 -->
     <delete id="deleteById">
         DELETE FROM diary
         WHERE diary_id = #{id}

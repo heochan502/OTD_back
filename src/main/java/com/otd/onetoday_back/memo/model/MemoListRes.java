@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class MemoListRes {
-    private List<MemoGetRes> list;
+    private List<MemoGetRes> memos;
     private int totalCount;
 }

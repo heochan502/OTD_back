@@ -7,10 +7,10 @@ import java.util.List;
 
 @Data
 public class DiaryPostReq {
+    private int id;
+    private int memberNoLogin;
     private String diaryName;
     private String diaryContent;
-    private String diaryImage; // 저장된 이미지 파일명
-    private List<MultipartFile> diaryImageFiles; // 업로드용
-    private int memberNoLogin;
-    private int id; // save 시 useGeneratedKeys="true" 에서 id 채워짐
+    private String diaryImage;
+    private List<MultipartFile> diaryImageFiles;
 }

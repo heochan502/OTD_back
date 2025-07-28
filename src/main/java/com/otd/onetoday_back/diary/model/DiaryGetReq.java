@@ -8,5 +8,4 @@ public class DiaryGetReq {
     private int currentPage;
     private int pageSize;
     private int offset;
-    private String searchText;
 }
