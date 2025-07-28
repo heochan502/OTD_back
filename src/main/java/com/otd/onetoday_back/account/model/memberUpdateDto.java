@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class memberUpdateDto {
-    private long memberNoLogin;
+    private int memberNoLogin;
     private String memberId;
     private String email;
     private String name;

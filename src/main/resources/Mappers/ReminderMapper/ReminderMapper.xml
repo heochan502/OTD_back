@@ -37,8 +37,8 @@
             AND MONTH(r.re_date) = #{month})
             OR
             (r.re_repeat = 1
-            AND created &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d'))
-        AND member_no_login = #{memberId}
+            AND r.re_created &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d'))
+        AND r.member_no_login = #{memberId}
         GROUP BY r.re_id
     </select>
     <update id="modify">
