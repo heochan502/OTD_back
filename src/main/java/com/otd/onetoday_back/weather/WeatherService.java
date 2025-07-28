@@ -141,7 +141,6 @@ public class WeatherService {
     }
 
     public memberUpdateDto getNickName(int memberId) {
-        log.info("nick:{}", memberId);
         return weatherMapper.getNickName(memberId);
     }
 }
