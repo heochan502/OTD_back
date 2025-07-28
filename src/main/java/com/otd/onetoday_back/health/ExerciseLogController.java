@@ -19,7 +19,7 @@ public class ExerciseLogController {
     private final ExerciseLogService exerciseLogService;
 
     //    운동기록 생성
-    @PostMapping
+    @PostMapping("/elog")
     public ResponseEntity<?> save(HttpServletRequest httpReq, @RequestBody PostExerciseLogReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         log.info("logginedMemberId={}", logginedMemberId);
@@ -29,7 +29,7 @@ public class ExerciseLogController {
     }
 
 //    운동기록 상세조회
-    @GetMapping("/elog/{exerciselogId}")
+    @GetMapping("elog/{exerciselogId}")
     public ResponseEntity<?> getDetail(HttpServletRequest httpReq, @PathVariable int exerciselogId) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         GetExerciseLogDetailReq req = GetExerciseLogDetailReq.builder()
@@ -60,7 +60,7 @@ public class ExerciseLogController {
 
 
 //    운동기록 수정
-    @PutMapping
+    @PutMapping("/elog")
     public ResponseEntity<?> update(HttpServletRequest httpReq, @RequestBody PutExerciseLogReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         log.info("req:{}", req);
@@ -69,7 +69,7 @@ public class ExerciseLogController {
     }
 
 //    운동기록 삭제
-    @DeleteMapping
+    @DeleteMapping("/elog")
     public ResponseEntity<?> delete(HttpServletRequest httpReq, @RequestParam("exerciselog_id") int exerciselogId) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         GetExerciseLogDetailReq req = GetExerciseLogDetailReq.builder()
