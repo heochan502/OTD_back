@@ -4,88 +4,83 @@ import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.common.model.ResultResponse;
 import com.otd.onetoday_back.diary.model.*;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/OTD/diary")
+@RequestMapping("/diary")
 public class DiaryController {
 
     private final DiaryService diaryService;
 
-    private Integer getLoggedInMemberId(HttpSession session) {
+    // ✅ 공통 로그인 검사
+    private Integer getLoginMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            throw new CustomException("로그인 정보가 없습니다.", 401);
+            // 401 Unauthorized
+            throw new CustomException("로그인이 필요합니다.", 401);
         }
         return memberId;
     }
 
     @GetMapping
-    public ResultResponse<?> getDiaryList(
-            HttpSession session,
-            @ModelAttribute DiaryGetReq req,
-            HttpServletRequest request) {
-
-        Integer memberId = getLoggedInMemberId(session);
+    public ResultResponse<DiaryListRes> findAll(@ModelAttribute DiaryGetReq req, HttpSession session) {
+        Integer memberId = getLoginMemberId(session);
         req.setMemberNoLogin(memberId);
-
-        DiaryListRes result = diaryService.findAll(req);
-        return ResultResponse.success(result, request.getRequestURI());
+        return ResultResponse.success(diaryService.findAll(req), "/diary");
     }
 
     @GetMapping("/{id}")
-    public ResultResponse<?> getDiaryById(
-            @PathVariable int id,
-            HttpSession session,
-            HttpServletRequest request) {
-
-        Integer memberId = getLoggedInMemberId(session);
-        DiaryGetRes result = diaryService.findById(id, memberId);
-        return ResultResponse.success(result, request.getRequestURI());
+    public ResultResponse<DiaryGetRes> findById(@PathVariable int id, HttpSession session) {
+        Integer memberId = getLoginMemberId(session);
+        return ResultResponse.success(diaryService.findById(id, memberId), "/diary/" + id);
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
-    public ResultResponse<?> postDiary(
+    public ResultResponse<DiaryPostAndUploadRes> postDiary(
             HttpSession session,
             @RequestPart("diaryData") DiaryPostReq req,
-            @RequestPart(value = "diaryImageFiles", required = false) List<MultipartFile> imageFiles,
-            HttpServletRequest request) {
+            @RequestPart(value = "diaryImageFiles", required = false) List<MultipartFile> diaryImageFiles) {
 
-        Integer memberId = getLoggedInMemberId(session);
-        req.setDiaryImageFiles(imageFiles);
-
-        DiaryPostAndUploadRes result = diaryService.saveDiaryAndHandleUpload(memberId, req);
-        return ResultResponse.success(result, request.getRequestURI());
+        Integer memberId = getLoginMemberId(session);
+        req.setDiaryImageFiles(diaryImageFiles);
+        return ResultResponse.success(diaryService.saveDiaryAndHandleUpload(memberId, req), "/diary");
     }
 
-    @PutMapping
-    public ResultResponse<?> updateDiary(
+    @PutMapping(consumes = {"application/json"})
+    public ResultResponse<String> putDiary(
             HttpSession session,
-            @RequestBody DiaryPutReq req,
-            HttpServletRequest request) {
+            @RequestBody DiaryPutReq req) {
 
-        Integer memberId = getLoggedInMemberId(session);
+        Integer memberId = getLoginMemberId(session);
         diaryService.updateDiary(req, memberId);
-        return ResultResponse.success("수정 완료", request.getRequestURI());
+        return ResultResponse.success("ok", "/diary");
+    }
+
+    @PutMapping(consumes = {"multipart/form-data"})
+    public ResultResponse<?> updateDiaryWithImage(
+            HttpSession session,
+            @RequestPart("diaryData") DiaryPutReq req,
+            @RequestPart(value = "diaryImageFiles", required = false) List<MultipartFile> diaryImageFiles
+    ) {
+        Integer memberId = getLoginMemberId(session);
+        req.setDiaryImageFiles(diaryImageFiles);
+        DiaryPostAndUploadRes result = diaryService.updateDiaryAndHandleUpload(memberId, req);
+        return ResultResponse.success(result, "/diary");
     }
 
     @DeleteMapping
-    public ResultResponse<?> deleteDiary(
-            @RequestParam("id") int id,
-            HttpSession session,
-            HttpServletRequest request) {
+    public ResultResponse<String> deleteDiary(
+            @RequestParam int id,
+            HttpSession session) {
 
-        Integer memberId = getLoggedInMemberId(session);
+        Integer memberId = getLoginMemberId(session);
         diaryService.deleteDiary(id, memberId);
-        return ResultResponse.success("삭제 완료", request.getRequestURI());
+        return ResultResponse.success("ok", "/diary");
     }
 }

@@ -38,6 +38,10 @@ public class MemoController {
         Integer memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
 
+        // ✅ 잘못된 요청 방지
+        if (req.getCurrentPage() <= 0) req.setCurrentPage(1);
+        if (req.getPageSize() <= 0) req.setPageSize(10);
+
         MemoListRes result = memoService.findAll(req);
         return ResultResponse.success(result, request.getRequestURI());
     }

@@ -10,5 +10,15 @@ import java.util.List;
 @AllArgsConstructor
 public class DiaryPostAndUploadRes {
     private int id;
-    private List<UploadResponse> uploadedFiles;
+    private String diaryName;
+    private String diaryContent;
+    private String createdAt;
+    private String mood;
+    private String imageFileName;
+    private List<UploadResponse> uploadResults;
+
+    public DiaryPostAndUploadRes(int id, List<UploadResponse> uploadResults) {
+        this.id = id;
+        this.uploadResults = uploadResults;
+    }
 }

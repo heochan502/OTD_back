@@ -10,4 +10,5 @@ import java.util.List;
 public class DiaryListRes {
     private List<DiaryGetRes> diaryList;
     private int totalCount;
+
 }

@@ -7,10 +7,20 @@ import java.util.List;
 
 @Data
 public class DiaryPostReq {
-    private int id;
-    private int memberNoLogin;
     private String diaryName;
     private String diaryContent;
-    private String diaryImage;
+    private Integer memberNoLogin;
+    private String mood;
+    private String imageFileName;
     private List<MultipartFile> diaryImageFiles;
+
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }
