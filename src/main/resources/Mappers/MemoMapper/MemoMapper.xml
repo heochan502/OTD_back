@@ -1,88 +1,77 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="com.otd.onetoday_back.memo.MemoMapper">
+
+    <!-- 메모 저장 -->
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO memo (
-        member_no_login,
-        memo_name,
-        memo_content
-        ) VALUES (
-        #{memberNoLogin},
-        #{title},
-        #{content}
+            member_no_login,
+            memo_name,
+            memo_content,
+            memo_image,
+            created_at
         )
+        VALUES (
+                   #{memberNoLogin},
+                   #{memoName},
+                   #{memoContent},
+                   #{memoImage},
+                   NOW()
+               )
     </insert>
-    <insert id="insertMemoImage">
-        INSERT INTO memo_image (memo_id, file_name)
-        VALUES (#{memoId}, #{fileName})
-    </insert>
 
-    <select id="findImagesByMemoId" resultType="string">
-        SELECT file_name FROM memo_image WHERE memo_id = #{memoId}
-    </select>
-
-    <update id="updateMemoImage">
-        UPDATE memo
-        SET memo_image = #{memoImage}
-        WHERE memo_id = #{memoId}
-    </update>
-
+    <!-- 메모 전체 조회 (페이징) -->
     <select id="findAll" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
         SELECT
-        memo_id AS id,
-        memo_name AS title,
-        memo_content AS content,
-        created_at,
-        memo_image AS imageFileName
+            memo_id AS id,
+            member_no_login,
+            memo_name,
+            memo_content,
+            memo_image,
+            created_at
         FROM memo
-        <where>
-            member_no_login = #{memberNoLogin}
-            <if test="searchText != null and searchText.trim() != ''">
-            <bind name="pattern" value="'%' + searchText + '%'" />
-                AND (
-                (memo_name LIKE #{pattern}
-                OR memo_content LIKE #{pattern})
-                )
-            </if>
-        </where>
-        ORDER BY created_at DESC, memo_id DESC  LIMIT #{pageSize} OFFSET #{offset} </select>
-
-    <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetOneRes">
-        SELECT
-        memo_id AS id,
-        memo_name AS title,
-        memo_content AS content,
-        created_at,
-        memo_image AS imageFileName,
-        member_no_login AS memberNoLogin
-        FROM memo
-        WHERE memo_id = #{id}
+        WHERE member_no_login = #{memberNoLogin}
+        ORDER BY created_at DESC
+            LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
+    <!-- 전체 개수 (페이징용) -->
     <select id="getTotalCount" resultType="int">
         SELECT COUNT(*)
         FROM memo
-        <where>
-            member_no_login = #{memberNoLogin}
-            <if test="searchText != null and searchText.trim() != ''">
-            <bind name="pattern" value="'%' + searchText + '%'" />
-            AND (
-            memo_name LIKE #{pattern}
-            OR memo_content LIKE #{pattern}
-            )
-        </if>
-        </where>
+        WHERE member_no_login = #{memberNoLogin}
     </select>
 
+    <!-- 메모 단건 조회 -->
+    <select id="findById" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
+        SELECT
+            memo_id AS id,
+            member_no_login,
+            memo_name,
+            memo_content,
+            memo_image,
+            created_at
+        FROM memo
+        WHERE memo_id = #{id}
+    </select>
+
+    <!-- 메모 수정 -->
     <update id="modify">
         UPDATE memo
-        SET memo_name = #{title},
-        memo_content = #{content}
+        SET
+            memo_name = #{memoName},
+            memo_content = #{memoContent},
+            memo_image = #{memoImage}
         WHERE memo_id = #{id}
     </update>
 
+    <!-- 메모 삭제 -->
     <delete id="deleteById">
         DELETE FROM memo
         WHERE memo_id = #{id}
     </delete>
+
 </mapper>

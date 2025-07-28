@@ -9,121 +9,121 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.nio.file.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MemoService {
+
     private final MemoMapper memoMapper;
 
-    @Value("${constants.file.directory}")
+    @Value("${file.upload-dir}")
     private String uploadDir;
 
-    public MemoPostAnduploadRes saveMemoAndHandleUpload(int userId, MemoPostReq req) {
-        req.setMemberNoLogin(userId);
-        memoMapper.save(req);
-        int newMemoId = req.getId();
-
-        List<UploadResponse> uploadResponseList = new ArrayList<>();
-        List<MultipartFile> memoImageFiles = req.getMemoImageFiles();
-
-        if (memoImageFiles != null && !memoImageFiles.isEmpty()) {
-            try {
-                Path uploadPath = Paths.get(uploadDir);
-                if (!Files.exists(uploadPath)) {
-                    Files.createDirectories(uploadPath);
-                    log.info("업로드 디렉토리 생성: {}", uploadPath.toAbsolutePath());
-                }
-
-                for (MultipartFile file : memoImageFiles) {
-                    if (file == null || file.isEmpty()) continue;
-
-                    String originalFilename = file.getOriginalFilename();
-                    String fileExtension = "";
-
-                    if (originalFilename != null && originalFilename.contains(".")) {
-                        fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-                    }
-
-                    String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
-                    Path filePath = uploadPath.resolve(uniqueFileName);
-                    Files.copy(file.getInputStream(), filePath);
-
-                    uploadResponseList.add(new UploadResponse(uniqueFileName, originalFilename, "이미지 업로드 성공"));
-                }
-
-                if (!uploadResponseList.isEmpty()) {
-                    String firstImageFileName = uploadResponseList.get(0).getFileName();
-                    memoMapper.updateMemoImage(newMemoId, firstImageFileName);
-                }
-
-            } catch (IOException e) {
-                log.error("이미지 업로드 실패: {}", e.getMessage(), e);
-                uploadResponseList.add(new UploadResponse(null, null, "이미지 업로드 실패"));
-            }
-        } else {
-            log.warn("업로드할 파일이 없거나 비어 있습니다");
-            uploadResponseList.add(new UploadResponse(null, null, "파일 없음"));
-        }
-
-        return new MemoPostAnduploadRes(newMemoId, uploadResponseList);
-    }
-
     public MemoListRes findAll(MemoGetReq req) {
-        int actualCurrentPage = (req.getCurrentPage() > 0) ? req.getCurrentPage() : 1;
-        int actualPageSize = (req.getPageSize() > 0) ? req.getPageSize() : 5;
-        int offset = (actualCurrentPage - 1) * actualPageSize;
-
-        req.setCurrentPage(actualCurrentPage);
-        req.setPageSize(actualPageSize);
+        int offset = (req.getCurrentPage() - 1) * req.getPageSize();
         req.setOffset(offset);
 
-        MemoListRes response = new MemoListRes();
         List<MemoGetRes> memoList = memoMapper.findAll(req);
         int totalCount = memoMapper.getTotalCount(req);
 
-        if (memoList != null) {
-            response.setMemoList(memoList);
-        }
-        response.setTotalCount(totalCount);
-
-        return response;
+        return new MemoListRes(memoList, totalCount);
     }
 
-    public MemoGetOneRes findOwnedMemoById(int memoId, int memberId) {
-        MemoGetOneRes memo = Optional.ofNullable(memoMapper.findById(memoId))
-                .orElseThrow(() -> new CustomException("해당 메모가 존재하지 않습니다.", 404));
-
-        if (memo.getMemberNoLogin() != memberId) {
-            throw new CustomException("권한이 없습니다.", 403);
+    public MemoGetRes findById(int id, int memberId) {
+        MemoGetRes memo = memoMapper.findById(id);
+        if (memo == null) {
+            throw new CustomException("해당 메모가 존재하지 않습니다.", 404);
+        }
+        if (memo.getMemberNoLogin() != memberId) { // ← 여기 memo로 수정
+            throw new CustomException("해당 메모에 접근할 수 없습니다.", 403);
         }
 
         return memo;
     }
 
-    public int modify(MemoPutReq req) {
-        MemoGetOneRes memo = Optional.ofNullable(memoMapper.findById(req.getId()))
-                .orElseThrow(() -> new CustomException("해당 메모가 존재하지 않습니다.", 404));
+    public MemoPostAnduploadRes saveMemoAndHandleUpload(int memberId, MemoPostReq req) {
+        req.setMemberNoLogin(memberId);
 
-        if (memo.getMemberNoLogin() != req.getMemberNoLogin()) {
-            throw new CustomException("권한이 없습니다.", 403);
+        List<MultipartFile> imageFiles = req.getMemoImageFiles();
+        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
+            MultipartFile file = imageFiles.get(0);
+            String fileName = saveFile(file);
+            req.setMemoImage(fileName); // DB에 저장할 대표 이미지 파일명
         }
 
-        return memoMapper.modify(req);
+        memoMapper.save(req);
+        int newMemoId = req.getId();
+
+        return new MemoPostAnduploadRes(
+                newMemoId,
+                req.getMemoImage() != null
+                        ? Collections.singletonList(new UploadResponse(
+                        req.getMemoImage(),
+                        imageFiles.get(0).getOriginalFilename(),
+                        "업로드 성공"))
+                        : Collections.emptyList()
+        );
     }
 
-    public int deleteById(int memoId, int memberId) {
-        MemoGetOneRes memo = Optional.ofNullable(memoMapper.findById(memoId))
-                .orElseThrow(() -> new CustomException("해당 메모가 존재하지 않습니다.", 404));
-
-        if (memo.getMemberNoLogin() != memberId) {
-            throw new CustomException("권한이 없습니다.", 403);
+    public void updateMemo(MemoPutReq req, int memberId) {
+        MemoGetRes existing = memoMapper.findById(req.getId());
+        if (existing == null) {
+            throw new CustomException("수정할 메모가 존재하지 않습니다.", 404);
+        }
+        if (existing.getMemberNoLogin() != memberId) {
+            throw new CustomException("수정 권한이 없습니다.", 403);
         }
 
-        return memoMapper.deleteById(memoId);
+        // memoImage 포함하여 업데이트
+        memoMapper.modify(req);
+    }
+
+    public void deleteMemo(int id, int memberId) {
+        MemoGetRes existing = memoMapper.findById(id);
+        if (existing == null) {
+            throw new CustomException("삭제할 메모가 존재하지 않습니다.", 404);
+        }
+        if (existing.getMemberNoLogin() != memberId) {
+            throw new CustomException("삭제 권한이 없습니다.", 403);
+        }
+
+        if (existing.getMemoImage() != null) {
+            deleteFileIfExists(existing.getMemoImage());
+        }
+
+        memoMapper.deleteById(id);
+    }
+
+    private String saveFile(MultipartFile file) {
+        try {
+            String originalFilename = file.getOriginalFilename();
+            String ext = (originalFilename != null && originalFilename.contains("."))
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".bin";
+
+            String safeFileName = UUID.randomUUID().toString() + ext;
+            Path target = Paths.get(uploadDir).resolve(safeFileName).normalize();
+
+            Files.createDirectories(target.getParent());
+            file.transferTo(target.toFile()); // 또는 Files.copy(file.getInputStream(), target);
+            return safeFileName;
+        } catch (IOException e) {
+            log.error("파일 저장 실패: {}", e.getMessage());
+            throw new CustomException("파일 저장 중 오류가 발생했습니다.", 500);
+        }
+    }
+
+    private void deleteFileIfExists(String fileName) {
+        Path path = Paths.get(uploadDir).resolve(fileName).normalize();
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            log.warn("파일 삭제 실패: {}", fileName);
+        }
     }
 }

@@ -6,9 +6,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class CorsFilter implements Filter {
+
+    private static final List<String> ALLOWED_ORIGINS = List.of(
+            "http://localhost:5173"
+    );
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -19,22 +24,18 @@ public class CorsFilter implements Filter {
 
         String origin = req.getHeader("Origin");
 
-        // 허용할 Origin을 정확히 지정 (와일드카드 금지)
-        if (origin != null && (
-                origin.equals("http://localhost:5173") ||
-                origin.equals("http://localhost:5174") ||
-                origin.equals("http://localhost:5175"))) {
-
-            res.setHeader("Access-Control-Allow-Origin", origin);
+        if (origin != null && ALLOWED_ORIGINS.contains(origin)) {
+            res.setHeader("Access-Control-Allow-Origin", origin); // ✅ NOT "*"
             res.setHeader("Access-Control-Allow-Credentials", "true");
             res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             res.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept");
 
-            // OPTIONS 요청은 바로 종료
             if ("OPTIONS".equalsIgnoreCase(req.getMethod())) {
                 res.setStatus(HttpServletResponse.SC_OK);
                 return;
             }
         }
+
+        chain.doFilter(request, response);
     }
 }

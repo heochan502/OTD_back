@@ -1,11 +1,12 @@
-package com.otd.onetoday_back.memo.model;
+package com.otd.onetoday_back.diary.model;
 
 import lombok.Data;
 
 @Data
-public class MemoGetReq {
+public class DiaryGetReq {
     private int memberNoLogin;
     private int currentPage;
     private int pageSize;
     private int offset;
+    private String searchText;
 }

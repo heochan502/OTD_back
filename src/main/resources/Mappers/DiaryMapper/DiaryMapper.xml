@@ -6,42 +6,69 @@
 <mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, created_at)
-        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{diaryImage}, NOW())
+        INSERT INTO diary (
+            member_no_login, diary_name, diary_content, diary_image, created_at
+        ) VALUES (
+                     #{memberNoLogin}, #{diaryName}, #{diaryContent}, #{diaryImage}, NOW()
+                 )
     </insert>
 
-    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT memo_id AS id, member_no_login, diary_name, diary_content, diary_image, created_at
-        FROM diary
-        WHERE memo_id = #{id}
-          AND member_no_login = #{memberNoLogin}
-    </select>
-
-    <update id="update">
-        UPDATE diary
-        SET diary_name = #{diaryName},
-            diary_content = #{diaryContent}
-        WHERE memo_id = #{id} AND member_no_login = #{memberNoLogin}
-    </update>
-
-    <delete id="delete">
-        DELETE FROM diary
-        WHERE memo_id = #{id}
-          AND member_no_login = #{memberNoLogin}
-    </delete>
-
     <select id="findAll" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT memo_id AS id, member_no_login, diary_name, diary_content, diary_image, created_at
+        SELECT
+        diary_id AS id,
+        diary_name,
+        diary_content,
+        diary_image,
+        created_at,
+        member_no_login AS memberNoLogin
         FROM diary
-        WHERE member_no_login = #{memberNoLogin}
-        ORDER BY memo_id DESC
-            LIMIT #{limit} OFFSET #{offset}
+        <where>
+            member_no_login = #{memberNoLogin}
+            <if test="searchText != null and searchText.trim() != ''">
+                <bind name="pattern" value="'%' + searchText + '%'" />
+                AND (diary_name LIKE #{pattern} OR diary_content LIKE #{pattern})
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <select id="countAll" resultType="int">
+    <select id="getTotalCount" resultType="int">
         SELECT COUNT(*)
         FROM diary
-        WHERE member_no_login = #{memberNoLogin}
+        <where>
+            member_no_login = #{memberNoLogin}
+            <if test="searchText != null and searchText.trim() != ''">
+                <bind name="pattern" value="'%' + searchText + '%'" />
+                AND (diary_name LIKE #{pattern} OR diary_content LIKE #{pattern})
+            </if>
+        </where>
     </select>
+
+    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT
+            diary_id AS id,
+            diary_name,
+            diary_content,
+            diary_image,
+            created_at,
+            member_no_login AS memberNoLogin
+        FROM diary
+        WHERE diary_id = #{id}
+    </select>
+
+    <update id="modify">
+        UPDATE diary
+        SET
+            diary_name = #{diaryName},
+            diary_content = #{diaryContent},
+            diary_image = #{diaryImage}
+        WHERE diary_id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM diary
+        WHERE diary_id = #{id}
+    </delete>
 
 </mapper>

@@ -1,14 +1,15 @@
 package com.otd.onetoday_back.memo.model;
 
-import lombok.Getter;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Getter
+@Data
 public class MemoGetRes {
     private int id;
-    private String title;
-    private String content;
+    private String memoName;
+    private String memoContent;
+    private String memoImage;
+    private int memberNoLogin;
     private LocalDateTime createdAt;
-    private String imageFileName;
 }

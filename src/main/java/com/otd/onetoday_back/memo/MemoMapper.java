@@ -2,18 +2,27 @@ package com.otd.onetoday_back.memo;
 
 import com.otd.onetoday_back.memo.model.*;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface MemoMapper {
+
+    // 메모 등록
     void save(MemoPostReq req);
-    void updateMemoImage(@Param("memoId") int memoId, @Param("memoImage") String memoImage);
-    List<String> findImagesByMemoId(int memoId);
+
+    // 메모 목록 조회 (페이징)
     List<MemoGetRes> findAll(MemoGetReq req);
+
+    // 총 개수 (페이징)
     int getTotalCount(MemoGetReq req);
-    MemoGetOneRes findById(int id);
-    int modify(MemoPutReq req);
-    int deleteById(int id);
+
+    // 메모 단건 조회
+    MemoGetRes findById(int id);
+
+    // 메모 수정
+    void modify(MemoPutReq req);
+
+    // 메모 삭제
+    void deleteById(int id);
 }

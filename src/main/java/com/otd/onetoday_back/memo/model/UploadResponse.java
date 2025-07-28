@@ -5,10 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class UploadResponse {
     private String fileName;
     private String originalName;
-    private String message; // UploadResponse(String, String, String) 형식
+    private String message;
 }
