@@ -30,7 +30,7 @@ public interface MealMapper {
 
     int deleteMealTotal ( @Param("memberNoLogin") int memberNoLogin, @Param("mealInfo")findFoodDetailInfoReq mealInfo);
 
-    //데이터가 아무것도없으면 지우는거
+    //데이터가 지우는거
     int deleteMealCategoryIn ( @Param("memberNoLogin") int memberNoLogin, @Param("mealInfo")findFoodDetailInfoReq mealInfo);
 
 

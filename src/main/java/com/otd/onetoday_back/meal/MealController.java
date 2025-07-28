@@ -52,10 +52,6 @@ public class MealController {
          int result = mealService.inputDayMealData( memberNoLogin,mealInfo);
          log.info("result: {}", result);
         return ResponseEntity.ok(1);
-//        log.info("memeber id {} : foodname {}", memberId, foodName);
-//        List<findFoodNameRes> res = mealService.findFoodName(foodInfo);
-//        log.info("res : {}", res);
-//        return null;
     }
 
     @GetMapping("/getMeal")
