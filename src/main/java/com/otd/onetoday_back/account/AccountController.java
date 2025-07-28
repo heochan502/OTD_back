@@ -55,7 +55,7 @@ public class AccountController {
         return ResponseEntity.ok(profile);
     }
 
-    @PostMapping("/profile")
+    @PutMapping("/profile/detail")
     public ResponseEntity<?> updateProfile(
             HttpServletRequest httpReq,
             @RequestBody memberUpdateDto dto) {
@@ -64,14 +64,15 @@ public class AccountController {
         if (memberNoLogin == null) {
             return ResponseEntity.status(401).build();
         }
-        AccountProfileRes result = accountService.updateProfile(memberNoLogin.longValue(), dto);
+        AccountProfileRes result = accountService.updateProfile(memberNoLogin.intValue(), dto);
         if (result != null) {
             return ResponseEntity.ok(result);
         }
         return ResponseEntity.badRequest().build();
     }
 
-@PostMapping("/login")
+
+    @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
 
         log.info(" changed  : {}", req);
@@ -81,7 +82,6 @@ public class AccountController {
         if (result == null) {
             return ResponseEntity.notFound().build();
         }
-        //세션 처리
         HttpUtils.setSession(httpReq, AccountConstants.MEMBER_ID_NAME, result.getMemberNoLogin());//확인하기
 
         log.info(" MEMBER_ID_NAME  : {}", result.getMemberNoLogin());
@@ -132,5 +132,12 @@ public class AccountController {
     public ResponseEntity<?> logout(HttpServletRequest httpReq) {
         HttpUtils.removeSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         return ResponseEntity.ok(1);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteMember(@RequestParam int memberNoLogin) {
+        log.info("memberNoLogin={}", memberNoLogin);
+        int result = accountService.deleteById(memberNoLogin);
+        return ResponseEntity.ok(result);
     }
 }
