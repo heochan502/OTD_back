@@ -32,13 +32,13 @@ public class DiaryController {
     public ResultResponse<DiaryListRes> findAll(@ModelAttribute DiaryGetReq req, HttpSession session) {
         Integer memberId = getLoginMemberId(session);
         req.setMemberNoLogin(memberId);
-        return ResultResponse.success(diaryService.findAll(req), "/api/OTD/diary");
+        return ResultResponse.success(diaryService.findAll(req), "/api/OTD/memoAndDiary/diary");
     }
 
     @GetMapping("/{id}")
     public ResultResponse<DiaryGetRes> findById(@PathVariable int id, HttpSession session) {
         Integer memberId = getLoginMemberId(session);
-        return ResultResponse.success(diaryService.findById(id, memberId), "/api/OTD/diary/" + id);
+        return ResultResponse.success(diaryService.findById(id, memberId), "/api/OTD/memoAndDiary/diary/" + id);
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
@@ -49,7 +49,7 @@ public class DiaryController {
 
         Integer memberId = getLoginMemberId(session);
         req.setDiaryImageFiles(diaryImageFiles);
-        return ResultResponse.success(diaryService.saveDiaryAndHandleUpload(memberId, req), "/api/OTD/diary");
+        return ResultResponse.success(diaryService.saveDiaryAndHandleUpload(memberId, req), "/api/OTD/memoAndDiary/diary");
     }
 
     @PutMapping(consumes = {"application/json"})
@@ -59,7 +59,7 @@ public class DiaryController {
 
         Integer memberId = getLoginMemberId(session);
         diaryService.updateDiary(req, memberId);
-        return ResultResponse.success("ok", "/api/OTD/diary");
+        return ResultResponse.success("ok", "/api/OTD/memoAndDiary/diary");
     }
 
     @PutMapping(consumes = {"multipart/form-data"})
@@ -71,7 +71,7 @@ public class DiaryController {
         Integer memberId = getLoginMemberId(session);
         req.setDiaryImageFiles(diaryImageFiles);
         DiaryPostAndUploadRes result = diaryService.updateDiaryAndHandleUpload(memberId, req);
-        return ResultResponse.success(result, "/api/OTD/diary");
+        return ResultResponse.success(result, "/api/OTD/memoAndDiary/diary");
     }
 
     @DeleteMapping
@@ -81,6 +81,6 @@ public class DiaryController {
 
         Integer memberId = getLoginMemberId(session);
         diaryService.deleteDiary(id, memberId);
-        return ResultResponse.success("ok", "/api/OTD/diary");
+        return ResultResponse.success("ok", "/api/OTD/memoAndDiary/diary");
     }
 }
