@@ -22,7 +22,7 @@
         (member_no_login, food_db_id, meal_time ,food_amount, meal_br_lu_di )
         VALUES
         <foreach collection="mealDetails" item="detail" separator=",">
-            (#{memberNoLogin}, #{detail.foodDbId},  #{mealDay} , #{detail.foodAmount}, #{mealBrLuDi})
+         (#{memberNoLogin}, #{detail.foodDbId},  #{mealDay} , #{detail.foodAmount}, #{mealBrLuDi})
         </foreach>
     </insert>
 
@@ -31,14 +31,14 @@
         FROM  meal_food_db
         WHERE food_db_id IN
         <foreach collection="foodDbId" item="foodId"  open="(" separator="," close=")">
-            #{foodId}
+             #{foodId}
         </foreach>
 
     </select>
 
     <insert id="inputTotalCalorie">
         INSERT INTO meal_total_calo
-        (member_no_login, meal_day, meal_br_lu_di, total_calorie , total_protein, total_fat, total_carbohydrate, total_sugar, total_natrium)
+            (member_no_login, meal_day, meal_br_lu_di, total_calorie , total_protein, total_fat, total_carbohydrate, total_sugar, total_natrium)
         VALUES (#{memberNoLogin}, #{mealDay}, #{mealBrLuDi}, #{totalCalorie},  #{totalProtein}, #{totalFat}, #{totalCarbohydrate}, #{totalSugar},#{totalNatrium} )
 
     </insert>
@@ -49,15 +49,15 @@
         WHERE meal_br_lu_di = #{mealInfo.mealBrLuDi} AND member_no_login =  #{mealInfo.memberNoLogin} and DATE(meal_time) = #{mealInfo.mealDay} AND  food_db_id = #{foodDbId}
     </update>
 
-    <!--    <delete id="deleteMealCategory">-->
-    <!--        DELETE FROM meal_category-->
-    <!--        WHERE food_db_id NOT IN (-->
+<!--    <delete id="deleteMealCategory">-->
+<!--        DELETE FROM meal_category-->
+<!--        WHERE food_db_id NOT IN (-->
 
-    <!--        <foreach collection="mealDetails" item="detail" separator=",">-->
-    <!--         #{detail.foodDbId}-->
-    <!--        </foreach>-->
-    <!--       ) AND meal_br_lu_di = #{mealBrLuDi} and member_no_login =  #{memberNoLogin} and DATE(meal_time) = #{mealDay}-->
-    <!--    </delete>-->
+<!--        <foreach collection="mealDetails" item="detail" separator=",">-->
+<!--         #{detail.foodDbId}-->
+<!--        </foreach>-->
+<!--       ) AND meal_br_lu_di = #{mealBrLuDi} and member_no_login =  #{memberNoLogin} and DATE(meal_time) = #{mealDay}-->
+<!--    </delete>-->
 
     <delete id="deleteMealCategoryIn">
         DELETE FROM meal_category
@@ -71,20 +71,30 @@
 
 
     <update id="modifyByMealTotalAndMealBrLuDi">
-        UPDATE meal_total_calo
-        SET  total_calorie= #{totalCalorie} , total_protein =#{totalProtein}, total_fat= #{totalFat}, total_carbohydrate=#{totalCarbohydrate}, total_sugar=#{totalSugar}, total_natrium=#{totalNatrium}
-        WHERE meal_br_lu_di = #{mealBrLuDi} AND member_no_login =  #{memberNoLogin} and DATE(meal_day) = #{mealDay}
+            UPDATE meal_total_calo
+            SET  total_calorie= #{totalCalorie} , total_protein =#{totalProtein}, total_fat= #{totalFat}, total_carbohydrate=#{totalCarbohydrate}, total_sugar=#{totalSugar}, total_natrium=#{totalNatrium}
+            WHERE meal_br_lu_di = #{mealBrLuDi} AND member_no_login =  #{memberNoLogin} and DATE(meal_day) = #{mealDay}
     </update>
 
 
 
     <select id="getDataByMemberNoId">
-        SELECT mf.food_name, mf.calorie, mc.meal_time ,mc.food_db_id, mc.food_amount as amount, mt.total_calorie as all_day_calorie, mt.meal_br_lu_di, mt.total_fat, mt.total_carbohydrate, mt.total_protein
-        FROM meal_total_calo as mt
-        JOIN(  SELECT * FROM meal_category WHERE member_no_login =  #{memberNoLogin} AND
-        meal_br_lu_di = #{mealBrLuDi} AND DATE(meal_time) = #{mealDay} ) mc ON  mt.meal_br_lu_di = #{mealBrLuDi} AND mt.member_no_login =  #{memberNoLogin}
-        JOIN ( SELECT food_name, calorie ,food_db_id FROM meal_food_db ) as mf ON mf.food_db_id = mc.food_db_id ;
+      SELECT mf.food_name, mf.calorie, DATE(mc.meal_time) ,mc.food_db_id, mc.food_amount as amount, mt.total_calorie as all_day_calorie, mt.meal_br_lu_di, mt.total_fat, mt.total_carbohydrate, mt.total_protein
+		FROM meal_total_calo as mt
+                JOIN(  SELECT * FROM meal_category WHERE member_no_login =  #{memberNoLogin} AND
+							meal_br_lu_di = #{mealBrLuDi} AND DATE(meal_time) = #{mealDay} ) mc ON  mt.meal_br_lu_di = #{mealBrLuDi} AND mt.member_no_login =  #{memberNoLogin}
+                JOIN ( SELECT food_name, calorie ,food_db_id FROM meal_food_db ) as mf ON mf.food_db_id = mc.food_db_id ;
+
+
     </select>
 
 
-</mapper>
+    <select id="onDayTotalData">
+        SELECT sum(total_calorie) as total_calorie, sum(total_protein) as total_protein, sum(total_fat) as total_fat, sum(total_carbohydrate)as total_carbohydrate, meal_day
+        FROM meal_total_calo
+        WHERE member_no_login = #{memberNoLogin} and DATE(meal_day) = #{mealDay}
+
+    </select>
+
+
+ </mapper>

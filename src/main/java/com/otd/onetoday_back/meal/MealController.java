@@ -6,11 +6,13 @@ import com.otd.onetoday_back.common.util.HttpUtils;
 import com.otd.onetoday_back.meal.model.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -37,8 +39,26 @@ public class MealController {
             List<FindFoodNameRes> res =  mealService.findFoodName(foodInfo);
             return ResponseEntity.ok(res);
         }
-
     }
+
+    //수정 중.///.././
+    @GetMapping("/eatenMeal")
+    public ResponseEntity<?> eatenFood(HttpServletRequest httpReq, @RequestParam String mealDay)
+    {
+        Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        if (memberNoLogin == null) {
+            return ResponseEntity.ok("로그인 안함");
+        }
+
+        GetOnEatenDataRes result = mealService.getOnEatenDataRes(memberNoLogin, mealDay);
+        log.info("result: {}", result);
+
+        return ResponseEntity.ok(result);
+    }
+
+
+
+
     @PostMapping ("/saveMeal")
     public ResponseEntity<?> mealCalculation(HttpServletRequest httpReq, @RequestBody findFoodDetailInfoReq mealInfo)
     {

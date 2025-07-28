@@ -5,12 +5,16 @@ import com.otd.onetoday_back.meal.model.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 
 @Mapper
 
 public interface MealMapper {
+
+
+    GetOnEatenDataRes onDayTotalData (int memberNoLogin, String mealDay);
 
 //    List<FindFoodNameRes> findFoodNameForFoodName(String foodName);
     // 객체 재사용이라 이름이 같음  list안에 이름

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -25,12 +26,11 @@ public class MealService {
         sumData.setMealDay(mealInfo.getMealDay());
         sumData.setMemberNoLogin(memberNoLogin);
         sumData.setMealBrLuDi(mealInfo.getMealBrLuDi());
+        sumData.setTotalCalorie(mealInfo.getTotalCalorie());
 
         for (int i = 0; i < result.size(); i++) {
             float amount = mealInfo.getAmount().get(i);
             GetFoodInfoAllRes food = result.get(i);
-
-            sumData.setTotalCalorie((int)Math.round(sumData.getTotalCalorie() + (food.getCalorie() / 100.0) * amount));
             sumData.setTotalProtein(sumData.getTotalProtein() + (food.getProtein() / 100.0f) * amount);
             sumData.setTotalFat(sumData.getTotalFat() + (food.getFat() / 100.0f) * amount);
             sumData.setTotalCarbohydrate(sumData.getTotalCarbohydrate() + (food.getCarbohydrate() / 100.0f) * amount);
@@ -116,8 +116,12 @@ public class MealService {
     }
 
     List<GetMealListRes> getDataByMemberNoId(GetMealListReq getData){
-
-        return mealMapper.getDataByMemberNoId(getData);
+        List<GetMealListRes> result = mealMapper.getDataByMemberNoId(getData);
+        for (int  i=0; i < result.size(); i++)
+        {
+            result.get(i).setMealDay(getData.getMealDay());
+        }
+        return result;
     }
 
     int modifyMeal (Integer memberNoLogin , findFoodDetailInfoReq mealInfo)
@@ -149,6 +153,13 @@ public class MealService {
 
 
         return 0;
+    }
+
+
+    GetOnEatenDataRes getOnEatenDataRes (int memberNoId, String mealDay)
+    {
+
+        return mealMapper.onDayTotalData(memberNoId, mealDay);
     }
 
 
