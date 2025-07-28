@@ -45,27 +45,49 @@ public class DiaryService {
         return diary;
     }
 
-    public DiaryPostAndUploadRes saveDiaryAndHandleUpload(int memberId, DiaryPostReq req) {
-        req.setMemberNoLogin(memberId);
-
-        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
-        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            MultipartFile file = imageFiles.get(0);
-            String fileName = saveFile(file);
-            req.setDiaryImage(fileName);
+    public DiaryPostAndUploadRes updateDiaryAndHandleUpload(int memberId, DiaryPutReq req) {
+        // 1. 기존 일기 조회 및 권한 검사
+        DiaryGetRes existing = diaryMapper.findById(req.getId());
+        if (existing == null) {
+            throw new CustomException("수정할 일기가 존재하지 않습니다.", 404);
+        }
+        if (existing.getMemberNoLogin() != memberId) {
+            throw new CustomException("수정 권한이 없습니다.", 403);
         }
 
-        diaryMapper.save(req);
-        int newDiaryId = req.getId();
+        // 2. 이미지 처리
+        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
+        UploadResponse uploadResponse = null;
 
+        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
+            MultipartFile file = imageFiles.get(0);
+
+            // 기존 이미지가 있다면 삭제
+            if (existing.getImageFileName() != null) {
+                deleteFileIfExists(existing.getImageFileName());
+            }
+
+            // 새 이미지 저장
+            String uploadedFileName = saveFile(file);
+            req.setImageFileName(uploadedFileName);
+
+            uploadResponse = new UploadResponse(
+                    uploadedFileName,
+                    file.getOriginalFilename(),
+                    "업로드 성공"
+            );
+        } else {
+            // 이미지가 없으면 null 처리
+            req.setImageFileName(null);
+        }
+
+        // 3. DB 수정
+        diaryMapper.modify(req);
+
+        // 4. 결과 반환
         return new DiaryPostAndUploadRes(
-                newDiaryId,
-                req.getDiaryImage() != null
-                        ? Collections.singletonList(new UploadResponse(
-                        req.getDiaryImage(),
-                        imageFiles.get(0).getOriginalFilename(),
-                        "업로드 성공"))
-                        : Collections.emptyList()
+                req.getId(),
+                uploadResponse != null ? List.of(uploadResponse) : Collections.emptyList()
         );
     }
 
@@ -90,8 +112,8 @@ public class DiaryService {
             throw new CustomException("삭제 권한이 없습니다.", 403);
         }
 
-        if (existing.getDiaryImage() != null) {
-            deleteFileIfExists(existing.getDiaryImage());
+        if (existing.getImageFileName() != null) {
+            deleteFileIfExists(existing.getImageFileName());
         }
 
         diaryMapper.deleteById(id);

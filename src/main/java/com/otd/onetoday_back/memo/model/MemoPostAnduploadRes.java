@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 public class MemoPostAnduploadRes {
     private int id;
-    private List<UploadResponse> uploadResponseList;
+    private List<UploadResponse> uploadResults;
 }

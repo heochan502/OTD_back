@@ -10,6 +10,6 @@ public class DiaryGetRes {
     private int memberNoLogin;
     private String diaryName;
     private String diaryContent;
-    private String diaryImage;
+    private String imageFileName;
     private LocalDateTime createdAt;
 }

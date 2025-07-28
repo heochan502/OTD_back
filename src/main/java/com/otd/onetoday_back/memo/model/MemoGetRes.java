@@ -10,13 +10,6 @@ public class MemoGetRes {
     private String memoName;
     private String memoContent;
     private String createdAt;
-    private String imageFileName;
+    private String memoImage;
     private Integer memberNoLogin;
-
-    public String getMemoImage() {
-        return memoImage;
-    }
-    public void setMemoImage(String memoImage) {
-        this.memoImage = memoImage;
-    }
 }

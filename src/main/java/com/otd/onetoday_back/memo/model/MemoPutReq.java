@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class MemoPutReq {
     private int id; // 수정할 메모의 ID
+    private int memberNoLogin;
     private String memoName;
     private String memoContent;
     private String memoImage; // 이미지 파일명 (기존 이미지 유지하거나 새로 설정)
