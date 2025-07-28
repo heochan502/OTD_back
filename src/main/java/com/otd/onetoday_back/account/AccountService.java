@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -63,5 +64,13 @@ public class AccountService {
     public boolean existsByMemberNick(String memberNick) {
         return accountMapper.existsByMemberNick(memberNick) > 0;
     }
+
+
+    @Transactional
+    public int deleteById(int memberNoLogin) {
+        accountMapper.deleteMemberLocationByMemberId(memberNoLogin);
+        return accountMapper.deleteById(memberNoLogin);
+    }
+
 
 }

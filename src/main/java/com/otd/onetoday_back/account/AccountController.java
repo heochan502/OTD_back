@@ -72,7 +72,7 @@ public class AccountController {
     }
 
 
-@PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletRequest httpReq, @RequestBody AccountLoginReq req) {
 
         log.info(" changed  : {}", req);
@@ -132,5 +132,12 @@ public class AccountController {
     public ResponseEntity<?> logout(HttpServletRequest httpReq) {
         HttpUtils.removeSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         return ResponseEntity.ok(1);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteMember(@RequestParam int memberNoLogin) {
+        log.info("memberNoLogin={}", memberNoLogin);
+        int result = accountService.deleteById(memberNoLogin);
+        return ResponseEntity.ok(result);
     }
 }

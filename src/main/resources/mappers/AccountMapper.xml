@@ -47,6 +47,16 @@
         SELECT count(*) FROM member WHERE member_nick = #{memberNick}
     </select>
 
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM member
+        WHERE member_no_login = #{memberNoLogin}
+    </delete>
+
+
+    <delete id="deleteMemberLocationByMemberId" parameterType="int">
+        DELETE FROM member_location
+        WHERE local_member_id = #{memberNoLogin}
+    </delete>
 </mapper>
 
 
