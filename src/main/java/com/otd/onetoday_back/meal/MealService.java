@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -152,6 +153,13 @@ public class MealService {
 
 
         return 0;
+    }
+
+
+    GetOnEatenDataRes getOnEatenDataRes (int memberNoId, String mealDay)
+    {
+
+        return mealMapper.onDayTotalData(memberNoId, mealDay);
     }
 
 

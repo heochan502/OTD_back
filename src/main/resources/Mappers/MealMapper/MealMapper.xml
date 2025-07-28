@@ -89,4 +89,12 @@
     </select>
 
 
+    <select id="onDayTotalData">
+        SELECT sum(total_calorie) as total_calorie, sum(total_protein) as total_protein, sum(total_fat) as total_fat, sum(total_carbohydrate)as total_carbohydrate, meal_day
+        FROM meal_total_calo
+        WHERE member_no_login = #{memberNoLogin} and DATE(meal_day) = #{mealDay}
+
+    </select>
+
+
  </mapper>
