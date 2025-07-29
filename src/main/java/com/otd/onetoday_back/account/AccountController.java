@@ -135,9 +135,10 @@ public class AccountController {
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteMember(@RequestParam int memberNoLogin) {
+    public ResponseEntity<?> deleteMember(@RequestParam int memberNoLogin, HttpSession session) {
         log.info("memberNoLogin={}", memberNoLogin);
         int result = accountService.deleteById(memberNoLogin);
+        session.invalidate();
         return ResponseEntity.ok(result);
     }
 }
