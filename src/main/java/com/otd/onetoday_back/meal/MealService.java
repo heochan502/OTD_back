@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -19,19 +20,17 @@ public class MealService {
 
 
     private InpuMealDetailDto  calculateTotal (findFoodDetailInfoReq mealInfo, int memberNoLogin ) {
-        InpuMealDetailDto sumData = new InpuMealDetailDto();
+        InpuMealDetailDto sumData = new InpuMealDetailDto();// 필드에 할당
         List<GetFoodInfoAllRes> result = mealMapper.getDetailFoodInfo(mealInfo.getFoodDbId());
 
-        sumData = new InpuMealDetailDto(); // 필드에 할당
         sumData.setMealDay(mealInfo.getMealDay());
         sumData.setMemberNoLogin(memberNoLogin);
         sumData.setMealBrLuDi(mealInfo.getMealBrLuDi());
+        sumData.setTotalCalorie(mealInfo.getTotalCalorie());
 
         for (int i = 0; i < result.size(); i++) {
             float amount = mealInfo.getAmount().get(i);
             GetFoodInfoAllRes food = result.get(i);
-
-            sumData.setTotalCalorie((int)(sumData.getTotalCalorie() + (food.getCalorie() / 100.0) * amount));
             sumData.setTotalProtein(sumData.getTotalProtein() + (food.getProtein() / 100.0f) * amount);
             sumData.setTotalFat(sumData.getTotalFat() + (food.getFat() / 100.0f) * amount);
             sumData.setTotalCarbohydrate(sumData.getTotalCarbohydrate() + (food.getCarbohydrate() / 100.0f) * amount);
@@ -67,13 +66,9 @@ public class MealService {
 
 
     List<FindFoodNameRes> findFoodName (FindFoodNameReq foodInfo) {
-//        if (foodInfo.getFoodCategory() == null || foodInfo.getFoodCategory().isEmpty()) {
-//         return   mealMapper.findFoodNameForFoodName(foodInfo.getFoodName());
-//        }
-//        else
-//        {
+
             return   mealMapper.findFoodNameForFoodNameAndCategory(foodInfo);
-//        }
+
     }
 
     List<FindFoodCategoryRes> findFoodCategory (FindFoodNameReq foodInfo) {
@@ -111,40 +106,23 @@ public class MealService {
             InputMealCategoryReq inputMealData = indataMealCategory(memberNoLogin,mealInfo);
 
             int res = mealMapper.inputDayMealData( inputMealData);
-            log.info("inputDayMealCategory 성공 실패 : {}", res);
+//            log.info("inputDayMealCategory 성공 실패 : {}", res);
 
             InpuMealDetailDto sumData = calculateTotal(mealInfo,memberNoLogin);
             int result = mealMapper.inputTotalCalorie(sumData);
-            log.info("inputDayMealDetail 작동하냐 : {}", result);
-//        List<GetFoodInfoAllRes> result = mealMapper.getDetailFoodInfo(mealInfo.getFoodDbId());
-//
-//
-//            InpuMealDetailDto sumData = new InpuMealDetailDto();
-//            sumData.setMealDay(mealInfo.getMealDay());
-//            sumData.setMemberNoLogin(memberNoLogin);
-//            sumData.setMealBrLuDi(mealInfo.getMealBrLuDi());
-//
-//            for (int i = 0; i < result.size(); i++) {
-//                float amount = mealInfo.getAmount().get(i);
-//                GetFoodInfoAllRes food = result.get(i);
-//
-//                sumData.setTotalCalorie((int)(sumData.getTotalCalorie() + (food.getCalorie() / 100.0) * amount));
-//                log.info("sumData: {} {} {} ", sumData.getTotalCalorie() ,food.getCalorie() ,amount);
-//                sumData.setTotalProtein((float)(sumData.getTotalProtein() + (food.getProtein() / 100.0) * amount));
-//                sumData.setTotalFat((float)(sumData.getTotalFat() + (food.getFat() / 100.0) * amount));
-//                sumData.setTotalCarbohydrate((float)(sumData.getTotalCarbohydrate() + (food.getCarbohydrate() / 100.0) * amount));
-//                sumData.setTotalSugar((float)(sumData.getTotalSugar() + (food.getSugar() / 100.0) * amount));
-//                sumData.setTotalNatrium((float)(sumData.getTotalNatrium() + (food.getNatrium() / 100.0) * amount));
-//            }
-//            return  mealMapper.inputTotalCalorie(sumData);
+
         }
         return 0;
     }
 
     List<GetMealListRes> getDataByMemberNoId(GetMealListReq getData){
-
-        return mealMapper.getDataByMemberNoId(getData);
-    };
+        List<GetMealListRes> result = mealMapper.getDataByMemberNoId(getData);
+        for (int  i=0; i < result.size(); i++)
+        {
+            result.get(i).setMealDay(getData.getMealDay());
+        }
+        return result;
+    }
 
     int modifyMeal (Integer memberNoLogin , findFoodDetailInfoReq mealInfo)
     {
@@ -154,16 +132,17 @@ public class MealService {
         }
         if (mealInfo.getFoodDbId() != null && !mealInfo.getFoodDbId().isEmpty()) {
             InputMealCategoryReq inputMealData = indataMealCategory(memberNoLogin,mealInfo);
-            int res = mealMapper.deleteMealCategory( inputMealData);
-            log.info("deleteMealCategory 성공 실패 : {}", res);
+            int res = mealMapper.deleteMealCategoryIn( memberNoLogin, mealInfo);
+//            log.info("deleteMealCategory 성공 실패 : {}", res);
 
-            for (int i = 0; i < inputMealData.getMealDetails().size() ; i++) {
-                res = mealMapper.modifyByMealDayAndMealBrLuDi(inputMealData, inputMealData.getMealDetails().get(i).getFoodDbId(),inputMealData.getMealDetails().get(i).getFoodAmount());
-                log.info("modifyByMealDayAndMealBrLuDi 성공 실패 : {}", res);
-            }
+
+            int result = mealMapper.inputDayMealData( inputMealData);
+
+//            log.info("inputDayMealData 작동하냐 : {}", result);
+//
             InpuMealDetailDto sumData = calculateTotal(mealInfo,memberNoLogin);
-            int result = mealMapper.modifyByMealTotalAndMealBrLuDi(sumData);
-            log.info("modifyByMealTotalAndMealBrLuDi 작동하냐 : {}", result);
+             result = mealMapper.modifyByMealTotalAndMealBrLuDi(sumData);
+//            log.info("modifyByMealTotalAndMealBrLuDi 작동하냐 : {}", result);
 
         }
         else
@@ -176,5 +155,17 @@ public class MealService {
         return 0;
     }
 
+
+    GetOnEatenDataRes getOnEatenDataRes (int memberNoId, String mealDay)
+    {
+
+        return mealMapper.onDayTotalData(memberNoId, mealDay);
+    }
+
+
+    List<GetMealStatisticRes> getMealStatistic(GetMealStatisticReq getStatistic)
+    {
+        return mealMapper.getMealStatistic(getStatistic);
+    }
 
 }

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,20 +36,19 @@ public class AccountService {
         }
         return res;
     }
-    public AccountProfileRes updateProfile(Long memberNoLogin, memberUpdateDto dto) {
-        AccountProfileRes res = accountMapper.findProfileById(memberNoLogin.intValue());
-        if (res == null) {
+    public AccountProfileRes updateProfile(int memberNoLogin, memberUpdateDto dto) {
+        AccountProfileRes currentProfile = accountMapper.findProfileById(memberNoLogin);
+        if (currentProfile == null) {
             return null;
         }
-
         dto.setMemberNoLogin(memberNoLogin);
+
         int result = accountMapper.updateProfile(dto);
         if (result > 0) {
-            return accountMapper.findProfileById(memberNoLogin.intValue());
+            return accountMapper.findProfileById(memberNoLogin);
         }
         return null;
     }
-
     public AccountProfileRes getProfile(int memberNoLogin) {
         return accountMapper.findProfileById(memberNoLogin);
     }
@@ -64,5 +64,13 @@ public class AccountService {
     public boolean existsByMemberNick(String memberNick) {
         return accountMapper.existsByMemberNick(memberNick) > 0;
     }
+
+
+    @Transactional
+    public int deleteById(int memberNoLogin) {
+        accountMapper.deleteMemberLocationByMemberId(memberNoLogin);
+        return accountMapper.deleteById(memberNoLogin);
+    }
+
 
 }

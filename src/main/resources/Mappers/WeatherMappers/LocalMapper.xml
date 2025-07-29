@@ -10,7 +10,8 @@
             resultType="com.otd.onetoday_back.weather.location.model.LocationDto">
         SELECT local_id, city, county, town
         FROM locallist
-        WHERE REPLACE(CONCAT(city, county, town), ' ', '') LIKE CONCAT('%', REPLACE(#{keyword}, ' ', ''), '%')
+        WHERE REPLACE(CONCAT(city, county, town), ' ', '')
+        LIKE CONCAT('%', REPLACE(#{keyword}, ' ', ''), '%')
     </select>
     <select id="getLocalListByMemberId">
         SELECT l.*
@@ -24,8 +25,7 @@
         SET is_selected = FALSE
         WHERE local_member_id = #{memberId}
     </update>
-
-    <!-- 특정 지역 선택 -->
+    <!-- 지역 선택 -->
     <update id="updateSelectedLocation">
         UPDATE member_location
         SET is_selected = TRUE

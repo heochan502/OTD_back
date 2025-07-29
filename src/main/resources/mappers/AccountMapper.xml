@@ -27,12 +27,12 @@
     <update id="updateProfile" parameterType="com.otd.onetoday_back.account.model.memberUpdateDto">
         UPDATE member
         SET
-        member_id = #{memberId},
+        member_id = #{mamberId}
         email = #{email},
         name = #{name},
         birth_date = #{birthDate},
         member_nick = #{memberNick},
-        member_img = #{memberImg}
+        member_img = #{memberImg},
         WHERE member_no_login = #{memberNoLogin}
     </update>
     <select id="existsByMemberId" parameterType="string" resultType="int">

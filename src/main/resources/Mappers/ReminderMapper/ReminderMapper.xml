@@ -7,7 +7,7 @@
         member_no_login = #{memberId},
         re_title = #{title},
         re_content = #{content},
-        re_repeat = #{repeat},
+        `re_repeat` = #{repeat},
         re_alarm = #{alarm}
         <if test="date != null and date != ''">
             , re_date = #{date}
@@ -20,17 +20,26 @@
             (#{id}, #{dow})
         </foreach>
     </insert>
-    <select id="findByMonth">
-        SELECT re_id AS id, re_title AS title, re_date AS date
-        FROM reminder
-        WHERE r_date IS NOT NULL
-        AND YEAR(r_date) = #{year}
-        AND MONTH(r_date) = #{month}
-    </select>
-    <select id="findByDay">
-        SELECT re_id AS id, re_title AS title, re_date AS date
-        FROM reminder
-        WHERE re_date LIKE CONCAT(#{year},'-',#{month},'-',#{day}) AND member_no_id = #{memberId}
+    <select id="findByYearAndMonth">
+        SELECT r.re_id AS id,
+            r.re_title AS title,
+            r.re_content AS content,
+            r.re_created AS created,
+            r.re_date AS date,
+            r.re_alarm AS alarm,
+            r.re_repeat AS `repeat`,
+            GROUP_CONCAT(rr.rr_dow) AS repeatDow
+        FROM reminder r
+        LEFT JOIN reminder_repeat rr ON r.re_id = rr.re_id
+        WHERE
+            (r.re_date IS NOT NULL
+            AND YEAR(r.re_date) = #{year}
+            AND MONTH(r.re_date) = #{month})
+            OR
+            (r.re_repeat = 1
+            AND r.re_created &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d'))
+        AND r.member_no_login = #{memberId}
+        GROUP BY r.re_id
     </select>
     <update id="modify">
         UPDATE reminder
@@ -49,13 +58,6 @@
         FROM reminder_repeat
         WHERE re_id = #{id}
     </delete>
-    <update id="modifyDow">
-        UPDATE reminder_repeat(re_id, rr_dow)
-        VALUES
-        <foreach collection="repeatDow" item="dow" separator=",">
-            (#{id}, #{dow})
-        </foreach>
-    </update>
     <delete id="deleteById">
         DELETE
         FROM reminder

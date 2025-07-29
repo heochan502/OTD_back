@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.otd.onetoday_back.health.HealthLogMapper">
+
+    <!--    건강기록 추가하기 -->
+    <insert id="saveHealthLog">
+        INSERT INTO healthlog
+        <trim prefix="SET" suffixOverrides=",">
+            SET member_no = #{memberNO}
+            , weight = #{weight}
+            , height = #{height}
+            <if test="systolicBp != null">systolic_bp = #{systolicBp},</if>
+            <if test="diastolicBp != null">diastolic_bp = #{diastolicBp},</if>
+            <if test="sugarLevel != null">sugar_level = #{sugarLevel},</if>
+            <if test="moodLevel != null">mood_level = #{moodLevel},</if>
+            <if test="sleepQuality != null">sleep_quality = #{sleepQuality},</if>
+            <if test="healthlogDatetime != null">healthlog_datetime = #{healthlogDatetime},</if>
+        </trim>
+    </insert>
+
+    <!--    건강기록 상세 조회 -->
+    <select id="findByHealthlogId">
+        SELECT *
+        FROM healthlog
+        WHERE healthlog_id = #{healthlogId}
+        AND member_no = #{memberNO}
+    </select>
+
+    <!--    건강기록 목록 조회-->
+    <select id="findAllByMemberIdOrderByHealthlogIdDesc">
+        SELECT *
+        FROM healthlog
+        WHERE member_no = #{memberNO}
+        ORDER BY healthlog_id DESC
+    </select>
+
+    <!--    건강기록 삭제-->
+    <delete id="deleteByHealthlogId">
+        DELETE FROM healthlog
+        WHERE healthlog_id = #{healthlogId}
+        AND member_no = #{memberNO}
+    </delete>
+
+</mapper>

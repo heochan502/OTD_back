@@ -6,12 +6,13 @@ import com.otd.onetoday_back.common.util.HttpUtils;
 import com.otd.onetoday_back.meal.model.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,7 +27,7 @@ public class MealController {
     @GetMapping()
     public ResponseEntity<?> findFood(HttpServletRequest httpReq, @ModelAttribute FindFoodNameReq foodInfo)
     {
-//        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
 //        log.info("foodInfo: {}", foodInfo);
 
         if (foodInfo.getFoodName() == null || foodInfo.getFoodName().isEmpty()) {
@@ -38,8 +39,39 @@ public class MealController {
             List<FindFoodNameRes> res =  mealService.findFoodName(foodInfo);
             return ResponseEntity.ok(res);
         }
-
     }
+
+    // 먹은거 처음 화면 위에 바
+    @GetMapping("/eatenMeal")
+    public ResponseEntity<?> eatenFood(HttpServletRequest httpReq, @RequestParam String mealDay)
+    {
+        Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        if (memberNoLogin == null) {
+            return ResponseEntity.ok("로그인 안함");
+        }
+        GetOnEatenDataRes result = mealService.getOnEatenDataRes(memberNoLogin, mealDay);
+        log.info("result: {}", result);
+
+        return ResponseEntity.ok(result);
+    }
+
+ @GetMapping("/statsMeal")
+ public ResponseEntity<?> eatenFood(HttpServletRequest httpReq, @ModelAttribute GetMealStatisticReq weekly)
+ {
+     Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+     if (memberNoLogin == null) {
+         return ResponseEntity.ok("로그인 안함");
+     }
+     weekly.setMemberNoLogin(memberNoLogin);
+     log.info("result 주간 데이터: {}", weekly);
+     List<GetMealStatisticRes> result = mealService.getMealStatistic( weekly);
+     log.info("result: {}", result);
+
+     return ResponseEntity.ok(result);
+ }
+
+
+
     @PostMapping ("/saveMeal")
     public ResponseEntity<?> mealCalculation(HttpServletRequest httpReq, @RequestBody findFoodDetailInfoReq mealInfo)
     {
@@ -52,10 +84,6 @@ public class MealController {
          int result = mealService.inputDayMealData( memberNoLogin,mealInfo);
          log.info("result: {}", result);
         return ResponseEntity.ok(1);
-//        log.info("memeber id {} : foodname {}", memberId, foodName);
-//        List<findFoodNameRes> res = mealService.findFoodName(foodInfo);
-//        log.info("res : {}", res);
-//        return null;
     }
 
     @GetMapping("/getMeal")
@@ -87,5 +115,7 @@ public class MealController {
         return ResponseEntity.ok(result);
 //
     }
+
+
 
 }

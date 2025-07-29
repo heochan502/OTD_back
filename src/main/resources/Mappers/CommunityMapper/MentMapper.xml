@@ -5,41 +5,39 @@
 
 <mapper namespace="com.otd.onetoday_back.community.mapper.MentMapper">
 
-    <!-- 댓글 저장 -->
-    <insert id="save" parameterType="com.otd.onetoday_back.community.domain.Ment">
-        INSERT INTO community_comment (
-        post_id,
-        member_no_login,
-        content,
-        updated_at
-        ) VALUES (
-        #{postId},
-        #{memberNoLogin},
-        #{content},
-        #{updatedAt}
-        )
+    <resultMap id="MentResMap" type="com.otd.onetoday_back.community.dto.MentRes">
+        <id column="comment_id" property="commentId" />
+        <result column="post_id" property="postId" />
+        <result column="member_no_login" property="memberNoLogin" />
+        <result column="nickname" property="memberNick" />
+        <result column="profile_img" property="memberImg" />
+        <result column="content" property="content" />
+        <result column="updated_at" property="updatedAt" />
+    </resultMap>
+
+    <insert id="save">
+        INSERT INTO community_comment (post_id, member_no_login, content, updated_at)
+        VALUES (#{postId}, #{memberNoLogin}, #{content}, NOW())
     </insert>
 
-    <!-- 게시글에 대한 댓글 목록 조회 (작성자 닉네임, 이미지 포함) -->
     <select id="findByPostId" resultType="com.otd.onetoday_back.community.dto.MentRes">
         SELECT
-        c.comment_id AS mentId,
-        c.post_id AS postId,
-        c.member_no_login AS memberNoLogin,
-        m.member_nick AS memberNick,
-        m.member_img AS memberImg,
+        c.comment_id,
+        c.post_id,
+        c.member_no_login,
+        a.nickname AS memberNick,
+        a.profile_img AS memberImg,
         c.content,
-        c.updated_at AS updatedAt
+        c.updated_at
         FROM community_comment c
-        JOIN member m ON c.member_no_login = m.member_no
+        JOIN account a ON c.member_no_login = a.id
         WHERE c.post_id = #{postId}
-        ORDER BY c.updated_at ASC
+        ORDER BY c.updated_at DESC
     </select>
 
-    <!-- 댓글 삭제 -->
     <delete id="deleteById">
-        DELETE FROM community_comment
-        WHERE comment_id = #{mentId}
+        DELETE FROM community_comment WHERE comment_id = #{commentId}
     </delete>
+
 
 </mapper>

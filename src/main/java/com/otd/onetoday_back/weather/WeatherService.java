@@ -1,6 +1,7 @@
 package com.otd.onetoday_back.weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.otd.onetoday_back.account.model.memberUpdateDto;
 import com.otd.onetoday_back.weather.config.constants.ConstKma;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.model.WeatherDto;
@@ -138,5 +139,9 @@ public class WeatherService {
             log.error("날씨 API 실패", e);
             throw new RuntimeException("날씨 API 실패", e);
         }
+    }
+
+    public memberUpdateDto getNickName(int memberId) {
+        return weatherMapper.getNickName(memberId);
     }
 }
