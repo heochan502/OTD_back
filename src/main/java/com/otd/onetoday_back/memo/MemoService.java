@@ -2,6 +2,7 @@ package com.otd.onetoday_back.memo;
 
 import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.memo.model.*;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +22,20 @@ public class MemoService {
 
     private final MemoMapper memoMapper;
 
-    @Value("${file.upload-dir}")
+    @Value("${constants.file.directory}")
     private String uploadDir;
+
+    // Windows 환경에서 경로 자동 보정
+    @PostConstruct
+    public void adjustUploadPathForWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win") && uploadDir.startsWith("/home")) {
+            uploadDir = "C:/2025_swstudy/upload"; // Windows용 안전한 경로
+            log.warn("Windows 환경 감지됨. uploadDir을 {} 로 강제 설정합니다.", uploadDir);
+        } else {
+            log.info("uploadDir 설정값: {}", uploadDir);
+        }
+    }
 
     public MemoListRes findAll(MemoGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
@@ -115,9 +128,7 @@ public class MemoService {
                     : ".bin";
             String safeFileName = UUID.randomUUID().toString() + ext;
 
-            // uploadDir에 trim() 적용해서 공백 제거
-            String trimmedUploadDir = uploadDir.trim();
-            Path target = Paths.get(trimmedUploadDir).resolve(safeFileName).normalize();
+            Path target = Paths.get(uploadDir.trim()).resolve(safeFileName).normalize();
 
             Files.createDirectories(target.getParent());
             file.transferTo(target.toFile());
@@ -130,8 +141,7 @@ public class MemoService {
     }
 
     private void deleteFileIfExists(String fileName) {
-        String trimmedUploadDir = uploadDir.trim();
-        Path path = Paths.get(trimmedUploadDir).resolve(fileName).normalize();
+        Path path = Paths.get(uploadDir.trim()).resolve(fileName).normalize();
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {
