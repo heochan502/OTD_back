@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, created_at)
+        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{imageFileName}, NOW())
+    </insert>
+
+    <select id="findAll" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT
+            diary_id AS id,
+            member_no_login,
+            diary_name,
+            diary_content,
+            diary_image AS imageFileName,
+            created_at
+        FROM diary
+        WHERE member_no_login = #{memberNoLogin}
+        ORDER BY created_at DESC
+            LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="getTotalCount" resultType="int">
+        SELECT COUNT(*) FROM diary
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
+
+    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT
+            diary_id AS id,
+            member_no_login,
+            diary_name,
+            diary_content,
+            diary_image AS imageFileName,
+            created_at
+        FROM diary
+        WHERE diary_id = #{id}
+    </select>
+
+    <update id="modify">
+        UPDATE diary
+        SET
+            diary_name = #{diaryName},
+            diary_content = #{diaryContent},
+            diary_image = #{imageFileName}
+        WHERE diary_id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM diary WHERE diary_id = #{id}
+    </delete>
+
+</mapper>
