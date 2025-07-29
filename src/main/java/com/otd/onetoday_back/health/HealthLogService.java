@@ -17,7 +17,7 @@ public class HealthLogService {
     public int saveHealthLog(PostHealthLogReq req, int logginMemberId) {
         PostHealthLogDto postHealthLogDto = PostHealthLogDto.builder()
                 .healthlogId(req.getHealthlogId())
-                .memberNo(logginMemberId)
+                .memberId(logginMemberId)
                 .weight(req.getWeight())
                 .height(req.getHeight())
                 .systolicBp(req.getSystolicBp())
@@ -25,6 +25,7 @@ public class HealthLogService {
                 .sugarLevel(req.getSugarLevel())
                 .moodLevel(req.getMoodLevel())
                 .sleepQuality(req.getSleepQuality())
+                .healthlogDatetime(req.getHealthlogDatetime())
                 .build();
 
         return healthLogMapper.saveHealthLog(postHealthLogDto);
