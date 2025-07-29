@@ -2,7 +2,7 @@ package com.otd.onetoday_back.health.model;
 
 public class GetHealthLogDetailDto {
     private int healthlogId;
-    private int memberNo;
+    private int memberId;
     private int weight;
     private int height;
     private int systolicBp;
