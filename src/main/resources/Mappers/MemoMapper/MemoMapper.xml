@@ -14,27 +14,27 @@
             memo_image,
             created_at
         ) VALUES (
-            #{memberNoLogin},
-            #{memoName},
-            #{memoContent},
-            #{memoImageFileName},
-            NOW()
-            )
+                     #{memberNoLogin},
+                     #{memoName},
+                     #{memoContent},
+                     #{memoImageFileName},
+                     NOW()
+                 )
     </insert>
 
-    <!-- 메모 목록 조회 (페이징 포함) -->
+    <!-- 메모 목록 조회 -->
     <select id="findAll" resultType="com.otd.onetoday_back.memo.model.MemoGetRes">
         SELECT
             memo_id AS id,
             member_no_login,
             memo_name,
             memo_content,
-            memo_image AS memo_image_file_name,
+            memo_image AS memoImageFileName,
             created_at
         FROM memo
         WHERE member_no_login = #{memberNoLogin}
         ORDER BY memo_id DESC
-            LIMIT #{limit} OFFSET #{offset}
+            LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
     <!-- 전체 개수 조회 -->
@@ -51,7 +51,7 @@
             member_no_login,
             memo_name,
             memo_content,
-            memo_image AS memo_image_file_name,
+            memo_image AS memoImageFileName,
             created_at
         FROM memo
         WHERE memo_id = #{id}
@@ -72,5 +72,4 @@
         DELETE FROM memo
         WHERE memo_id = #{id}
     </delete>
-
 </mapper>
