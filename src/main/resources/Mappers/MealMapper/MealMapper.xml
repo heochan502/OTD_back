@@ -79,13 +79,40 @@
 
 
     <select id="getDataByMemberNoId">
-      SELECT mf.food_name, mf.calorie, DATE(mc.meal_day) ,mc.food_db_id, mc.food_amount as amount, mt.total_calorie as all_day_calorie, mt.meal_br_lu_di, mt.total_fat, mt.total_carbohydrate, mt.total_protein
-		FROM meal_total_calo as mt
-                JOIN(  SELECT * FROM meal_category WHERE member_no_login =  #{memberNoLogin} AND
-							meal_br_lu_di = #{mealBrLuDi} AND DATE(meal_day) = #{mealDay} ) mc ON  mt.meal_br_lu_di = #{mealBrLuDi} AND mt.member_no_login =  #{memberNoLogin}
-                JOIN ( SELECT food_name, calorie ,food_db_id FROM meal_food_db ) as mf ON mf.food_db_id = mc.food_db_id ;
+<!--      SELECT mf.food_name, mf.calorie, DATE(mc.meal_day) ,mc.food_db_id, mc.food_amount as amount, mt.total_calorie as all_day_calorie, mt.meal_br_lu_di, mt.total_fat, mt.total_carbohydrate, mt.total_protein-->
+<!--		FROM meal_total_calo as mt-->
+<!--                JOIN(  SELECT * FROM meal_category WHERE member_no_login =  #{memberNoLogin} AND-->
+<!--							meal_br_lu_di = #{mealBrLuDi} AND DATE(meal_day) = #{mealDay,jdbcType=VARCHAR} ) mc ON  mt.meal_br_lu_di = #{mealBrLuDi} AND mt.member_no_login =  #{memberNoLogin}-->
+<!--                JOIN ( SELECT food_name, calorie ,food_db_id FROM meal_food_db ) as mf ON mf.food_db_id = mc.food_db_id ;-->
 
-
+        SELECT
+        mf.food_name,
+        mf.calorie,
+        DATE(mc.meal_day),
+        mc.food_db_id,
+        mc.food_amount as amount,
+        mt.total_calorie as all_day_calorie,
+        mt.meal_br_lu_di,
+        mt.total_fat,
+        mt.total_carbohydrate,
+        mt.total_protein
+            FROM meal_total_calo as mt
+            JOIN (
+                SELECT *
+                    FROM meal_category
+                    WHERE
+                        member_no_login = #{memberNoLogin}
+                        AND meal_br_lu_di = #{mealBrLuDi}
+                        AND DATE(meal_day) = #{mealDay}
+                            ) as mc
+                    ON mt.meal_br_lu_di = #{mealBrLuDi}
+        AND mt.member_no_login = #{memberNoLogin}
+        AND DATE(mt.meal_day) = #{mealDay}
+            JOIN (
+                SELECT food_name, calorie ,food_db_id
+                FROM meal_food_db
+            ) as mf
+            ON mf.food_db_id = mc.food_db_id;
     </select>
 
 
