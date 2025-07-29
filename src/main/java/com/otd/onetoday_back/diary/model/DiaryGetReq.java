@@ -8,4 +8,8 @@ public class DiaryGetReq {
     private int currentPage;
     private int pageSize;
     private int offset;
+
+    public void setOffsetFromPage() {
+        this.offset = (currentPage - 1) * pageSize;
+    }
 }

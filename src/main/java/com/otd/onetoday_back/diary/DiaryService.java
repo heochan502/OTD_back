@@ -24,7 +24,6 @@ public class DiaryService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    // ✅ 전체 조회
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
         req.setOffset(offset);
@@ -35,7 +34,6 @@ public class DiaryService {
         return new DiaryListRes(diaryList, totalCount);
     }
 
-    // ✅ 단건 조회
     public DiaryGetRes findById(int id, int memberId) {
         DiaryGetRes diary = diaryMapper.findById(id);
         if (diary == null) {
@@ -47,73 +45,33 @@ public class DiaryService {
         return diary;
     }
 
-    // ✅ 등록 (multipart/form-data)
     public DiaryPostAndUploadRes saveDiaryAndHandleUpload(int memberId, DiaryPostReq req) {
         req.setMemberNoLogin(memberId);
 
-        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
-        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            MultipartFile file = imageFiles.get(0);
-            String fileName = saveFile(file);
-            req.setImageFileName(fileName);
+        UploadResponse uploadResponse = handleFileUpload(req.getDiaryImageFiles(), null);
+        if (uploadResponse != null) {
+            req.setImageFileName(uploadResponse.getSavedFileName());
         }
 
         diaryMapper.save(req);
-        int newDiaryId = req.getId();
 
         return new DiaryPostAndUploadRes(
-                newDiaryId,
-                req.getImageFileName() != null
-                        ? Collections.singletonList(new UploadResponse(
-                        req.getImageFileName(),
-                        imageFiles.get(0).getOriginalFilename(),
-                        "업로드 성공"))
-                        : Collections.emptyList()
+                req.getId(),
+                uploadResponse != null ? List.of(uploadResponse) : Collections.emptyList()
         );
     }
 
-    // ✅ 수정 (application/json 또는 multipart)
     public void updateDiary(DiaryPutReq req, int memberId) {
-        DiaryGetRes existing = diaryMapper.findById(req.getId());
-        if (existing == null) {
-            throw new CustomException("수정할 일기가 존재하지 않습니다.", 404);
-        }
-        if (existing.getMemberNoLogin() != memberId) {
-            throw new CustomException("수정 권한이 없습니다.", 403);
-        }
-
+        DiaryGetRes existing = validateAndGetDiary(req.getId(), memberId);
         diaryMapper.modify(req);
     }
 
-    // ✅ 수정 + 이미지 업로드
     public DiaryPostAndUploadRes updateDiaryAndHandleUpload(int memberId, DiaryPutReq req) {
-        DiaryGetRes existing = diaryMapper.findById(req.getId());
-        if (existing == null) {
-            throw new CustomException("수정할 일기가 존재하지 않습니다.", 404);
-        }
-        if (existing.getMemberNoLogin() != memberId) {
-            throw new CustomException("수정 권한이 없습니다.", 403);
-        }
+        DiaryGetRes existing = validateAndGetDiary(req.getId(), memberId);
 
-        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
-        String uploadedFileName = null;
-        UploadResponse uploadResponse = null;
-
-        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            MultipartFile file = imageFiles.get(0);
-
-            if (existing.getImageFileName() != null) {
-                deleteFileIfExists(existing.getImageFileName());
-            }
-
-            uploadedFileName = saveFile(file);
-            req.setImageFileName(uploadedFileName);
-
-            uploadResponse = new UploadResponse(
-                    uploadedFileName,
-                    file.getOriginalFilename(),
-                    "업로드 성공"
-            );
+        UploadResponse uploadResponse = handleFileUpload(req.getDiaryImageFiles(), existing.getImageFileName());
+        if (uploadResponse != null) {
+            req.setImageFileName(uploadResponse.getSavedFileName());
         } else {
             req.setImageFileName(null);
         }
@@ -126,15 +84,8 @@ public class DiaryService {
         );
     }
 
-    // ✅ 삭제
     public void deleteDiary(int id, int memberId) {
-        DiaryGetRes existing = diaryMapper.findById(id);
-        if (existing == null) {
-            throw new CustomException("삭제할 일기가 존재하지 않습니다.", 404);
-        }
-        if (existing.getMemberNoLogin() != memberId) {
-            throw new CustomException("삭제 권한이 없습니다.", 403);
-        }
+        DiaryGetRes existing = validateAndGetDiary(id, memberId);
 
         if (existing.getImageFileName() != null) {
             deleteFileIfExists(existing.getImageFileName());
@@ -143,7 +94,31 @@ public class DiaryService {
         diaryMapper.deleteById(id);
     }
 
-    // ✅ 파일 저장
+    private DiaryGetRes validateAndGetDiary(int id, int memberId) {
+        DiaryGetRes existing = diaryMapper.findById(id);
+        if (existing == null) {
+            throw new CustomException("대상 일기가 존재하지 않습니다.", 404);
+        }
+        if (existing.getMemberNoLogin() != memberId) {
+            throw new CustomException("권한이 없습니다.", 403);
+        }
+        return existing;
+    }
+
+    private UploadResponse handleFileUpload(List<MultipartFile> imageFiles, String existingFileName) {
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+            MultipartFile file = imageFiles.get(0);
+            if (file != null && !file.isEmpty()) {
+                if (existingFileName != null) {
+                    deleteFileIfExists(existingFileName);
+                }
+                String savedFileName = saveFile(file);
+                return new UploadResponse(savedFileName, file.getOriginalFilename(), "업로드 성공");
+            }
+        }
+        return null;
+    }
+
     private String saveFile(MultipartFile file) {
         try {
             String originalFilename = file.getOriginalFilename();
@@ -152,9 +127,7 @@ public class DiaryService {
                     : ".bin";
             String safeFileName = UUID.randomUUID().toString() + ext;
 
-            String trimmedUploadDir = uploadDir.trim();
-            Path target = Paths.get(trimmedUploadDir).resolve(safeFileName).normalize();
-
+            Path target = Paths.get(uploadDir.trim()).resolve(safeFileName).normalize();
             Files.createDirectories(target.getParent());
             file.transferTo(target.toFile());
 
@@ -165,12 +138,9 @@ public class DiaryService {
         }
     }
 
-    // ✅ 파일 삭제
     private void deleteFileIfExists(String fileName) {
-        String trimmedUploadDir = uploadDir.trim();
-        Path path = Paths.get(trimmedUploadDir).resolve(fileName).normalize();
         try {
-            Files.deleteIfExists(path);
+            Files.deleteIfExists(Paths.get(uploadDir.trim()).resolve(fileName).normalize());
         } catch (IOException e) {
             log.warn("파일 삭제 실패: {}", fileName);
         }

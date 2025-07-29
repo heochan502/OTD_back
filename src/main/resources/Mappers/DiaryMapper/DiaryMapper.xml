@@ -5,42 +5,11 @@
 
 <mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
 
-    <!-- INSERT -->
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, created_at)
-        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{imageFileName}, NOW())
+        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, mood, created_at)
+        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{imageFileName}, #{mood}, NOW())
     </insert>
 
-    <!-- SELECT: 상세 조회 -->
-    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT
-            diary_id AS id,
-            member_no_login,
-            diary_name,
-            diary_content,
-            diary_image AS imageFileName,
-            created_at
-        FROM diary
-        WHERE diary_id = #{id}
-    </select>
-
-    <!-- UPDATE -->
-    <update id="modify">
-        UPDATE diary
-        SET
-            diary_name = #{diaryName},
-            diary_content = #{diaryContent},
-            diary_image = #{imageFileName}
-        WHERE diary_id = #{id}
-    </update>
-
-    <!-- DELETE -->
-    <delete id="deleteById">
-        DELETE FROM diary
-        WHERE diary_id = #{id}
-    </delete>
-
-    <!-- 페이징 조회 -->
     <select id="findAll" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
         SELECT
             diary_id AS id,
@@ -48,6 +17,7 @@
             diary_name,
             diary_content,
             diary_image AS imageFileName,
+            mood,
             created_at
         FROM diary
         WHERE member_no_login = #{memberNoLogin}
@@ -55,11 +25,36 @@
             LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
-    <!-- 전체 개수 조회 -->
     <select id="getTotalCount" resultType="int">
-        SELECT COUNT(*)
-        FROM diary
+        SELECT COUNT(*) FROM diary
         WHERE member_no_login = #{memberNoLogin}
     </select>
+
+    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT
+            diary_id AS id,
+            member_no_login,
+            diary_name,
+            diary_content,
+            diary_image AS imageFileName,
+            mood,
+            created_at
+        FROM diary
+        WHERE diary_id = #{id}
+    </select>
+
+    <update id="modify">
+        UPDATE diary
+        SET
+            diary_name = #{diaryName},
+            diary_content = #{diaryContent},
+            diary_image = #{imageFileName},
+            mood = #{mood}
+        WHERE diary_id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM diary WHERE diary_id = #{id}
+    </delete>
 
 </mapper>

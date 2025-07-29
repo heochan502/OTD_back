@@ -14,9 +14,11 @@ public interface DiaryMapper {
 
     int getTotalCount(DiaryGetReq req);
 
-    DiaryGetRes findById(int id); // memberId 체크는 서비스단에서 처리
+    DiaryGetRes findById(int id);
 
     void modify(DiaryPutReq req);
 
     void deleteById(int id);
+
+
 }

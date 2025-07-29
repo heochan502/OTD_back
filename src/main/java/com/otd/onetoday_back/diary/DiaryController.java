@@ -14,15 +14,15 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/OTD/memoAndDiary/diary")
+// @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // 개발 중 사용할 경우
 public class DiaryController {
 
     private final DiaryService diaryService;
+    private static final String BASE_PATH = "/api/OTD/memoAndDiary/diary";
 
-    // ✅ 공통 로그인 검사
     private Integer getLoginMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
         if (memberId == null) {
-            // 401 Unauthorized
             throw new CustomException("로그인이 필요합니다.", 401);
         }
         return memberId;
@@ -32,13 +32,13 @@ public class DiaryController {
     public ResultResponse<DiaryListRes> findAll(@ModelAttribute DiaryGetReq req, HttpSession session) {
         Integer memberId = getLoginMemberId(session);
         req.setMemberNoLogin(memberId);
-        return ResultResponse.success(diaryService.findAll(req), "/api/OTD/memoAndDiary/diary");
+        return ResultResponse.success(diaryService.findAll(req), BASE_PATH);
     }
 
     @GetMapping("/{id}")
     public ResultResponse<DiaryGetRes> findById(@PathVariable int id, HttpSession session) {
         Integer memberId = getLoginMemberId(session);
-        return ResultResponse.success(diaryService.findById(id, memberId), "/api/OTD/memoAndDiary/diary/" + id);
+        return ResultResponse.success(diaryService.findById(id, memberId), BASE_PATH + "/" + id);
     }
 
     @PostMapping(consumes = {"multipart/form-data"})
@@ -49,7 +49,9 @@ public class DiaryController {
 
         Integer memberId = getLoginMemberId(session);
         req.setDiaryImageFiles(diaryImageFiles);
-        return ResultResponse.success(diaryService.saveDiaryAndHandleUpload(memberId, req), "/api/OTD/memoAndDiary/diary");
+
+        DiaryPostAndUploadRes result = diaryService.saveDiaryAndHandleUpload(memberId, req);
+        return ResultResponse.success(result, BASE_PATH);
     }
 
     @PutMapping(consumes = {"application/json"})
@@ -59,28 +61,25 @@ public class DiaryController {
 
         Integer memberId = getLoginMemberId(session);
         diaryService.updateDiary(req, memberId);
-        return ResultResponse.success("ok", "/api/OTD/memoAndDiary/diary");
+        return ResultResponse.success("ok", BASE_PATH);
     }
 
     @PutMapping(consumes = {"multipart/form-data"})
-    public ResultResponse<?> updateDiaryWithImage(
+    public ResultResponse<DiaryPostAndUploadRes> updateDiaryWithImage(
             HttpSession session,
             @RequestPart("diaryData") DiaryPutReq req,
-            @RequestPart(value = "diaryImageFiles", required = false) List<MultipartFile> diaryImageFiles
-    ) {
+            @RequestPart(value = "diaryImageFiles", required = false) List<MultipartFile> diaryImageFiles) {
+
         Integer memberId = getLoginMemberId(session);
         req.setDiaryImageFiles(diaryImageFiles);
         DiaryPostAndUploadRes result = diaryService.updateDiaryAndHandleUpload(memberId, req);
-        return ResultResponse.success(result, "/api/OTD/memoAndDiary/diary");
+        return ResultResponse.success(result, BASE_PATH);
     }
 
     @DeleteMapping
-    public ResultResponse<String> deleteDiary(
-            @RequestParam int id,
-            HttpSession session) {
-
+    public ResultResponse<String> deleteDiary(@RequestParam int id, HttpSession session) {
         Integer memberId = getLoginMemberId(session);
         diaryService.deleteDiary(id, memberId);
-        return ResultResponse.success("ok", "/api/OTD/memoAndDiary/diary");
+        return ResultResponse.success("ok", BASE_PATH);
     }
 }
