@@ -6,8 +6,8 @@
 <mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, mood, created_at)
-        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{imageFileName}, #{mood}, NOW())
+        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, created_at)
+        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{imageFileName}, NOW())
     </insert>
 
     <select id="findAll" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
@@ -17,7 +17,6 @@
             diary_name,
             diary_content,
             diary_image AS imageFileName,
-            mood,
             created_at
         FROM diary
         WHERE member_no_login = #{memberNoLogin}
@@ -37,7 +36,6 @@
             diary_name,
             diary_content,
             diary_image AS imageFileName,
-            mood,
             created_at
         FROM diary
         WHERE diary_id = #{id}
@@ -48,8 +46,7 @@
         SET
             diary_name = #{diaryName},
             diary_content = #{diaryContent},
-            diary_image = #{imageFileName},
-            mood = #{mood}
+            diary_image = #{imageFileName}
         WHERE diary_id = #{id}
     </update>
 
