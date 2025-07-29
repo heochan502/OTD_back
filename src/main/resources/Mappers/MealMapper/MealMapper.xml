@@ -131,7 +131,7 @@
 <!--                ,sum(total_sugar) as total_sugar,-->
 <!--                SUM(total_natrium) as total_natrium-->
             FROM  meal_total_calo
-            WHERE meal_day BETWEEN #{startDate} AND #{endDate}
+            WHERE meal_day BETWEEN #{startDate} AND #{endDate} and member_no_login = #{memberNoLogin}
             GROUP BY meal_day;
     </select>
 
