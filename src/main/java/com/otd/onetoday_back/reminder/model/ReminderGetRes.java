@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 @Setter
 @ToString
 public class ReminderGetRes {
+    private int memberId;
     private int id;
     private String title;
     private String content;
