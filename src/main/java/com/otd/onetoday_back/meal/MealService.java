@@ -163,4 +163,9 @@ public class MealService {
     }
 
 
+    List<GetMealStatisticRes> getMealStatistic(GetMealStatisticReq getStatistic)
+    {
+        return mealMapper.getMealStatistic(getStatistic);
+    }
+
 }
