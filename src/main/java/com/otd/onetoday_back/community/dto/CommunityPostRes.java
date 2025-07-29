@@ -22,4 +22,5 @@ public class CommunityPostRes {
     private int like;
     private int commentCount;    // 댓글 수
     private boolean likedByCurrentUser;
+    private Boolean isDeleted;
 }

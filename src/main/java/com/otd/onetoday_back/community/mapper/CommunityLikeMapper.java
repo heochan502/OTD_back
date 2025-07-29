@@ -7,9 +7,11 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface CommunityLikeMapper {
-    CommunityLike findByPostIdAndMemberId(@Param("postId") int postId, @Param("memberId") int memberId);
-    void insert(CommunityLike like);
-    void deleteByPostIdAndMemberId(@Param("postId") int postId, @Param("memberId") int memberId);
-    int countByPostId(@Param("postId") int postId);
-
+    CommunityLike findByPostIdAndMemberId(@Param("postId") int postId, @Param("memberId") int memberId); // ❓ 필요 없다면 제거 가능
+    void like(@Param("postId") int postId, @Param("memberId") int memberId);
+    void unlike(@Param("postId") int postId, @Param("memberId") int memberId);
+    int exists(@Param("postId") int postId, @Param("memberId") int memberId);
+    int countLikes(@Param("postId") int postId);
+    int updateLikeCount(@Param("postId") int postId, @Param("likeCount") int likeCount);
 }
+
