@@ -12,6 +12,6 @@ import java.util.List;
 public interface HealthLogMapper {
 int saveHealthLog(PostHealthLogDto dto);
 GetHealthLogDetailRes findByHealthlogId(GetHealthLogDetailReq req);
-List<GetHealthLogRes> findAllByMemberIdOrderByHealthlogIdDesc(int memberNo);
+List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(int memberNo);
 int deleteByHealthlogId(GetHealthLogDetailReq req);
 }

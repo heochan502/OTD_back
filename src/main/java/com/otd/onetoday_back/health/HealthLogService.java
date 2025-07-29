@@ -36,8 +36,8 @@ public class HealthLogService {
         return healthLogMapper.findByHealthlogId(req);
     }
 //    건강기록 목록 조회
-    public List<GetHealthLogRes> findAllByMemberIdOrderByHealthlogIdDesc(int logginMemberId) {
-        return healthLogMapper.findAllByMemberIdOrderByHealthlogIdDesc(logginMemberId);
+    public List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(int logginMemberId) {
+        return healthLogMapper.findAllByMemberIdOrderByhealthlogDatetimeDesc(logginMemberId);
 
     }
 

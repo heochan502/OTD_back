@@ -34,8 +34,8 @@ public class ExerciseLogService {
     }
 
 //    운동기록 목록조회
-    public List<GetExerciseLogRes> findAllByMemberIdOrderByExerciselogIdDesc(int loggindMemberId) {
-        return exerciseLogMapper.findAllByMemberIdOrderByExerciselogIdDesc(loggindMemberId);
+    public List<GetExerciseLogRes> findAllByMemberIdOrderByExerciseDatetimeDesc(int loggindMemberId) {
+        return exerciseLogMapper.findAllByMemberIdOrderByExerciseDatetimeDesc(loggindMemberId);
     }
 
 //    운동종목
@@ -45,6 +45,7 @@ public class ExerciseLogService {
 //    운동기록 수정
     public int modifyByExerciselogId(PutExerciseLogReq req, int logginedMemberId) {
         PutExerciseLogDto putExerciseLogDto = PutExerciseLogDto.builder()
+                .exerciselogId(req.getExerciseId())
                 .exerciseId(req.getExerciseId())
                 .exerciseKcal(req.getExerciseKcal())
                 .exerciseDatetime(req.getExerciseDatetime())
