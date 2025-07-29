@@ -41,7 +41,7 @@ public class MealController {
         }
     }
 
-    //수정 중.///.././
+    // 먹은거 처음 화면 위에 바
     @GetMapping("/eatenMeal")
     public ResponseEntity<?> eatenFood(HttpServletRequest httpReq, @RequestParam String mealDay)
     {
@@ -49,13 +49,26 @@ public class MealController {
         if (memberNoLogin == null) {
             return ResponseEntity.ok("로그인 안함");
         }
-
         GetOnEatenDataRes result = mealService.getOnEatenDataRes(memberNoLogin, mealDay);
         log.info("result: {}", result);
 
         return ResponseEntity.ok(result);
     }
 
+ @GetMapping("/statsMeal")
+ public ResponseEntity<?> eatenFood(HttpServletRequest httpReq, @ModelAttribute GetMealStatisticReq weekly)
+ {
+     Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+     if (memberNoLogin == null) {
+         return ResponseEntity.ok("로그인 안함");
+     }
+     weekly.setMemberNoLogin(memberNoLogin);
+     log.info("result 주간 데이터: {}", weekly);
+     List<GetMealStatisticRes> result = mealService.getMealStatistic( weekly);
+     log.info("result: {}", result);
+
+     return ResponseEntity.ok(result);
+ }
 
 
 
@@ -102,5 +115,7 @@ public class MealController {
         return ResponseEntity.ok(result);
 //
     }
+
+
 
 }

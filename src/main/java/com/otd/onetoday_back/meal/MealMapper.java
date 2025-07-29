@@ -37,5 +37,6 @@ public interface MealMapper {
     //데이터가 지우는거
     int deleteMealCategoryIn ( @Param("memberNoLogin") int memberNoLogin, @Param("mealInfo")findFoodDetailInfoReq mealInfo);
 
+    List<GetMealStatisticRes> getMealStatistic(GetMealStatisticReq getStatistic);
 
 }

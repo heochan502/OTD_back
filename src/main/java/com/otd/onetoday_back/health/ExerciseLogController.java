@@ -47,7 +47,7 @@ public class ExerciseLogController {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
 
         log.info("logginedMemberId:{}", logginedMemberId);
-        List<GetExerciseLogRes> result = exerciseLogService.findAllByMemberIdOrderByExerciselogIdDesc(logginedMemberId);
+        List<GetExerciseLogRes> result = exerciseLogService.findAllByMemberIdOrderByExerciseDatetimeDesc(logginedMemberId);
         return ResponseEntity.ok(result);
     }
 
@@ -65,6 +65,7 @@ public class ExerciseLogController {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         log.info("req:{}", req);
         int result = exerciseLogService.modifyByExerciselogId(req, logginedMemberId);
+        log.info("result:{}", result);
         return ResponseEntity.ok(result);
     }
 
@@ -76,7 +77,6 @@ public class ExerciseLogController {
                 .exerciselogId(exerciselogId)
                 .memberId(logginedMemberId)
                 .build();
-
         int result = exerciseLogService.deleteByExerciselogId(req);
         return ResponseEntity.ok(result);
     }

@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class PostHealthLogDto {
     private int healthlogId;
-    private int memberNo;
+    private int memberId;
     private int weight;
     private int height;
     private int systolicBp;
