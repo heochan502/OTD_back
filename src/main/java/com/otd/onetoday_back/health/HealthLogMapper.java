@@ -5,7 +5,6 @@ import com.otd.onetoday_back.health.model.GetHealthLogDetailRes;
 import com.otd.onetoday_back.health.model.GetHealthLogRes;
 import com.otd.onetoday_back.health.model.PostHealthLogDto;
 import org.apache.ibatis.annotations.Mapper;
-import org.springframework.aop.target.LazyInitTargetSource;
 
 import java.util.List;
 

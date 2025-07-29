@@ -9,5 +9,5 @@ import lombok.ToString;
 @ToString
 public class GetHealthLogDetailReq {
     private int healthlogId;
-    private int memberNo;
+    private int memberId;
 }

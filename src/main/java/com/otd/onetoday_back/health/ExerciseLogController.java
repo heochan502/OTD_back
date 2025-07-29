@@ -76,7 +76,6 @@ public class ExerciseLogController {
                 .exerciselogId(exerciselogId)
                 .memberId(logginedMemberId)
                 .build();
-
         int result = exerciseLogService.deleteByExerciselogId(req);
         return ResponseEntity.ok(result);
     }
