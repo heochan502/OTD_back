@@ -47,7 +47,7 @@ public class HealthLogController {
     @GetMapping
     public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByHealthlogIdDesc(logginedMemberId);
+        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(logginedMemberId);
         return ResponseEntity.ok(result);
     }
 

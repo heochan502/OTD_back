@@ -25,11 +25,11 @@
     </select>
 
     <!--    건강기록 목록 조회-->
-    <select id="findAllByMemberIdOrderByHealthlogIdDesc">
+    <select id="findAllByMemberIdOrderByhealthlogDatetimeDesc">
         SELECT *
         FROM healthlog
         WHERE member_no = #{memberId}
-        ORDER BY healthlog_id DESC
+        ORDER BY healthlog_datetime DESC
     </select>
 
     <!--    건강기록 삭제-->
