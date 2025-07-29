@@ -2,6 +2,7 @@ package com.otd.onetoday_back.community.controller;
 
 import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.util.HttpUtils;
+import com.otd.onetoday_back.community.dto.CommunityListRes;
 import com.otd.onetoday_back.community.dto.CommunityPostReq;
 import com.otd.onetoday_back.community.dto.CommunityPostRes;
 import com.otd.onetoday_back.community.service.CommunityService;
@@ -22,10 +23,11 @@ public class CommunityController {
 
     private final CommunityService communityService;
 
+    // 게시글 등록
     @PostMapping("/create")
     public ResponseEntity<?> createPost(HttpServletRequest req, @ModelAttribute CommunityPostReq reqDto) {
         Integer loginId = (Integer) HttpUtils.getSessionValue(req, AccountConstants.MEMBER_ID_NAME);
-        log.info("💬 로그인 ID: {}", loginId); // ✅ 확인용 로그
+        log.info("💬 로그인 ID: {}", loginId);
 
         if (loginId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인이 필요합니다.");
@@ -34,17 +36,6 @@ public class CommunityController {
         reqDto.setMemberNoLogin(loginId);
         communityService.createPost(reqDto);
         return ResponseEntity.ok("등록 성공");
-    }
-
-    //페이징 로직 추가
-    @GetMapping("/list")
-    public ResponseEntity<?> getPosts(
-            @RequestParam(required = false) String searchText,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        List<CommunityPostRes> posts = communityService.getAllPosts(searchText, page, size);
-        return ResponseEntity.ok(posts);
     }
 
 
@@ -62,10 +53,22 @@ public class CommunityController {
     }
 
     @DeleteMapping("/delete/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable int postId) {
-        communityService.deletePost(postId);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> deletePost(HttpServletRequest req, @PathVariable int postId) {
+        Integer loginId = (Integer) HttpUtils.getSessionValue(req, AccountConstants.MEMBER_ID_NAME);
+        log.info("삭제 시도: postId={}, loginId={}", postId, loginId);
+
+        if (loginId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+        }
+
+        boolean result = communityService.deletePost(postId, loginId);
+        if (result) {
+            return ResponseEntity.ok("게시글 삭제 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한 없음");
+        }
     }
+
     @PostMapping("/like/{postId}")
     public ResponseEntity<?> toggleLike(
             @PathVariable int postId,
@@ -78,6 +81,15 @@ public class CommunityController {
 
         communityService.toggleLike(postId, memberId);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/list")
+    public ResponseEntity<CommunityListRes> getList(
+            @RequestParam(defaultValue = "") String searchText,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        CommunityListRes res = communityService.getPostsWithPaging(searchText, page, size);
+        return ResponseEntity.ok(res);
     }
 
 

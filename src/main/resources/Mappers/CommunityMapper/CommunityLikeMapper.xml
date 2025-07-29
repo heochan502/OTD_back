@@ -19,6 +19,12 @@
         WHERE post_id = #{postId} AND member_id = #{memberId}
     </select>
 
+    <!-- 좋아요 여부 존재 확인 (boolean 용도) -->
+    <select id="exists" resultType="int">
+        SELECT COUNT(*)
+        FROM community_like
+        WHERE post_id = #{postId} AND member_id = #{memberId}
+    </select>
 
     <!-- 좋아요 등록 -->
     <insert id="like">
@@ -32,12 +38,19 @@
         WHERE post_id = #{postId} AND member_id = #{memberId}
     </delete>
 
-    <!-- 특정 게시글의 좋아요 수 -->
+    <!-- 게시글별 좋아요 수 -->
     <select id="countLikes" resultType="int">
         SELECT COUNT(*)
         FROM community_like
         WHERE post_id = #{postId}
     </select>
 
-    </mapper>
+    <update id="updateLikeCount">
+        UPDATE community_post
+        SET `like` = #{likeCount}
+        WHERE post_id = #{postId}
+    </update>
+
+
+</mapper>
 

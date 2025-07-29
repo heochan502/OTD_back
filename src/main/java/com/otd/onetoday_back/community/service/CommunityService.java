@@ -1,5 +1,6 @@
 package com.otd.onetoday_back.community.service;
 
+import com.otd.onetoday_back.community.dto.CommunityListRes;
 import com.otd.onetoday_back.community.dto.CommunityPostReq;
 import com.otd.onetoday_back.community.dto.CommunityPostRes;
 import com.otd.onetoday_back.community.mapper.CommunityLikeMapper;
@@ -7,6 +8,7 @@ import com.otd.onetoday_back.community.mapper.CommunityMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.otd.onetoday_back.community.domain.CommunityLike;
@@ -27,37 +29,15 @@ public class CommunityService {
 
     // 게시글 등록
     public void createPost(CommunityPostReq req) {
-        String filePath = null;
+        req.setCreatedAt(LocalDateTime.now());
+        req.setUpdatedAt(LocalDateTime.now());
+        req.setViewCount(0);
+        req.setLike(0);
+        req.setFilePath(null); // 파일 업로드 제외하므로 null
 
-        communityMapper.save(
-                req.getMemberNoLogin(),
-                req.getTitle(),
-                req.getContent(),
-                filePath,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                0, // viewCount 초기값
-                0  // like 초기값
-        );
-        // 3. 파일 저장 (Optional)
-        MultipartFile file = req.getFile();
-        if (file != null && !file.isEmpty()) {
-            try {
-                String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-                String savePath = "/your/upload/path/" + fileName;
-                file.transferTo(new File(savePath));
-                filePath = "/uploads/" + fileName;
-
-                // postId 가져오기 필요
-                int postId = req.getPostId(); // 또는 save 후 selectKey로 받아오기
-                communityMapper.saveFile(postId, filePath);
-            } catch (IOException e) {
-                throw new RuntimeException("파일 업로드 실패", e);
-            }
-        }
-
-
+        communityMapper.save(req); // DTO 한 개만 전달
     }
+
     // Service
     public void toggleLike(int postId, int memberNoLogin) {
         if (likeMapper.exists(postId, memberNoLogin) > 0) {
@@ -97,15 +77,23 @@ public class CommunityService {
         );
     }
 
-    // 게시글 삭제
-    public void deletePost(int postId) {
-        communityMapper.deleteById(postId);
+    public boolean deletePost(int postId, int memberNoLogin) {
+        CommunityPostRes post = communityMapper.findPostById(postId);
+        if (post != null && post.getMemberNoLogin() == memberNoLogin) {
+            communityMapper.deleteById(postId);  // is_deleted = TRUE 처리
+            return true;
+        }
+        return false;
     }
 
-    // 페이징 관련
-    public List<CommunityPostRes> getAllPosts(String searchText, int page, int size) {
+    // 페이징
+    public CommunityListRes getPostsWithPaging(String searchText, int page, int size) {
         int offset = (page - 1) * size;
-        return communityMapper.findAllWithPaging(searchText, size, offset);
+        List<CommunityPostRes> posts = communityMapper.findAllWithPaging(searchText, size, offset);
+        int totalCount = communityMapper.countAll(searchText);
+
+        return new CommunityListRes(posts, totalCount);
     }
+
 
 }

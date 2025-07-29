@@ -16,27 +16,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MentService {
 
+
     private final MentMapper mentMapper;
 
-    // 댓글 저장
-    public void saveMent(MentReq req) {
-        Ment ment = Ment.builder()
-                .postId(req.getPostId())
-                .memberNoLogin(req.getMemberNoLogin())
-                .content(req.getContent())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        mentMapper.save(ment);
+    public void write(MentReq req) {
+        mentMapper.save(req);
     }
 
-    // 게시글별 댓글 리스트 조회
-    public List<MentRes> getMentListByPostId(int postId) {
+    public List<MentRes> getComments(int postId) {
         return mentMapper.findByPostId(postId);
     }
 
-    // 댓글 삭제
-    public void deleteMent(int mentId) {
-        mentMapper.deleteById(mentId);
+    public void delete(int commentId) {
+        mentMapper.deleteById(commentId);
     }
+
 }
