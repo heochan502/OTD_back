@@ -9,6 +9,4 @@ import lombok.ToString;
 @ToString
 public class FindFoodCategoryRes {
     private String foodCategory;
-
-
 }

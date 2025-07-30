@@ -14,6 +14,8 @@ public interface AccountMapper {
     int existsByMemberId(String memberId);
     int existsByEmail(String email);
     int existsByMemberNick(String memberNick);
+    String findPasswordByMemberNo(int memberNoLogin);
+    int updatePassword(int memberNoLogin, String newPassword);
     int deleteById(int memberNoLogin);
     int deleteMemberLocationByMemberId(int memberNoLogin);
 
