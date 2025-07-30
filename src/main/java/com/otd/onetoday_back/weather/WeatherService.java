@@ -62,7 +62,10 @@ public class WeatherService {
             Map<String, String> ultraMap = new HashMap<>();
 
             for (Item item : ultraItems) {
-                ultraMap.put(item.getCategory(), item.getObsrValue());
+                String category = item.getCategory();
+                if ("T1H".equals(category) || "REH".equals(category)) {
+                    ultraMap.put(category, item.getObsrValue());
+                }
             }
 
             log.info("ultraItems = {}", ultraMap);
