@@ -10,18 +10,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DiaryPostAndUploadRes {
-    private int id;
-    private String diaryName;
-    private String diaryContent;
-    private String createdAt;
-    private String imageFileName;
-    private List<UploadResponse> uploadResults;
-
-    @ToString.Exclude
-    private String mood;
-
-    public DiaryPostAndUploadRes(int id, List<UploadResponse> uploadResults) {
-        this.id = id;
-        this.uploadResults = uploadResults;
-    }
+    private int memoId;
+    private String diaryImage;
 }

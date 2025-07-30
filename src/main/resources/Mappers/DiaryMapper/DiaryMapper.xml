@@ -2,56 +2,56 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
 
-    <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, created_at)
-        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{imageFileName}, NOW())
-    </insert>
-
-    <select id="findAll" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT
-            diary_id AS id,
-            member_no_login,
-            diary_name,
-            diary_content,
-            diary_image AS imageFileName,
-            created_at AS createdAt
+    <select id="findAll"
+            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq"
+            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT memo_id, diary_name, diary_content, diary_image, created_at
         FROM diary
         WHERE member_no_login = #{memberNoLogin}
         ORDER BY created_at DESC
-            LIMIT #{pageSize} OFFSET #{offset}
+        LIMIT #{offset}, #{pageSize}
     </select>
 
-    <select id="getTotalCount" resultType="int">
+    <select id="getTotalCount"
+            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq"
+            resultType="int">
         SELECT COUNT(*) FROM diary
         WHERE member_no_login = #{memberNoLogin}
     </select>
 
-    <select id="findById" resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT
-            diary_id AS id,
-            member_no_login,
-            diary_name,
-            diary_content,
-            diary_image AS imageFileName,
-            created_at
+    <select id="findById"
+            parameterType="map"
+            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT memo_id, diary_name, diary_content, diary_image, created_at
         FROM diary
-        WHERE diary_id = #{id}
+        WHERE memo_id = #{id}
+        AND member_no_login = #{memberNoLogin}
     </select>
 
-    <update id="modify">
+    <insert id="save"
+            parameterType="com.otd.onetoday_back.diary.model.DiaryPostReq"
+            useGeneratedKeys="true"
+            keyProperty="memoId">
+        INSERT INTO diary (member_no_login, diary_name, diary_content, diary_image, created_at)
+        VALUES (#{memberNoLogin}, #{diaryName}, #{diaryContent}, #{diaryImage}, NOW())
+    </insert>
+
+    <update id="update"
+            parameterType="com.otd.onetoday_back.diary.model.DiaryPutReq">
         UPDATE diary
-        SET
-            diary_name = #{diaryName},
-            diary_content = #{diaryContent},
-            diary_image = #{imageFileName}
-        WHERE diary_id = #{id}
+        SET diary_name = #{diaryName},
+        diary_content = #{diaryContent},
+        diary_image = #{diaryImage}
+        WHERE memo_id = #{memoId}
+        AND member_no_login = #{memberNoLogin}
     </update>
 
-    <delete id="deleteById">
-        DELETE FROM diary WHERE diary_id = #{id}
+    <delete id="delete" parameterType="map">
+        DELETE FROM diary
+        WHERE memo_id = #{id}
+        AND member_no_login = #{memberNoLogin}
     </delete>
 
 </mapper>

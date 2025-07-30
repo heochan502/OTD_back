@@ -7,12 +7,11 @@ import java.time.LocalDateTime;
 
 @Data
 public class DiaryGetRes {
-    private int id;
-    private int memberNoLogin;
+    private int memo;
     private String diaryName;
     private String diaryContent;
-    private String imageFileName;
-    private LocalDateTime createdAt;
+    private String diaryImage;
+    private String createdAt;
 
     @ToString.Exclude
     private String mood;

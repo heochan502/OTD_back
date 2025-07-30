@@ -32,8 +32,8 @@ public class MemoController {
 
     @GetMapping
     public ResultResponse<?> getMemoList(
-            HttpSession session,
             @ModelAttribute MemoGetReq req,
+            HttpSession session,
             HttpServletRequest request) {
 
         Integer memberId = getLoggedInMemberId(session);
