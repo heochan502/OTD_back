@@ -118,6 +118,31 @@ public class AccountController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/password")
+    public ResponseEntity<?> changePassword(
+            HttpServletRequest httpReq,
+            @RequestBody PasswordChangeDto dto) {
+
+        if (!StringUtils.hasLength(dto.getCurrentPassword())
+                || !StringUtils.hasLength(dto.getNewPassword())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        if (memberNoLogin == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        int result = accountService.changePassword(memberNoLogin.intValue(), dto);
+
+        if (result == 1) {
+            return ResponseEntity.ok(result);
+        } else if (result == -1) {
+            return ResponseEntity.status(401).build();
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 
     @GetMapping("/check/nickname/{nickname}")
     public ResponseEntity<?> checkNickname(@PathVariable String nickname) {

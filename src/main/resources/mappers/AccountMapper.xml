@@ -47,11 +47,22 @@
         SELECT count(*) FROM member WHERE member_nick = #{memberNick}
     </select>
 
+    <select id="findPasswordByMemberNo" parameterType="int" resultType="string">
+        SELECT member_pw
+        FROM member
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
+
+    <update id="updatePassword" parameterType="map">
+        UPDATE member
+        SET member_pw = #{newPassword}
+        WHERE member_no_login = #{memberNoLogin}
+    </update>
+
     <delete id="deleteById" parameterType="int">
         DELETE FROM member
         WHERE member_no_login = #{memberNoLogin}
     </delete>
-
 
     <delete id="deleteMemberLocationByMemberId" parameterType="int">
         DELETE FROM member_location

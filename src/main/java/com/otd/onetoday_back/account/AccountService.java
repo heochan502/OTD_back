@@ -64,6 +64,18 @@ public class AccountService {
     public boolean existsByMemberNick(String memberNick) {
         return accountMapper.existsByMemberNick(memberNick) > 0;
     }
+    public int changePassword(int memberNoLogin, PasswordChangeDto dto) {
+        String currentHashedPw = accountMapper.findPasswordByMemberNo(memberNoLogin);
+
+        if (currentHashedPw == null) {
+            return 0;
+        }
+        if (!BCrypt.checkpw(dto.getCurrentPassword(), currentHashedPw)) {
+            return -1;
+        }
+        String hashedNewPw = BCrypt.hashpw(dto.getNewPassword(), BCrypt.gensalt());
+        return accountMapper.updatePassword(memberNoLogin, hashedNewPw);
+    }
 
 
     @Transactional
