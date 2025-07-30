@@ -2,6 +2,7 @@ package com.otd.onetoday_back.diary;
 
 import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.diary.model.*;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +22,19 @@ public class DiaryService {
 
     private final DiaryMapper diaryMapper;
 
-    @Value("${file.upload-dir}")
+    @Value("${constants.file.directory}")
     private String uploadDir;
+
+    @PostConstruct
+    public void adjustUploadPathForWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("win") && uploadDir.startsWith("/home")) {
+            uploadDir = "C:/2025_swstudy/upload";
+            log.warn("Windows 환경 감지됨. uploadDir을 {} 로 강제 설정합니다.", uploadDir);
+        } else {
+            log.info("uploadDir 설정값: {}", uploadDir);
+        }
+    }
 
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
