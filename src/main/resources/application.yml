@@ -12,7 +12,7 @@ Spring:
   application:
     name: On_Two_Day
   datasource:
-    url: jdbc:log4jdbc:mariadb://112.222.157.157:5012/first_project
+    url: jdbc:mariadb://112.222.157.157:5012/first_project
     username: green2
     password: msa502
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
