@@ -21,7 +21,8 @@
         </foreach>
     </insert>
     <select id="findByYearAndMonth">
-        SELECT r.re_id AS id,
+        SELECT r.member_no_login AS memberId,
+            r.re_id AS id,
             r.re_title AS title,
             r.re_content AS content,
             r.re_created AS created,
@@ -31,13 +32,13 @@
             GROUP_CONCAT(rr.rr_dow) AS repeatDow
         FROM reminder r
         LEFT JOIN reminder_repeat rr ON r.re_id = rr.re_id
-        WHERE
+        WHERE(
             (r.re_date IS NOT NULL
             AND YEAR(r.re_date) = #{year}
             AND MONTH(r.re_date) = #{month})
-            OR
+        OR
             (r.re_repeat = 1
-            AND r.re_created &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d'))
+            AND r.re_created &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d')))
         AND r.member_no_login = #{memberId}
         GROUP BY r.re_id
     </select>
