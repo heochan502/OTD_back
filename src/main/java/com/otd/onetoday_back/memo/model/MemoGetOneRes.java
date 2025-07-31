@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class MemoGetOneRes {
-    private int id;
+    private int memoId;
     private int memberNoLogin;
     private String memoName;
     private String memoContent;

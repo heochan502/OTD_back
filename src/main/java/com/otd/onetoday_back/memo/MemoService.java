@@ -43,9 +43,9 @@ public class MemoService {
         return new MemoListRes(memoList, totalCount);
     }
 
-    public MemoGetRes findById(int id, int memberId) {
+    public MemoGetRes findById(int memoId, int memberId) {
         Map<String, Object> param = new HashMap<>();
-        param.put("id", id);
+        param.put("memoId", memoId);
         param.put("memberNoLogin", memberId);
 
         MemoGetRes memo = memoMapper.findById(param);
@@ -61,7 +61,7 @@ public class MemoService {
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
             String fileName = saveFile(imageFiles.get(0));
-            req.setMemoImageFileName(fileName); // ✅ 통일된 필드명
+            req.setMemoImageFileName(fileName);
         }
 
         memoMapper.save(req);
@@ -70,13 +70,13 @@ public class MemoService {
                 req.getMemberNoLogin(),
                 req.getMemoName(),
                 req.getMemoContent(),
-                req.getMemoImageFileName() // ✅ 통일된 필드명
+                req.getMemoImageFileName()
         );
     }
 
     public void updateMemo(MemoPutReq req, int memberId) {
         Map<String, Object> param = new HashMap<>();
-        param.put("id", req.getId());
+        param.put("memoId", req.getMemoId());
         param.put("memberNoLogin", memberId);
 
         MemoGetRes existing = memoMapper.findById(param);
@@ -87,9 +87,9 @@ public class MemoService {
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
             String fileName = saveFile(imageFiles.get(0));
-            req.setMemoImageFileName(fileName); // ✅ 통일된 필드명
+            req.setMemoImageFileName(fileName);
 
-            if (existing.getMemoImageFileName() != null) { // ✅ 통일된 필드명
+            if (existing.getMemoImageFileName() != null) {
                 deleteFileIfExists(existing.getMemoImageFileName());
             }
         }
@@ -97,9 +97,9 @@ public class MemoService {
         memoMapper.update(req);
     }
 
-    public void deleteMemo(int id, int memberId) {
+    public void deleteMemo(int memoId, int memberId) {
         Map<String, Object> param = new HashMap<>();
-        param.put("id", id);
+        param.put("memoId", memoId);
         param.put("memberNoLogin", memberId);
 
         MemoGetRes existing = memoMapper.findById(param);
@@ -107,7 +107,7 @@ public class MemoService {
             throw new CustomException("삭제할 메모가 존재하지 않습니다.", 404);
         }
 
-        if (existing.getMemoImageFileName() != null) { // ✅ 통일된 필드명
+        if (existing.getMemoImageFileName() != null) {
             deleteFileIfExists(existing.getMemoImageFileName());
         }
 

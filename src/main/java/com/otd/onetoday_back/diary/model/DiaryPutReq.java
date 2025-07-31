@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class DiaryPutReq {
-    private int memoId;
+    private int diaryId;
     private int memberNoLogin;
     private String diaryName;
     private String diaryContent;

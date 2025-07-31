@@ -25,91 +25,112 @@ public class DiaryService {
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
         req.setOffset(offset);
-
         List<DiaryGetRes> diaryList = diaryMapper.findAll(req);
         int totalCount = diaryMapper.getTotalCount(req);
-
         return new DiaryListRes(diaryList, totalCount);
     }
 
-    public DiaryGetRes findById(int id, int memberId) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("id", id);
-        param.put("memberNoLogin", memberId);
+    public DiaryGetRes findById(int diaryId, int memberId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("diaryId", diaryId);
+        params.put("memberNoLogin", memberId);
 
-        DiaryGetRes diary = diaryMapper.findById(param);
+        DiaryGetRes diary = diaryMapper.findById(params);
         if (diary == null) {
-            throw new CustomException("해당 다이어리를 찾을 수 없습니다.", 404);
+            throw new CustomException("존재하지 않거나 권한이 없는 다이어리입니다.", 401);
         }
         return diary;
     }
 
-    public DiaryPostAndUploadRes save(DiaryPostReq req, MultipartFile imageFile) {
-        String uploadedFileName = uploadImage(imageFile);
+    public DiaryPostAndUploadRes save(DiaryPostReq req, MultipartFile diaryImage) {
+        if (req.getMemberNoLogin() <= 0) {
+            throw new CustomException("로그인이 필요합니다.", 403);
+        }
 
-        req.setDiaryImage(uploadedFileName);
+        if (diaryImage != null && !diaryImage.isEmpty()) {
+            String fileName = saveImage(diaryImage);
+            req.setDiaryImage(fileName);
+        }
 
-        diaryMapper.save(req);
-
-        return new DiaryPostAndUploadRes(req.getMemoId(), uploadedFileName);
+        diaryMapper.insert(req);
+        return new DiaryPostAndUploadRes(req.getDiaryId(), req.getDiaryImage());
     }
 
-    public DiaryPostAndUploadRes update(DiaryPutReq req, MultipartFile imageFile) {
-        DiaryGetRes existing = findById(req.getMemoId(), req.getMemberNoLogin());
+    public DiaryPostAndUploadRes update(DiaryPutReq req, MultipartFile diaryImage) {
+        if (req.getMemberNoLogin() <= 0) {
+            throw new CustomException("로그인이 필요합니다.", 401);
+        }
 
-        String uploadedFileName = uploadImage(imageFile);
-        if (uploadedFileName != null) {
-            deleteFileIfExists(existing.getDiaryImage());
-            req.setDiaryImage(uploadedFileName);
+        Map<String, Object> params = new HashMap<>();
+        params.put("diaryId", req.getDiaryId());
+        params.put("memberNoLogin", req.getMemberNoLogin());
+
+        DiaryGetRes existing = diaryMapper.findById(params);
+        if (existing == null) {
+            throw new CustomException("존재하지 않거나 수정 권한이 없습니다.", 403);
+        }
+
+        if (diaryImage != null && !diaryImage.isEmpty()) {
+            deleteImageFile(existing.getDiaryImage());
+            String fileName = saveImage(diaryImage);
+            req.setDiaryImage(fileName);
         } else {
             req.setDiaryImage(existing.getDiaryImage());
         }
 
         diaryMapper.update(req);
-
-        return new DiaryPostAndUploadRes(req.getMemoId(), req.getDiaryImage());
+        return new DiaryPostAndUploadRes(req.getDiaryId(), req.getDiaryImage());
     }
 
+    public void delete(int diaryId, int memberId) {
+        if (memberId <= 0) {
+            throw new CustomException("로그인이 필요합니다.", 401);
+        }
 
-    public void delete(int id, int memberId) {
-        DiaryGetRes existing = findById(id, memberId);
-        deleteFileIfExists(existing.getDiaryImage());
+        Map<String, Object> params = new HashMap<>();
+        params.put("diaryId", diaryId);
+        params.put("memberNoLogin", memberId);
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("id", id);
-        param.put("memberNoLogin", memberId);
+        DiaryGetRes existing = diaryMapper.findById(params);
+        if (existing == null) {
+            throw new CustomException("존재하지 않거나 삭제 권한이 없습니다.", 403);
+        }
 
-        diaryMapper.delete(param);
+        deleteImageFile(existing.getDiaryImage());
+        diaryMapper.delete(params);
     }
 
-    private String uploadImage(MultipartFile file) {
-        if (file == null || file.isEmpty()) return null;
-
-        String extension = getExtension(file.getOriginalFilename());
-        String uuidFileName = UUID.randomUUID() + "." + extension;
-
+    private String saveImage(MultipartFile file) {
         try {
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-            Path fullPath = uploadPath.resolve(uuidFileName);
-            file.transferTo(fullPath.toFile());
+            String originalFilename = file.getOriginalFilename();
+            String ext = "." + getExtension(originalFilename);
+            String newFileName = UUID.randomUUID() + ext;
 
-            return uuidFileName;
+            Path directoryPath = Paths.get(uploadDir);
+            Files.createDirectories(directoryPath);
+            Path filePath = directoryPath.resolve(newFileName);
+
+            log.info("📁 저장할 경로: {}", filePath.toAbsolutePath());
+            log.info("📎 업로드 파일명: {}", originalFilename);
+
+            Files.write(filePath, file.getBytes());
+
+            log.info("✅ 이미지 저장 완료: {}", newFileName);
+
+            return newFileName;
         } catch (IOException e) {
+            log.error("❌ 이미지 저장 실패", e);
             throw new CustomException("이미지 업로드 실패: " + e.getMessage(), 500);
         }
     }
 
-    private void deleteFileIfExists(String fileName) {
-        if (fileName == null || fileName.isEmpty()) return;
-
-        Path path = Paths.get(uploadDir, fileName);
+    private void deleteImageFile(String filename) {
+        if (filename == null || filename.isEmpty()) return;
         try {
-            Files.deleteIfExists(path);
+            Path filePath = Paths.get(uploadDir, filename);
+            Files.deleteIfExists(filePath);
         } catch (IOException e) {
-            log.error("이미지 삭제 실패: {}", fileName);
+            log.warn("이미지 삭제 실패: {}", filename);
         }
     }
 

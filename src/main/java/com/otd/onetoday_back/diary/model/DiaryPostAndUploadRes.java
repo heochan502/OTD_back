@@ -10,6 +10,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DiaryPostAndUploadRes {
-    private int memoId;
+    private int diaryId;
     private String diaryImage;
 }

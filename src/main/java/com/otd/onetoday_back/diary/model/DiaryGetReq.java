@@ -6,6 +6,6 @@ import lombok.Data;
 public class DiaryGetReq {
     private int memberNoLogin;
     private int currentPage = 1;
-    private int pageSize = 10;
+    private int pageSize = 3;
     private int offset;
 }

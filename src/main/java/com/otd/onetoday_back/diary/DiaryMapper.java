@@ -11,9 +11,9 @@ public interface DiaryMapper {
     List<DiaryGetRes> findAll(DiaryGetReq req);
     int getTotalCount(DiaryGetReq req);
 
-    DiaryGetRes findById(Map<String, Object> param);
+    DiaryGetRes findById(Map<String, Object> params);
 
-    void save(DiaryPostReq req);
+    void insert(DiaryPostReq req);
     void update(DiaryPutReq req);
-    void delete(Map<String, Object> param);
+    void delete(Map<String, Object> params);
 }

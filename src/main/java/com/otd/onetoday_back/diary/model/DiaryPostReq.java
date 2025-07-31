@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class DiaryPostReq {
-    private int memoId;
+    private int diaryId;
     private int memberNoLogin;
     private String diaryName;
     private String diaryContent;

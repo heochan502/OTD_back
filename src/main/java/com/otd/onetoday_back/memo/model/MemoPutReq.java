@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class MemoPutReq {
-    private int id; // 수정할 메모의 ID
+    private int memoId; // 수정할 메모의 ID
     private int memberNoLogin;
     private String memoName;
     private String memoContent;

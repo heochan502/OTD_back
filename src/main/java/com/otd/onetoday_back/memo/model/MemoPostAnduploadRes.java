@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class MemoPostAnduploadRes {
-    private int id;
+    private int memoId;
     private String memoName;
     private String memoContent;
     private String memoImageFileName;
