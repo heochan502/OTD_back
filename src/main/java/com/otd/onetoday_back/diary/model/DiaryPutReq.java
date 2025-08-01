@@ -13,9 +13,6 @@ public class DiaryPutReq {
     private String diaryName;
     private String diaryContent;
     private String diaryImage;
-    private List<MultipartFile> diaryImageFiles;
-
-
-    @ToString.Exclude
     private String mood;
+    private List<MultipartFile> diaryImageFiles;
 }

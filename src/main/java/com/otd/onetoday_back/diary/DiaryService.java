@@ -19,8 +19,7 @@ public class DiaryService {
 
     private final DiaryMapper diaryMapper;
 
-    @Value("${constants.file.directory}")
-    private String uploadDir;
+    private final String uploadDir = "/home/download";
 
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
@@ -31,9 +30,10 @@ public class DiaryService {
     }
 
     public DiaryGetRes findById(int diaryId, int memberId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("diaryId", diaryId);
-        params.put("memberNoLogin", memberId);
+        Map<String, Object> params = Map.of(
+                "diaryId", diaryId,
+                "memberNoLogin", memberId
+        );
 
         DiaryGetRes diary = diaryMapper.findById(params);
         if (diary == null) {
@@ -61,9 +61,10 @@ public class DiaryService {
             throw new CustomException("로그인이 필요합니다.", 401);
         }
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("diaryId", req.getDiaryId());
-        params.put("memberNoLogin", req.getMemberNoLogin());
+        Map<String, Object> params = Map.of(
+                "diaryId", req.getDiaryId(),
+                "memberNoLogin", req.getMemberNoLogin()
+        );
 
         DiaryGetRes existing = diaryMapper.findById(params);
         if (existing == null) {
@@ -87,9 +88,10 @@ public class DiaryService {
             throw new CustomException("로그인이 필요합니다.", 401);
         }
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("diaryId", diaryId);
-        params.put("memberNoLogin", memberId);
+        Map<String, Object> params = Map.of(
+                "diaryId", diaryId,
+                "memberNoLogin", memberId
+        );
 
         DiaryGetRes existing = diaryMapper.findById(params);
         if (existing == null) {

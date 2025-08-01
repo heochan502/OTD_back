@@ -13,5 +13,5 @@ public class MemoPostAnduploadRes {
     private int memoId;
     private String memoName;
     private String memoContent;
-    private String memoImageFileName;
+    private String memoImage;
 }

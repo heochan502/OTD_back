@@ -12,6 +12,6 @@ public class MemoPostReq {
     private int memberNoLogin;
     private String memoName;
     private String memoContent;
-    private String memoImageFileName;
+    private String memoImage;
     private List<MultipartFile> memoImageFiles;
 }

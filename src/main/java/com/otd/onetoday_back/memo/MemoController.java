@@ -4,7 +4,6 @@ import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.common.model.ResultResponse;
 import com.otd.onetoday_back.memo.model.*;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +32,7 @@ public class MemoController {
     @GetMapping
     public ResultResponse<?> getMemoList(
             @ModelAttribute MemoGetReq req,
-            HttpSession session,
-            HttpServletRequest request) {
+            HttpSession session) {
 
         Integer memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
@@ -43,58 +41,57 @@ public class MemoController {
         if (req.getPageSize() <= 0) req.setPageSize(10);
 
         MemoListRes result = memoService.findAll(req);
-        return ResultResponse.success(result, request.getRequestURI());
+        return ResultResponse.success(result, "/api/OTD/memoAndDiary/memo");
     }
 
     @GetMapping("/{id}")
     public ResultResponse<?> getMemoById(
             @PathVariable int id,
-            HttpSession session,
-            HttpServletRequest request) {
+            HttpSession session) {
 
         Integer memberId = getLoggedInMemberId(session);
         MemoGetRes result = memoService.findById(id, memberId);
-        return ResultResponse.success(result, request.getRequestURI());
+        return ResultResponse.success(result, "/api/OTD/memoAndDiary/memo/" + id);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultResponse<?> postMemo(
             HttpSession session,
             @RequestPart("memoData") MemoPostReq req,
-            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles,
-            HttpServletRequest request) {
+            @RequestPart(value = "memoImage", required = false) List<MultipartFile> memoImage) {
 
         Integer memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
-        req.setMemoImageFiles(memoImageFiles);
+        req.setMemoImage(memoImage);
 
         MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(memberId, req);
-        return ResultResponse.success(result, request.getRequestURI());
+        String location = "/api/OTD/memoAndDiary/memo/" + result.getMemoId();
+        return ResultResponse.success(result, location);
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultResponse<?> updateMemo(
             HttpSession session,
             @RequestPart("memoData") MemoPutReq req,
-            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImageFiles,
-            HttpServletRequest request) {
+            @RequestPart(value = "memoImageFiles", required = false) List<MultipartFile> memoImage) {
 
         Integer memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
-        req.setMemoImageFiles(memoImageFiles);
+        req.setMemoImage(memoImage);
 
-        memoService.updateMemo(req, memberId);
-        return ResultResponse.success("수정 완료", request.getRequestURI());
+        MemoPostAnduploadRes result = memoService.updateMemo(req, memberId);
+        String location = "/api/OTD/memoAndDiary/memo/" + result.getMemoId();
+        return ResultResponse.success(result, location);
     }
 
     @DeleteMapping
     public ResultResponse<?> deleteMemo(
             @RequestParam("id") int id,
-            HttpSession session,
-            HttpServletRequest request) {
+            HttpSession session) {
 
         Integer memberId = getLoggedInMemberId(session);
         memoService.deleteMemo(id, memberId);
-        return ResultResponse.success("삭제 완료", request.getRequestURI());
+        String location = "/api/OTD/memoAndDiary/memo/" + id;
+        return ResultResponse.success("삭제 완료", location);
     }
 }

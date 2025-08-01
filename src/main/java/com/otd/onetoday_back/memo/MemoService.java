@@ -61,7 +61,7 @@ public class MemoService {
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
             String fileName = saveFile(imageFiles.get(0));
-            req.setMemoImageFileName(fileName);
+            req.setMemoImage(fileName);
         }
 
         memoMapper.save(req);
@@ -70,11 +70,11 @@ public class MemoService {
                 req.getMemberNoLogin(),
                 req.getMemoName(),
                 req.getMemoContent(),
-                req.getMemoImageFileName()
+                req.getMemoImage()
         );
     }
 
-    public void updateMemo(MemoPutReq req, int memberId) {
+    public MemoPostAnduploadRes updateMemo(MemoPutReq req, int memberId) {
         Map<String, Object> param = new HashMap<>();
         param.put("memoId", req.getMemoId());
         param.put("memberNoLogin", memberId);
@@ -87,14 +87,23 @@ public class MemoService {
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
             String fileName = saveFile(imageFiles.get(0));
-            req.setMemoImageFileName(fileName);
+            req.setMemoImage(fileName);
 
-            if (existing.getMemoImageFileName() != null) {
-                deleteFileIfExists(existing.getMemoImageFileName());
+            if (existing.getMemoImage() != null) {
+                deleteFileIfExists(existing.getMemoImage());
             }
+        } else {
+            req.setMemoImage(existing.getMemoImage());
         }
 
         memoMapper.update(req);
+
+        return new MemoPostAnduploadRes(
+                req.getMemoId(),
+                req.getMemoName(),
+                req.getMemoContent(),
+                req.getMemoImage()
+        );
     }
 
     public void deleteMemo(int memoId, int memberId) {
@@ -107,8 +116,8 @@ public class MemoService {
             throw new CustomException("삭제할 메모가 존재하지 않습니다.", 404);
         }
 
-        if (existing.getMemoImageFileName() != null) {
-            deleteFileIfExists(existing.getMemoImageFileName());
+        if (existing.getMemoImage() != null) {
+            deleteFileIfExists(existing.getMemoImage());
         }
 
         memoMapper.delete(param);

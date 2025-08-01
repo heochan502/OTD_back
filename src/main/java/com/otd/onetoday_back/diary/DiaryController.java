@@ -6,10 +6,19 @@ import com.otd.onetoday_back.common.model.ResultResponse;
 import com.otd.onetoday_back.diary.model.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class DiaryController {
 
     private final DiaryService diaryService;
+
+    private final String uploadDir = "/home/download";
 
     private int getLoginMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
@@ -50,7 +61,8 @@ public class DiaryController {
         int memberId = getLoginMemberId(session);
         req.setMemberNoLogin(memberId);
         DiaryPostAndUploadRes res = diaryService.save(req, diaryImage);
-        return ResultResponse.success(res, "/api/OTD/memoAndDiary/diary");
+        String location = "/api/OTD/memoAndDiary/diary/" + res.getDiaryId();
+        return ResultResponse.success(res, location);
     }
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -61,13 +73,39 @@ public class DiaryController {
     ) {
         int memberId = getLoginMemberId(session);
         req.setMemberNoLogin(memberId);
-        return ResultResponse.success(diaryService.update(req, imageFile), "/api/OTD/memoAndDiary/diary");
+        DiaryPostAndUploadRes res = diaryService.update(req, imageFile);
+        String location = "/api/OTD/memoAndDiary/diary/" + res.getDiaryId();
+        return ResultResponse.success(res, location);
     }
 
     @DeleteMapping("/{diaryId}")
     public ResultResponse<Void> delete(@PathVariable int diaryId, HttpSession session) {
         int memberId = getLoginMemberId(session);
         diaryService.delete(diaryId, memberId);
-        return ResultResponse.success(null, "/api/OTD/memoAndDiary/diary/" + diaryId);
+        String location = "/api/OTD/memoAndDiary/diary/" + diaryId;
+        return ResultResponse.success(null, location);
+    }
+    @GetMapping("/image/{filename:.+}")
+    public ResponseEntity<Resource> getDiaryImage(@PathVariable String filename) {
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new CustomException("이미지를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value());
+            }
+
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+
+        } catch (IOException e) {
+            throw new CustomException("이미지 로딩 중 오류 발생", 404);
+        }
     }
 }

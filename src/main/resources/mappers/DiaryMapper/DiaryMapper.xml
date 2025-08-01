@@ -5,15 +5,64 @@
 
 <mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
 
+    <select id="findAll"
+            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes"
+            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq">
+        SELECT
+            diary_id AS diaryId,
+            diary_name AS diaryName,
+            diary_content AS diaryContent,
+            diary_image AS diaryImage,
+            created_at AS createdAt,
+            mood
+        FROM diary
+        WHERE member_no_login = #{memberNoLogin}
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="getTotalCount"
+            resultType="int"
+            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq">
+        SELECT COUNT(*)
+        FROM diary
+        WHERE member_no_login = #{memberNoLogin}
+    </select>
+
+    <select id="findById"
+            parameterType="map"
+            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        SELECT
+            diary_id AS diaryId,
+            diary_name AS diaryName,
+            diary_content AS diaryContent,
+            diary_image AS diaryImage,
+            created_at AS createdAt,
+            mood
+        FROM diary
+        WHERE diary_id = #{diaryId}
+          AND member_no_login = #{memberNoLogin}
+    </select>
+
     <insert id="insert"
             parameterType="com.otd.onetoday_back.diary.model.DiaryPostReq"
             useGeneratedKeys="true"
             keyProperty="diaryId">
         INSERT INTO diary (
-            member_no_login, diary_name, diary_content, diary_image, created_at
+            member_no_login,
+            diary_name,
+            diary_content,
+            diary_image,
+            created_at,
+            mood
         ) VALUES (
-                     #{memberNoLogin}, #{diaryName}, #{diaryContent}, #{diaryImage}, NOW()
-                 )
+            #{memberNoLogin},
+            #{diaryName},
+            #{diaryContent},
+            #{diaryImage},
+            #{mood},
+            NOW()
+        )
     </insert>
 
     <update id="update"
@@ -21,7 +70,8 @@
         UPDATE diary
         SET diary_name = #{diaryName},
             diary_content = #{diaryContent},
-            diary_image = #{diaryImage}
+            diary_image = #{diaryImage},
+            mood = #{mood}
         WHERE diary_id = #{diaryId}
           AND member_no_login = #{memberNoLogin}
     </update>
@@ -32,43 +82,5 @@
         WHERE diary_id = #{diaryId}
           AND member_no_login = #{memberNoLogin}
     </delete>
-
-    <select id="findById"
-            parameterType="map"
-            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT
-            diary_id AS diaryId,
-            member_no_login AS memberNoLogin,
-            diary_name,
-            diary_content,
-            diary_image,
-            created_at
-        FROM diary
-        WHERE diary_id = #{diaryId}
-          AND member_no_login = #{memberNoLogin}
-    </select>
-
-    <select id="findAll"
-            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq"
-            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT
-            diary_id AS diaryId,
-            member_no_login AS memberNoLogin,
-            diary_name,
-            diary_content,
-            diary_image,
-            created_at
-        FROM diary
-        WHERE member_no_login = #{memberNoLogin}
-        ORDER BY created_at DESC
-        LIMIT #{offset}, #{pageSize}
-    </select>
-
-    <select id="getTotalCount"
-            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq"
-            resultType="int">
-        SELECT COUNT(*) FROM diary
-        WHERE member_no_login = #{memberNoLogin}
-    </select>
 
 </mapper>

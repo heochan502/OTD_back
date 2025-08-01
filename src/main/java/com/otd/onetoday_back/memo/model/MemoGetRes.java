@@ -10,6 +10,6 @@ public class MemoGetRes {
     private int memberNoLogin;
     private String memoName;
     private String memoContent;
-    private String memoImageFileName;
+    private String memoImage;
     private LocalDateTime createdAt;
 }

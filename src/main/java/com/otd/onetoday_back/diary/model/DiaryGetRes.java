@@ -1,7 +1,6 @@
 package com.otd.onetoday_back.diary.model;
 
 import lombok.Data;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -11,13 +10,7 @@ public class DiaryGetRes {
     private String diaryName;
     private String diaryContent;
     private String diaryImage;
-    private String createdAt;
-
-    private int memberNoLogin;
-    public int getMemberNoLogin() {
-        return memberNoLogin;
-    }
-
-    @ToString.Exclude
+    private LocalDateTime createdAt;
     private String mood;
+    private int memberNoLogin;
 }

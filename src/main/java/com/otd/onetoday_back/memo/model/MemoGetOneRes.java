@@ -13,6 +13,6 @@ public class MemoGetOneRes {
     private int memberNoLogin;
     private String memoName;
     private String memoContent;
-    private String imageFileName;
+    private String memoImage;
     private LocalDateTime createdAt;
 }

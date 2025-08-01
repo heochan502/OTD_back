@@ -6,10 +6,10 @@
 <mapper namespace="com.otd.onetoday_back.memo.MemoMapper">
 
     <resultMap id="MemoResultMap" type="com.otd.onetoday_back.memo.model.MemoGetRes">
-        <id property="id" column="memo_id"/>
+        <id property="memoId" column="memo_id"/>
         <result property="memoName" column="memo_name"/>
         <result property="memoContent" column="memo_content"/>
-        <result property="memoImageFileName" column="memo_image"/>
+        <result property="memoImage" column="memo_image"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
@@ -30,27 +30,27 @@
     <select id="findById" parameterType="map" resultMap="MemoResultMap">
         SELECT *
         FROM memo
-        WHERE memo_id = #{id}
+        WHERE memo_id = #{memoId}
           AND member_no_login = #{memberNoLogin}
     </select>
 
     <insert id="save" parameterType="com.otd.onetoday_back.memo.model.MemoPostReq">
         INSERT INTO memo (member_no_login, memo_name, memo_content, memo_image, created_at)
-        VALUES (#{memberNoLogin}, #{memoName}, #{memoContent}, #{memoImageFileName}, NOW())
+        VALUES (#{memberNoLogin}, #{memoName}, #{memoContent}, #{memoImage}, NOW())
     </insert>
 
     <update id="update" parameterType="com.otd.onetoday_back.memo.model.MemoPutReq">
         UPDATE memo
         SET memo_name = #{memoName},
             memo_content = #{memoContent},
-            memo_image = #{memoImageFileName}
-        WHERE memo_id = #{id}
+            memo_image = #{memoImage}
+        WHERE memo_id = #{memoId}
           AND member_no_login = #{memberNoLogin}
     </update>
 
     <delete id="delete" parameterType="map">
         DELETE FROM memo
-        WHERE memo_id = #{id}
+        WHERE memo_id = #{memoId}
           AND member_no_login = #{memberNoLogin}
     </delete>
 
