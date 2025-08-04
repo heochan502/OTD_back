@@ -62,7 +62,7 @@ public class MemoController {
 
         Integer memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
-        req.setMemoImage(memoImage);
+        req.setMemoImageFiles(memoImage);
 
         MemoPostAnduploadRes result = memoService.saveMemoAndHandleUpload(memberId, req);
         String location = "/api/OTD/memoAndDiary/memo/" + result.getMemoId();
@@ -77,7 +77,7 @@ public class MemoController {
 
         Integer memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
-        req.setMemoImage(memoImage);
+        req.setMemoImageFiles(memoImage);
 
         MemoPostAnduploadRes result = memoService.updateMemo(req, memberId);
         String location = "/api/OTD/memoAndDiary/memo/" + result.getMemoId();
