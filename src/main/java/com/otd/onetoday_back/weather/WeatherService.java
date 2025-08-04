@@ -35,6 +35,17 @@ public class WeatherService {
             default -> "알 수 없음";
         };
     }
+    private String Pty(String pty) {
+        return switch (pty) {
+            case "1" -> "비";
+            case "2" -> "비/눈";
+            case "3" -> "눈";
+            case "5" -> "빗방울";
+            case "6" -> "빗방울눈날림";
+            case "7" -> "눈날림";
+            default -> "없음";
+        };
+    }
     // 실시간 날짜/시간
     String[] base = BaseTime.getBaseDateTime(); // 실황
     String[] baseV = BaseTime.getBaseTimeV(); // 예보
@@ -63,7 +74,7 @@ public class WeatherService {
 
             for (Item item : ultraItems) {
                 String category = item.getCategory();
-                if ("T1H".equals(category) || "REH".equals(category)) {
+                if ("T1H".equals(category) || "REH".equals(category) || "PTY".equals(category) || "RN1".equals(category)) {
                     ultraMap.put(category, item.getObsrValue());
                 }
             }
@@ -129,12 +140,16 @@ public class WeatherService {
             dto.setBaseTime(base[0] + " " + base[1]);
             dto.setTem(ultraMap.get("T1H"));
             dto.setReh(ultraMap.get("REH"));
+            dto.setRh1(ultraMap.get("RN1"));
+            dto.setPty(Pty(ultraMap.get("PTY")));
             dto.setLocalName(local.getCity() + " " + local.getCounty() + " "+ local.getTown());
 
             dto.setTmx(villageMap.get("TMX"));
             dto.setTmn(villageMap.get("TMN"));
             dto.setPop(villageMap.get("POP"));
             dto.setSky(Sky(villageMap.get("SKY")));
+
+            log.info("dto = {}", dto);
 
             return dto;
 
