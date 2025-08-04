@@ -4,21 +4,16 @@ import com.otd.onetoday_back.diary.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DiaryMapper {
-
-    void save(DiaryPostReq req);
-
     List<DiaryGetRes> findAll(DiaryGetReq req);
-
     int getTotalCount(DiaryGetReq req);
 
-    DiaryGetRes findById(int id);
+    DiaryGetRes findById(Map<String, Object> params);
 
-    void modify(DiaryPutReq req);
-
-    void deleteById(int id);
-
-
+    void insert(DiaryPostReq req);
+    void update(DiaryPutReq req);
+    void delete(Map<String, Object> params);
 }

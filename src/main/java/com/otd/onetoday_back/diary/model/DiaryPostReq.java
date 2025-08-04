@@ -10,13 +10,11 @@ import java.util.List;
 @Getter
 @Setter
 public class DiaryPostReq {
-    private int id;
+    private int diaryId;
     private int memberNoLogin;
     private String diaryName;
     private String diaryContent;
-    private String imageFileName;
-    private List<MultipartFile> diaryImageFiles;
-
-    @ToString.Exclude
+    private String diaryImage;
     private String mood;
+    private List<MultipartFile> diaryImageFiles;
 }

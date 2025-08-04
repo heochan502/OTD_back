@@ -11,9 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -25,12 +23,11 @@ public class MemoService {
     @Value("${constants.file.directory}")
     private String uploadDir;
 
-    // Windows 환경에서 경로 자동 보정
     @PostConstruct
     public void adjustUploadPathForWindows() {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win") && uploadDir.startsWith("/home")) {
-            uploadDir = "C:/2025_swstudy/upload"; // Windows용 안전한 경로
+            uploadDir = "C:/2025_swstudy/upload";
             log.warn("Windows 환경 감지됨. uploadDir을 {} 로 강제 설정합니다.", uploadDir);
         } else {
             log.info("uploadDir 설정값: {}", uploadDir);
@@ -43,17 +40,17 @@ public class MemoService {
 
         List<MemoGetRes> memoList = memoMapper.findAll(req);
         int totalCount = memoMapper.getTotalCount(req);
-
         return new MemoListRes(memoList, totalCount);
     }
 
-    public MemoGetRes findById(int id, int memberId) {
-        MemoGetRes memo = memoMapper.findById(id);
+    public MemoGetRes findById(int memoId, int memberId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("memoId", memoId);
+        param.put("memberNoLogin", memberId);
+
+        MemoGetRes memo = memoMapper.findById(param);
         if (memo == null) {
-            throw new CustomException("해당 메모가 존재하지 않습니다.", 404);
-        }
-        if (memo.getMemberNoLogin() != memberId) {
-            throw new CustomException("해당 메모에 접근할 수 없습니다.", 403);
+            throw new CustomException("해당 메모가 존재하지 않거나 접근 권한이 없습니다.", 404);
         }
         return memo;
     }
@@ -63,61 +60,67 @@ public class MemoService {
 
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            MultipartFile file = imageFiles.get(0);
-            String fileName = saveFile(file);
-            req.setMemoImageFileName(fileName);
+            String fileName = saveFile(imageFiles.get(0));
+            req.setMemoImage(fileName);
         }
 
         memoMapper.save(req);
-        int newMemoId = req.getId();
 
         return new MemoPostAnduploadRes(
-                newMemoId,
-                req.getMemoImageFileName() != null
-                        ? Collections.singletonList(new UploadResponse(
-                        req.getMemoImageFileName(),
-                        imageFiles.get(0).getOriginalFilename(),
-                        "업로드 성공"))
-                        : Collections.emptyList()
+                req.getMemberNoLogin(),
+                req.getMemoName(),
+                req.getMemoContent(),
+                req.getMemoImage()
         );
     }
 
-    public void updateMemo(MemoPutReq req, int memberId) {
-        MemoGetRes existing = memoMapper.findById(req.getId());
+    public MemoPostAnduploadRes updateMemo(MemoPutReq req, int memberId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("memoId", req.getMemoId());
+        param.put("memberNoLogin", memberId);
+
+        MemoGetRes existing = memoMapper.findById(param);
         if (existing == null) {
             throw new CustomException("수정할 메모가 존재하지 않습니다.", 404);
-        }
-        if (existing.getMemberNoLogin() != memberId) {
-            throw new CustomException("수정 권한이 없습니다.", 403);
         }
 
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            MultipartFile file = imageFiles.get(0);
-            String fileName = saveFile(file);
-            req.setMemoImageFileName(fileName);
-            if (existing.getMemoImageFileName() != null) {
-                deleteFileIfExists(existing.getMemoImageFileName());
+            String fileName = saveFile(imageFiles.get(0));
+            req.setMemoImage(fileName);
+
+            if (existing.getMemoImage() != null) {
+                deleteFileIfExists(existing.getMemoImage());
             }
+        } else {
+            req.setMemoImage(existing.getMemoImage());
         }
 
-        memoMapper.modify(req);
+        memoMapper.update(req);
+
+        return new MemoPostAnduploadRes(
+                req.getMemoId(),
+                req.getMemoName(),
+                req.getMemoContent(),
+                req.getMemoImage()
+        );
     }
 
-    public void deleteMemo(int id, int memberId) {
-        MemoGetRes existing = memoMapper.findById(id);
+    public void deleteMemo(int memoId, int memberId) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("memoId", memoId);
+        param.put("memberNoLogin", memberId);
+
+        MemoGetRes existing = memoMapper.findById(param);
         if (existing == null) {
             throw new CustomException("삭제할 메모가 존재하지 않습니다.", 404);
         }
-        if (existing.getMemberNoLogin() != memberId) {
-            throw new CustomException("삭제 권한이 없습니다.", 403);
+
+        if (existing.getMemoImage() != null) {
+            deleteFileIfExists(existing.getMemoImage());
         }
 
-        if (existing.getMemoImageFileName() != null) {
-            deleteFileIfExists(existing.getMemoImageFileName());
-        }
-
-        memoMapper.deleteById(id);
+        memoMapper.delete(param);
     }
 
     private String saveFile(MultipartFile file) {
@@ -129,7 +132,6 @@ public class MemoService {
             String safeFileName = UUID.randomUUID().toString() + ext;
 
             Path target = Paths.get(uploadDir.trim()).resolve(safeFileName).normalize();
-
             Files.createDirectories(target.getParent());
             file.transferTo(target.toFile());
 

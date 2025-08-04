@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DiaryPostRes {
-    private int id;
-    private List<String> imageFileNames;
+    private int diaryId;
+    private List<String> diaryImage;
 }

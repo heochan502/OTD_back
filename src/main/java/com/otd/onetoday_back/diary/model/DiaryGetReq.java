@@ -5,11 +5,7 @@ import lombok.Data;
 @Data
 public class DiaryGetReq {
     private int memberNoLogin;
-    private int currentPage;
-    private int pageSize;
+    private int currentPage = 1;
+    private int pageSize = 3;
     private int offset;
-
-    public void setOffsetFromPage() {
-        this.offset = (currentPage - 1) * pageSize;
-    }
 }
