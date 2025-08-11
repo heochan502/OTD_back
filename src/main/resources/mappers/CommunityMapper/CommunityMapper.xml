@@ -5,7 +5,7 @@
 
 <mapper namespace="com.otd.onetoday_back.community.mapper.CommunityMapper">
 
-    <!-- ✅ resultMap -->
+    <!-- ✅ resultMap: DTO와 DB 컬럼 매핑 -->
     <resultMap id="CommunityPostResMap" type="com.otd.onetoday_back.community.dto.CommunityPostRes">
         <id property="postId" column="post_id"/>
         <result property="memberNoLogin" column="member_no_login"/>
@@ -18,6 +18,7 @@
         <result property="viewCount" column="view_count"/>
         <result property="like" column="like"/>
         <result property="isDeleted" column="is_deleted"/>
+        <result property="commentCount" column="comment_count"/> <!-- 💬 댓글 수 -->
     </resultMap>
 
     <!-- 게시글 저장 -->
@@ -33,7 +34,7 @@
     </insert>
 
     <!-- 게시글 첨부파일 저장 -->
-    <insert id="saveFile"  parameterType="com.otd.onetoday_back.community.domain.Community">
+    <insert id="saveFile" parameterType="com.otd.onetoday_back.community.domain.Community">
         INSERT INTO community_postfile (
         post_id, member_no_login, file_name, file_path, file_type, uploaded_at
         ) VALUES (
@@ -60,9 +61,14 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
-        JOIN member m ON p.member_no_login = m.member_no_login
+        LEFT JOIN member m ON p.member_no_login = m.member_no_login
         <where>
             <if test="searchText != null and searchText != ''">
                 (p.title LIKE CONCAT('%', #{searchText}, '%')
@@ -91,16 +97,24 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
-        JOIN member m ON p.member_no_login = m.member_no_login
+        LEFT JOIN member m ON p.member_no_login = m.member_no_login
         WHERE p.post_id = #{postId}
+        LIMIT 1
     </select>
 
     <!-- 게시글 수정 -->
     <update id="modify" parameterType="com.otd.onetoday_back.community.domain.Community">
         UPDATE community_post
-        SET title = #{title}, content = #{content}, updated_at = #{updatedAt}
+        SET title = #{title},
+        content = #{content},
+        updated_at = #{updatedAt}
         WHERE post_id = #{postId}
     </update>
 
@@ -111,9 +125,11 @@
         WHERE post_id = #{postId}
     </update>
 
-    <!-- 단건 조회 (사용 안 할 가능성 높음) -->
+    <!-- 단건 조회 (필요 시) -->
     <select id="findPostById" resultMap="CommunityPostResMap">
-        SELECT * FROM community_post WHERE post_id = #{postId}
+        SELECT *
+        FROM community_post
+        WHERE post_id = #{postId}
     </select>
 
     <!-- 삭제 안 된 게시글 목록 -->
@@ -127,7 +143,12 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
         WHERE p.is_deleted = FALSE
         ORDER BY p.created_at DESC
@@ -142,7 +163,7 @@
         )
     </insert>
 
-    <!-- 댓글 목록 조회 -->
+    <!-- 댓글 목록 조회 (최신이 아래: ASC 정렬 권장 시 ASC로 변경 가능) -->
     <select id="findCommentsByPostId" resultType="com.otd.onetoday_back.community.dto.MentRes">
         SELECT
         c.comment_id,
@@ -153,9 +174,9 @@
         c.content,
         c.updated_at
         FROM community_comment c
-        JOIN member m ON c.member_no_login = m.member_no_login
+        LEFT JOIN member m ON c.member_no_login = m.member_no_login
         WHERE c.post_id = #{postId}
-        ORDER BY c.updated_at ASC
+        ORDER BY c.updated_at DESC
     </select>
 
     <!-- 페이징 포함 목록 -->
@@ -177,13 +198,19 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
-        JOIN member m ON p.member_no_login = m.member_no_login
+        LEFT JOIN member m ON p.member_no_login = m.member_no_login
         <where>
             p.is_deleted = FALSE
             <if test="searchText != null and searchText != ''">
-                AND (p.title LIKE CONCAT('%', #{searchText}, '%') OR p.content LIKE CONCAT('%', #{searchText}, '%'))
+                AND (p.title LIKE CONCAT('%', #{searchText}, '%')
+                OR p.content LIKE CONCAT('%', #{searchText}, '%'))
             </if>
         </where>
         ORDER BY p.post_id DESC
@@ -199,10 +226,12 @@
 
     <!-- 총 개수 -->
     <select id="countAll" resultType="int">
-        SELECT COUNT(*) FROM community_post
+        SELECT COUNT(*)
+        FROM community_post
         WHERE is_deleted = FALSE
         <if test="searchText != null and searchText != ''">
-            AND (title LIKE CONCAT('%', #{searchText}, '%') OR content LIKE CONCAT('%', #{searchText}, '%'))
+            AND (title LIKE CONCAT('%', #{searchText}, '%')
+            OR content LIKE CONCAT('%', #{searchText}, '%'))
         </if>
     </select>
 

@@ -1,11 +1,13 @@
 package com.otd.onetoday_back.community.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class MentRes {
     private int commentId;
