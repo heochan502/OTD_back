@@ -1,9 +1,11 @@
 package com.otd.onetoday_back.weather;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otd.onetoday_back.account.model.memberUpdateDto;
 import com.otd.onetoday_back.weather.config.constants.ConstKma;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
+import com.otd.onetoday_back.weather.model.SrtFcst;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import com.otd.onetoday_back.weather.model.json.Item;
 import com.otd.onetoday_back.weather.model.json.ResponseParent;
@@ -56,7 +58,7 @@ public class WeatherService {
 
         try {
             // FeignClient 초단기실황 호출
-            String ultraSrtNcstResponse = weatherFeignClient.getUltraSrtNcst(
+            String ncstResponse = weatherFeignClient.getUltraSrtNcst(
                     constKma.getServiceKey(),
                     constKma.getDataType(),
                     base[0],
@@ -67,19 +69,19 @@ public class WeatherService {
                     10
             );
             // 초단기실황 파싱
-            ResponseParent ultraWeatherApi = objectMapper.readValue(ultraSrtNcstResponse, ResponseParent.class);
-            List<Item> ultraItems = ultraWeatherApi.getResponse().getBody().getItems().getItem();
+            ResponseParent ncstWeatherApi = objectMapper.readValue(ncstResponse, ResponseParent.class);
+            List<Item> ncstItems = ncstWeatherApi.getResponse().getBody().getItems().getItem();
 
-            Map<String, String> ultraMap = new HashMap<>();
+            Map<String, String> ncstMap = new HashMap<>();
 
-            for (Item item : ultraItems) {
+            for (Item item : ncstItems) {
                 String category = item.getCategory();
                 if ("T1H".equals(category) || "REH".equals(category) || "PTY".equals(category) || "RN1".equals(category)) {
-                    ultraMap.put(category, item.getObsrValue());
+                    ncstMap.put(category, item.getObsrValue());
                 }
             }
 
-            log.info("ultraItems = {}", ultraMap);
+            log.info("ncstItems = {}", ncstMap);
 
             // FeignClient 단기예보 호출
             String villageTMN = weatherFeignClient.getVilageFcst(
@@ -127,28 +129,42 @@ public class WeatherService {
                     villageMap.put(category, item.getFcstValue());
                 }
             }
-
-
             log.info("villageItems = {}", villageMap);
+
+            String fcstResponse = weatherFeignClient.getUltraSrtFcst(
+                    constKma.getServiceKey(),
+                    constKma.getDataType(),
+                    base[0],
+                    base[0],
+                    location.getNx(),
+                    location.getNy(),
+                    1,
+                    10
+            );
+            ResponseParent fcstWeatherApi = objectMapper.readValue(fcstResponse, ResponseParent.class);
+
+            Map<String, String> fcstMap = new HashMap<>();
+
             // 값 저장
             LocationDto local = new LocationDto();
             local.setCity(location.getCity());
             local.setCounty(location.getCounty());
             local.setTown(location.getTown());
 
-            WeatherDto dto = new WeatherDto();
-            dto.setBaseTime(base[0] + " " + base[1]);
-            dto.setTem(ultraMap.get("T1H"));
-            dto.setReh(ultraMap.get("REH"));
-            dto.setRh1(ultraMap.get("RN1"));
-            dto.setPty(Pty(ultraMap.get("PTY")));
-            dto.setLocalName(local.getCity() + " " + local.getCounty() + " "+ local.getTown());
+            WeatherDto dto = WeatherDto.builder()
+                    .baseTime(base[0] + " " + base[1])
+                    .ncstTem(ncstMap.get("T1H"))
+                    .ncstReh(ncstMap.get("REH"))
+                    .ncstRh1(ncstMap.get("RN1"))
+                    .ncstPty(Pty(ncstMap.get("PTY")))
 
-            dto.setTmx(villageMap.get("TMX"));
-            dto.setTmn(villageMap.get("TMN"));
-            dto.setPop(villageMap.get("POP"));
-            dto.setSky(Sky(villageMap.get("SKY")));
+                    .villageTmx(villageMap.get("TMX"))
+                    .villageTmn(villageMap.get("TMN"))
+                    .villagePop(villageMap.get("POP"))
+                    .villageSky(Sky(villageMap.get("SKY")))
 
+                    .localName(local.getCity() + " " + local.getCounty() + " "+ local.getTown())
+                    .build();
             log.info("dto = {}", dto);
 
             return dto;
