@@ -23,13 +23,5 @@ public class WeatherDto {
     private String villagePop; // 강수 확률;
     private String villageSky; // 하늘 상태
 
-    // 초단기예보
-    private String fcstTem; // 기온
-    private String fcstRh1; // 강수량
-    private String fcstSky; // 하늘 상태
-    private String fcstPty; // 강수 형태
-    private String fcstDate;
-    private String fcstTime;
-
     private String localName; // 지역명
 }

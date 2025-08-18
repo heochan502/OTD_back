@@ -38,6 +38,7 @@ public class WeatherService {
         };
     }
     private String Pty(String pty) {
+        if (pty == null) return "없음";
         return switch (pty) {
             case "1" -> "비";
             case "2" -> "비/눈";
@@ -131,20 +132,6 @@ public class WeatherService {
             }
             log.info("villageItems = {}", villageMap);
 
-            String fcstResponse = weatherFeignClient.getUltraSrtFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
-                    base[0],
-                    base[0],
-                    location.getNx(),
-                    location.getNy(),
-                    1,
-                    10
-            );
-            ResponseParent fcstWeatherApi = objectMapper.readValue(fcstResponse, ResponseParent.class);
-
-            Map<String, String> fcstMap = new HashMap<>();
-
             // 값 저장
             LocationDto local = new LocationDto();
             local.setCity(location.getCity());
@@ -175,7 +162,56 @@ public class WeatherService {
         }
     }
 
+    public List<SrtFcst> getSrtFcst(int memberId) {
+        LocationDto location = weatherMapper.findLocalByMemberId(memberId);
+
+        try {
+            String fcstResponse = weatherFeignClient.getUltraSrtFcst(
+                    constKma.getServiceKey(),
+                    constKma.getDataType(),
+                    base[0],
+                    "0000",
+                    location.getNx(),
+                    location.getNy(),
+                    1,
+                    1000
+            );
+
+            ResponseParent fcstWeatherApi = objectMapper.readValue(fcstResponse, ResponseParent.class);
+            List<Item> fcstItems = fcstWeatherApi.getResponse().getBody().getItems().getItem();
+
+            Map<String, SrtFcst> fcstMap = new LinkedHashMap<>();
+            for (Item item : fcstItems) {
+                String fcstTime = item.getFcstTime();
+
+                fcstMap.putIfAbsent(fcstTime, new SrtFcst());
+                SrtFcst fcst = fcstMap.get(fcstTime);
+                fcst.setFcstTime(fcstTime);
+
+                switch (item.getCategory()) {
+                    case "T1H" -> fcst.setFcstTem(item.getFcstValue());
+                    case "RN1" -> fcst.setFcstRn1(item.getFcstValue());
+                    case "SKY" -> fcst.setFcstSky(Sky(item.getFcstValue()));
+                    case "PTY" -> fcst.setFcstPty(Pty(item.getFcstValue()));
+                }
+
+            }
+            log.info("fcstMap = {}", fcstMap);
+
+            List<SrtFcst> fcstList = new ArrayList<>(fcstMap.values());
+            log.info("fcstList = {}", fcstList);
+
+            return fcstList;
+
+        } catch (Exception e) {
+            log.error("fcstApi 실패", e);
+            throw new RuntimeException("fcstApi 실패", e);
+        }
+
+    }
+
     public memberUpdateDto getNickName(int memberId) {
         return weatherMapper.getNickName(memberId);
     }
+
 }
