@@ -164,42 +164,41 @@ public class WeatherService {
 
     public List<SrtFcst> getSrtFcst(int memberId) {
         LocationDto location = weatherMapper.findLocalByMemberId(memberId);
-
         try {
-            String fcstResponse = weatherFeignClient.getUltraSrtFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
-                    base[0],
-                    "0000",
-                    location.getNx(),
-                    location.getNy(),
-                    1,
-                    1000
-            );
+                String fcstResponse = weatherFeignClient.getUltraSrtFcst(
+                        constKma.getServiceKey(),
+                        constKma.getDataType(),
+                        base[0],
+                        base[1],
+                        location.getNx(),
+                        location.getNy(),
+                        1,
+                        1000
+                );
 
-            ResponseParent fcstWeatherApi = objectMapper.readValue(fcstResponse, ResponseParent.class);
-            List<Item> fcstItems = fcstWeatherApi.getResponse().getBody().getItems().getItem();
+                ResponseParent fcstWeatherApi = objectMapper.readValue(fcstResponse, ResponseParent.class);
+                List<Item> fcstItems = fcstWeatherApi.getResponse().getBody().getItems().getItem();
 
-            Map<String, SrtFcst> fcstMap = new LinkedHashMap<>();
-            for (Item item : fcstItems) {
-                String fcstTime = item.getFcstTime();
+                Map<String, SrtFcst> fcstMap = new LinkedHashMap<>();
+                for (Item item : fcstItems) {
+                    String fcstTime = item.getFcstTime();
 
-                fcstMap.putIfAbsent(fcstTime, new SrtFcst());
-                SrtFcst fcst = fcstMap.get(fcstTime);
-                fcst.setFcstTime(fcstTime);
+                    fcstMap.putIfAbsent(fcstTime, new SrtFcst());
+                    SrtFcst fcst = fcstMap.get(fcstTime);
+                    fcst.setFcstTime(fcstTime);
 
-                switch (item.getCategory()) {
-                    case "T1H" -> fcst.setFcstTem(item.getFcstValue());
-                    case "RN1" -> fcst.setFcstRn1(item.getFcstValue());
-                    case "SKY" -> fcst.setFcstSky(Sky(item.getFcstValue()));
-                    case "PTY" -> fcst.setFcstPty(Pty(item.getFcstValue()));
+                    switch (item.getCategory()) {
+                        case "T1H" -> fcst.setFcstTem(item.getFcstValue());
+                        case "RN1" -> fcst.setFcstRn1(item.getFcstValue());
+                        case "SKY" -> fcst.setFcstSky(Sky(item.getFcstValue()));
+                        case "PTY" -> fcst.setFcstPty(Pty(item.getFcstValue()));
+                    }
+
                 }
+                log.info("fcstMap = {}", fcstMap);
 
-            }
-            log.info("fcstMap = {}", fcstMap);
-
-            List<SrtFcst> fcstList = new ArrayList<>(fcstMap.values());
-            log.info("fcstList = {}", fcstList);
+                List<SrtFcst> fcstList = new ArrayList<>(fcstMap.values());
+                log.info("fcstList = {}", fcstList);
 
             return fcstList;
 
