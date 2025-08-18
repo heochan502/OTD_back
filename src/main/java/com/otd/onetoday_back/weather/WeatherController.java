@@ -2,6 +2,7 @@ package com.otd.onetoday_back.weather;
 
 import com.otd.onetoday_back.account.model.memberUpdateDto;
 import com.otd.onetoday_back.weather.location.LocationService;
+import com.otd.onetoday_back.weather.model.DailyWeather;
 import com.otd.onetoday_back.weather.model.SrtFcst;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import jakarta.servlet.http.HttpSession;
@@ -25,10 +26,10 @@ public class WeatherController {
         return weatherService.getWeatherByMemberId(memberId);
     }
 
-    @GetMapping("/fcst")
-    public List<SrtFcst> getSrtFcst(HttpSession session) {
+    @GetMapping("/daily")
+    public List<DailyWeather> getDailyWeather(HttpSession session) {
         Integer memberId = (Integer)session.getAttribute("memberId");
-        return weatherService.getSrtFcst(memberId);
+        return weatherService.getDailyWeather(memberId);
     }
 
     @GetMapping("/info")
