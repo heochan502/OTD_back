@@ -1,9 +1,7 @@
 package com.otd.onetoday_back.weather;
 
 import com.otd.onetoday_back.account.model.memberUpdateDto;
-import com.otd.onetoday_back.weather.location.LocationService;
 import com.otd.onetoday_back.weather.model.DailyWeather;
-import com.otd.onetoday_back.weather.model.SrtFcst;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

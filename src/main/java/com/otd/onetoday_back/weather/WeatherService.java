@@ -1,12 +1,10 @@
 package com.otd.onetoday_back.weather;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otd.onetoday_back.account.model.memberUpdateDto;
 import com.otd.onetoday_back.weather.config.constants.ConstKma;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.model.DailyWeather;
-import com.otd.onetoday_back.weather.model.SrtFcst;
 import com.otd.onetoday_back.weather.model.WeatherDto;
 import com.otd.onetoday_back.weather.model.json.Item;
 import com.otd.onetoday_back.weather.model.json.ResponseParent;
@@ -164,53 +162,6 @@ public class WeatherService {
             throw new RuntimeException("날씨 API 실패", e);
         }
     }
-
-//    public List<SrtFcst> getSrtFcst(int memberId) {
-//        LocationDto location = weatherMapper.findLocalByMemberId(memberId);
-//        try {
-//                String fcstResponse = weatherFeignClient.getUltraSrtFcst(
-//                        constKma.getServiceKey(),
-//                        constKma.getDataType(),
-//                        base[0],
-//                        base[1],
-//                        location.getNx(),
-//                        location.getNy(),
-//                        1,
-//                        1000
-//                );
-//
-//                ResponseParent fcstWeatherApi = objectMapper.readValue(fcstResponse, ResponseParent.class);
-//                List<Item> fcstItems = fcstWeatherApi.getResponse().getBody().getItems().getItem();
-//
-//                Map<String, SrtFcst> fcstMap = new LinkedHashMap<>();
-//                for (Item item : fcstItems) {
-//                    String fcstTime = item.getFcstTime();
-//
-//                    fcstMap.putIfAbsent(fcstTime, new SrtFcst());
-//                    SrtFcst fcst = fcstMap.get(fcstTime);
-//                    fcst.setFcstTime(fcstTime);
-//
-//                    switch (item.getCategory()) {
-//                        case "T1H" -> fcst.setFcstTem(item.getFcstValue());
-//                        case "RN1" -> fcst.setFcstRn1(item.getFcstValue());
-//                        case "SKY" -> fcst.setFcstSky(Sky(item.getFcstValue()));
-//                        case "PTY" -> fcst.setFcstPty(Pty(item.getFcstValue()));
-//                    }
-//
-//                }
-//                log.info("fcstMap = {}", fcstMap);
-//
-//                List<SrtFcst> fcstList = new ArrayList<>(fcstMap.values());
-//                log.info("fcstList = {}", fcstList);
-//
-//            return fcstList;
-//
-//        } catch (Exception e) {
-//            log.error("fcstApi 실패", e);
-//            throw new RuntimeException("fcstApi 실패", e);
-//        }
-//
-//    }
 
     public List<DailyWeather> getDailyWeather(int memberId) {
         LocationDto location = weatherMapper.findLocalByMemberId(memberId);
