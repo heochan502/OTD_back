@@ -3,7 +3,6 @@ package com.otd.onetoday_back.healthlog;
 import com.otd.onetoday_back.Dummy;
 import com.otd.onetoday_back.health.HealthLogMapper;
 import com.otd.onetoday_back.health.model.PostHealthLogDto;
-import com.otd.onetoday_back.health.model.PostHealthLogReq;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.jupiter.api.Test;
