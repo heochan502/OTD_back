@@ -163,11 +163,14 @@ public class WeatherService {
         }
     }
 
+    public String formatString(LocalDateTime date) {
+        return date.format(DateTimeFormatter.ofPattern("yyyMMdd"));
+    }
+
     public List<DailyWeather> getDailyWeather(int memberId) {
         LocationDto location = weatherMapper.findLocalByMemberId(memberId);
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
-        String baseDate = yesterday.format(DateTimeFormatter.ofPattern("yyyMMdd"));
-
+        String baseDate = formatString(yesterday);
         try {
             String dailyWeather = weatherFeignClient.getVilageFcst(
                     constKma.getServiceKey(),
@@ -177,29 +180,28 @@ public class WeatherService {
                     location.getNx(),
                     location.getNy(),
                     1,
-                    10000
+                    288
             );
 
             ResponseParent dailyWeatherApi = objectMapper.readValue(dailyWeather, ResponseParent.class);
             List<Item> dailyItems = dailyWeatherApi.getResponse().getBody().getItems().getItem();
             Map<String, DailyWeather> dailyMap = new LinkedHashMap<>();
+
             for (Item item : dailyItems) {
-                String dailyTime = item.getFcstTime();
+                String dailyTime = item.getFcstDate() + item.getFcstTime();
                 dailyMap.putIfAbsent(dailyTime, new DailyWeather());
 
                 DailyWeather daily = dailyMap.get(dailyTime);
-                daily.setFcstTime(dailyTime);
-                if (item.getFcstDate().equals(baseV[0])) {
-                    daily.setFcstDate(baseV[0]);
-                    switch (item.getCategory()) {
-                        case "POP" -> daily.setPOP(item.getFcstValue());
-                        case "SKY" -> daily.setSKY(Sky(item.getFcstValue()));
-                        case "PTY" -> daily.setPTY(Pty(item.getFcstValue()));
-                        case "TMP" -> daily.setTMP(item.getFcstValue());
-                    }
+                daily.setFcstDate(item.getFcstDate());
+                daily.setFcstTime(item.getFcstTime());
+                switch (item.getCategory()) {
+                    case "POP" -> daily.setPOP(item.getFcstValue());
+                    case "SKY" -> daily.setSKY(Sky(item.getFcstValue()));
+                    case "PTY" -> daily.setPTY(Pty(item.getFcstValue()));
+                    case "TMP" -> daily.setTMP(item.getFcstValue());
                 }
-
             }
+            log.info("dailyMap = {}", dailyMap);
             return new ArrayList<>(dailyMap.values());
         } catch (Exception e) {
             log.error("날씨 API 실패", e);
