@@ -29,6 +29,7 @@
         FROM exerciselog
         WHERE member_no = #{memberId}
         ORDER BY exercise_datetime DESC
+        LIMIT #{startIdx}, #{size}
 
     </select>
 

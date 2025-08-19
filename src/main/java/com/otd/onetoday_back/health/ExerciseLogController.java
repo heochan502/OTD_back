@@ -3,6 +3,7 @@ package com.otd.onetoday_back.health;
 import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.util.HttpUtils;
 import com.otd.onetoday_back.health.model.*;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import java.util.List;
 @RequestMapping("/api/OTD/health")
 public class ExerciseLogController {
     private final ExerciseLogService exerciseLogService;
+    private final int SIZE = 7;
+    private final int START_INDEX = 0;
 
     //    운동기록 생성
     @PostMapping("/elog")
@@ -43,11 +46,16 @@ public class ExerciseLogController {
 
 //    운동기록 목록조회
     @GetMapping("/elog")
-    public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
+    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetExerciseLogReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
 
-        log.info("logginedMemberId:{}", logginedMemberId);
-        List<GetExerciseLogRes> result = exerciseLogService.findAllByMemberIdOrderByExerciseDatetimeDesc(logginedMemberId);
+        GetExerciseLogDto getExerciseLogDto = GetExerciseLogDto.builder()
+                .memberId(logginedMemberId)
+                .size(req.getRowPerPage())
+                .startIdx((req.getPage()-1) * req.getRowPerPage())
+                .build();
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(getExerciseLogDto);
+        log.info("운동기록dto:{}", getExerciseLogDto);
         return ResponseEntity.ok(result);
     }
 

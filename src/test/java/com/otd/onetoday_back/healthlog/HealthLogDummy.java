@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 class HealthLogDummy extends Dummy {
 
     final int ADD_ROW_COUNT = 365;
-    final int MEMBER_ID = 17;
+    final int MEMBER_ID = 37;
 
     @Test
     void generate() {
@@ -28,8 +28,8 @@ class HealthLogDummy extends Dummy {
 
             PostHealthLogDto dto = PostHealthLogDto.builder()
                     .memberId(MEMBER_ID)
-                    .weight(faker.random().nextInt(60, 76))
-                    .height(faker.random().nextInt(174, 175))
+                    .weight(faker.random().nextInt(55, 62))
+                    .height(faker.random().nextInt(160, 161))
                     .systolicBp(faker.random().nextInt(100,130))
                     .diastolicBp(faker.random().nextInt(60,90))
                     .sugarLevel(faker.random().nextInt(85,140))

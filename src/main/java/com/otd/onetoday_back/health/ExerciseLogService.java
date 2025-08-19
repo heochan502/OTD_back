@@ -34,8 +34,8 @@ public class ExerciseLogService {
     }
 
 //    운동기록 목록조회
-    public List<GetExerciseLogRes> findAllByMemberIdOrderByExerciseDatetimeDesc(int loggindMemberId) {
-        return exerciseLogMapper.findAllByMemberIdOrderByExerciseDatetimeDesc(loggindMemberId);
+    public List<GetExerciseLogRes> getExerciseLogList(GetExerciseLogDto dto) {
+        return exerciseLogMapper.findAllByMemberIdOrderByExerciseDatetimeDesc(dto);
     }
 
 //    운동종목
