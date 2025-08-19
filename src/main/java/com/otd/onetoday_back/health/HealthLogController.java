@@ -3,10 +3,7 @@ package com.otd.onetoday_back.health;
 
 import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.util.HttpUtils;
-import com.otd.onetoday_back.health.model.GetHealthLogDetailReq;
-import com.otd.onetoday_back.health.model.GetHealthLogDetailRes;
-import com.otd.onetoday_back.health.model.GetHealthLogRes;
-import com.otd.onetoday_back.health.model.PostHealthLogReq;
+import com.otd.onetoday_back.health.model.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +42,13 @@ public class HealthLogController {
 
     //    건강기록 목록조회
     @GetMapping
-    public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
+    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetHealthLogReq req ) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(logginedMemberId);
-        return ResponseEntity.ok(result);
+
+       log.info("여기여기여기여기"+logginedMemberId + "데이터 " + req);
+
+//        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(logginedMemberId);
+        return ResponseEntity.ok(null);
     }
 
 //    건강기록 삭제
