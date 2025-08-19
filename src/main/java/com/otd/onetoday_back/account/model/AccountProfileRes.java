@@ -14,4 +14,5 @@ public class AccountProfileRes {
     private String name;
     private String birthDate;
     private String memberNick;
+    private String gender;
 }

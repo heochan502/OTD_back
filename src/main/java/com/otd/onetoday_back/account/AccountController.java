@@ -33,8 +33,13 @@ public class AccountController {
                 || !StringUtils.hasLength(req.getMemberPw())
                 || !StringUtils.hasLength(req.getEmail())
                 || !StringUtils.hasLength(req.getName())
-                || !StringUtils.hasLength(req.getMemberNick())) {
-            return ResponseEntity.badRequest().build(); //state: 400
+                || !StringUtils.hasLength(req.getMemberNick())
+                || !StringUtils.hasLength(req.getGender())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!"M".equals(req.getGender()) && !"F".equals(req.getGender())) {
+            return ResponseEntity.badRequest().build();
         }
         log.info(" changed  : {}", req.getMemberNick());
         int result = accountService.join(req);
@@ -119,7 +124,7 @@ public class AccountController {
     }
 
 
-    @PutMapping("/password")
+    @PutMapping("/profile/password")
     public ResponseEntity<?> changePassword(
             HttpServletRequest httpReq,
             @RequestBody PasswordChangeDto dto) {

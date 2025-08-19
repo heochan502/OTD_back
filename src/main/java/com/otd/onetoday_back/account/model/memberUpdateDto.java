@@ -15,5 +15,5 @@ public class memberUpdateDto {
     private String birthDate;
     private String memberNick;
     private String memberImg;
-
+    private String gender;
 }
