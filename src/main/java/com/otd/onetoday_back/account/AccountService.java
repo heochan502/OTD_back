@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -17,10 +18,17 @@ public class AccountService {
 
     private final AccountMapper accountMapper;
 
-    public int join(AccountJoinReq req)
-    {
+    public int join(AccountJoinReq req) {
         String hashedPw = BCrypt.hashpw(req.getMemberPw(), BCrypt.gensalt());
-        AccountJoinReq changedReq = new AccountJoinReq(req.getMemberId(),hashedPw,req.getEmail(),req.getName(),req.getBirthDate(),req.getMemberNick());
+        AccountJoinReq changedReq = new AccountJoinReq(
+                req.getMemberId(),
+                hashedPw,
+                req.getEmail(),
+                req.getName(),
+                req.getBirthDate(),
+                req.getMemberNick(),
+                req.getGender()
+        );
         log.info(" changed2  : {}" ,req.getMemberId());
         return accountMapper.save(changedReq);
     }
@@ -65,18 +73,55 @@ public class AccountService {
         return accountMapper.existsByMemberNick(memberNick) > 0;
     }
     public int changePassword(int memberNoLogin, PasswordChangeDto dto) {
-        String currentHashedPw = accountMapper.findPasswordByMemberNo(memberNoLogin);
+        try {
+            log.info("=== 비밀번호 변경 시작 ===");
+            log.info("memberNoLogin: {}", memberNoLogin);
+            log.info("입력받은 현재 비밀번호: '{}'", dto.getCurrentPassword());
+            log.info("입력받은 새 비밀번호: '{}'", dto.getNewPassword());
 
-        if (currentHashedPw == null) {
+            String currentHashedPw = accountMapper.findPasswordByMemberNo(memberNoLogin);
+            log.info("DB에서 조회한 해시: '{}'", currentHashedPw);
+
+            if (currentHashedPw == null) {
+                log.warn("사용자를 찾을 수 없음");
+                return 0;
+            }
+
+
+            log.info("BCrypt 검증 시작...");
+            boolean passwordMatch = BCrypt.checkpw(dto.getCurrentPassword(), currentHashedPw);
+            log.info("BCrypt.checkpw('{}', '{}') = {}",
+                    dto.getCurrentPassword(), currentHashedPw, passwordMatch);
+
+
+            log.info("=== 추가 테스트 ===");
+            log.info("입력 비밀번호 길이: {}", dto.getCurrentPassword().length());
+            log.info("해시 길이: {}", currentHashedPw.length());
+
+            if (!passwordMatch) {
+                log.warn("현재 비밀번호 불일치");
+                return -1;
+            }
+
+            String hashedNewPw = BCrypt.hashpw(dto.getNewPassword(), BCrypt.gensalt());
+            log.info("새 비밀번호 해시 생성 완료");
+
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("memberNoLogin", memberNoLogin);
+            params.put("newPassword", hashedNewPw);
+
+            log.info("DB 업데이트 시작...");
+            int result = accountMapper.updatePassword(params);
+            log.info("업데이트 결과: {}", result);
+
+            return result;
+
+        } catch (Exception e) {
+            log.error("비밀번호 변경 중 오류 발생", e);
             return 0;
         }
-        if (!BCrypt.checkpw(dto.getCurrentPassword(), currentHashedPw)) {
-            return -1;
-        }
-        String hashedNewPw = BCrypt.hashpw(dto.getNewPassword(), BCrypt.gensalt());
-        return accountMapper.updatePassword(memberNoLogin, hashedNewPw);
     }
-
 
     @Transactional
     public int deleteById(int memberNoLogin) {

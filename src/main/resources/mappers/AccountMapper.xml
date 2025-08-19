@@ -4,8 +4,8 @@
 
     <insert id="save" parameterType="com.otd.onetoday_back.account.model.AccountJoinReq">
 
-        INSERT INTO member (member_id,member_pw,email,name,birth_date,member_nick)
-        values (#{memberId},#{memberPw},#{email},#{name},#{birthDate}, #{memberNick})
+        INSERT INTO member (member_id,member_pw,email,name,birth_date,member_nick,gender)
+        values (#{memberId},#{memberPw},#{email},#{name},#{birthDate},#{memberNick},#{gender})
     </insert>
     <select id="findByLogin" parameterType="com.otd.onetoday_back.account.model.AccountLoginReq" resultType="com.otd.onetoday_back.account.model.AccountLoginRes">
         SELECT member_no_login AS memberNoLogin, member_pw AS memberPw
@@ -20,7 +20,8 @@
         email,
         name,
         birth_date AS birthDate,
-        member_nick AS memberNick
+        member_nick AS memberNick,
+        gender
         FROM member
         WHERE member_no_login = #{memberNoLogin}
     </select>
@@ -32,7 +33,8 @@
         name = #{name},
         birth_date = #{birthDate},
         member_nick = #{memberNick},
-        member_img = #{memberImg}
+        member_img = #{memberImg},
+        gender = #{gender}
         WHERE member_no_login = #{memberNoLogin}
     </update>
     <select id="existsByMemberId" parameterType="string" resultType="int">
@@ -53,7 +55,8 @@
         WHERE member_no_login = #{memberNoLogin}
     </select>
 
-    <update id="updatePassword" parameterType="map">
+
+    <update id="updatePassword">
         UPDATE member
         SET member_pw = #{newPassword}
         WHERE member_no_login = #{memberNoLogin}
