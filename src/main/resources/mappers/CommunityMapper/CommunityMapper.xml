@@ -5,7 +5,6 @@
 
 <mapper namespace="com.otd.onetoday_back.community.mapper.CommunityMapper">
 
-    <!-- ✅ resultMap: DTO와 DB 컬럼 매핑 -->
     <resultMap id="CommunityPostResMap" type="com.otd.onetoday_back.community.dto.CommunityPostRes">
         <id property="postId" column="post_id"/>
         <result property="memberNoLogin" column="member_no_login"/>
@@ -18,11 +17,11 @@
         <result property="viewCount" column="view_count"/>
         <result property="like" column="like"/>
         <result property="isDeleted" column="is_deleted"/>
-        <result property="commentCount" column="comment_count"/> <!-- 💬 댓글 수 -->
+        <result property="commentCount" column="comment_count"/>
     </resultMap>
 
     <!-- 게시글 저장 -->
-    <insert id="save" parameterType="com.otd.onetoday_back.community.domain.Community"
+    <insert id="save" parameterType="com.otd.onetoday_back.community.dto.CommunityPostReq"
             useGeneratedKeys="true" keyProperty="postId">
         INSERT INTO community_post (
         member_no_login, title, content, file_path,
@@ -30,15 +29,6 @@
         ) VALUES (
         #{memberNoLogin}, #{title}, #{content}, #{filePath},
         #{createdAt}, #{updatedAt}, #{viewCount}, #{like}
-        )
-    </insert>
-
-    <!-- 게시글 첨부파일 저장 -->
-    <insert id="saveFile" parameterType="com.otd.onetoday_back.community.domain.Community">
-        INSERT INTO community_postfile (
-        post_id, member_no_login, file_name, file_path, file_type, uploaded_at
-        ) VALUES (
-        #{postId}, #{memberNoLogin}, #{fileName}, #{filePath}, #{fileType}, #{uploadedAt}
         )
     </insert>
 
@@ -110,7 +100,7 @@
     </select>
 
     <!-- 게시글 수정 -->
-    <update id="modify" parameterType="com.otd.onetoday_back.community.domain.Community">
+    <update id="modify">
         UPDATE community_post
         SET title = #{title},
         content = #{content},
@@ -125,7 +115,7 @@
         WHERE post_id = #{postId}
     </update>
 
-    <!-- 단건 조회 (필요 시) -->
+    <!-- 단건 조회 -->
     <select id="findPostById" resultMap="CommunityPostResMap">
         SELECT *
         FROM community_post
@@ -163,7 +153,7 @@
         )
     </insert>
 
-    <!-- 댓글 목록 조회 (최신이 아래: ASC 정렬 권장 시 ASC로 변경 가능) -->
+    <!-- 댓글 목록 -->
     <select id="findCommentsByPostId" resultType="com.otd.onetoday_back.community.dto.MentRes">
         SELECT
         c.comment_id,
@@ -217,10 +207,17 @@
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <!-- 좋아요 업데이트 -->
+    <!-- 좋아요 수 업데이트 -->
     <update id="updateLikeCount">
         UPDATE community_post
         SET `like` = #{likeCount}
+        WHERE post_id = #{postId}
+    </update>
+
+    <!-- 대표이미지 경로 업데이트 (유지) -->
+    <update id="updatePostFilePath">
+        UPDATE community_post
+        SET file_path = #{filePath}, updated_at = NOW()
         WHERE post_id = #{postId}
     </update>
 
@@ -233,6 +230,14 @@
             AND (title LIKE CONCAT('%', #{searchText}, '%')
             OR content LIKE CONCAT('%', #{searchText}, '%'))
         </if>
+    </select>
+
+    <select id="findFilesByPostId"
+            resultType="com.otd.onetoday_back.community.domain.CommunityPostFile">
+        SELECT post_id, member_no_login, file_name, file_path, file_type, uploaded_at
+        FROM community_postfile
+        WHERE post_id = #{postId}
+        ORDER BY uploaded_at ASC
     </select>
 
 </mapper>

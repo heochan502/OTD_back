@@ -1,6 +1,8 @@
 constants:
   file:
-    directory : /home/download
+#    directory : /home/download
+    directory : C:/msaJAVA/healthcare/home/download
+
   # weather api
   feign-client:
     weather-api:

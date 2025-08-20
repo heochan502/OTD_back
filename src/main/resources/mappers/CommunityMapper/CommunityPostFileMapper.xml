@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.otd.onetoday_back.community.mapper.CommunityPostFileMapper">
+
+    <insert id="insert" parameterType="com.otd.onetoday_back.community.domain.CommunityPostFile">
+        INSERT INTO community_postfile
+        (post_id, member_no_login, file_name, file_path, file_type, uploaded_at)
+        VALUES
+        (#{postId}, #{memberNoLogin}, #{fileName}, #{filePath}, #{fileType}, #{uploadedAt})
+    </insert>
+
+    <select id="findByPostId" resultType="com.otd.onetoday_back.community.domain.CommunityPostFile">
+        SELECT post_id AS postId,
+        member_no_login AS memberNoLogin,
+        file_name AS fileName,
+        file_path AS filePath,
+        file_type AS fileType,
+        uploaded_at AS uploadedAt
+        FROM community_postfile
+        WHERE post_id = #{postId}
+        ORDER BY uploaded_at ASC
+    </select>
+
+    <delete id="deleteByPostId">
+        DELETE FROM community_postfile WHERE post_id = #{postId}
+    </delete>
+</mapper>
