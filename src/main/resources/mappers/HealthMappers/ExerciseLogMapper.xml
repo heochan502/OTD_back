@@ -15,21 +15,24 @@
         )
     </insert>
 
-    <!--    운동기록 상세 조회 -->
+    <!--    운동기록 목록 조회 -->
+    <select id="findByMemberId">
+        SELECT exerciselog_id, exercise_id, exercise_duration, exercise_kcal, effort_level, exercise_datetime
+        FROM exerciselog
+        WHERE member_no = #{memberId}
+        ORDER BY exercise_datetime DESC
+<!--       <if test="startIdx != null and size != null">-->
+<!--        LIMIT #{startIdx}, #{size}-->
+<!--       </if>-->
+
+    </select>
+
+    <!-- 운동기록 상세 조회 -->
     <select id="findByExerciselogId">
         SELECT exerciselog_id, exercise_id, exercise_duration, exercise_kcal, effort_level, exercise_datetime
         FROM exerciselog
         WHERE exerciselog_id = #{exerciselogId}
         AND member_no = #{memberId}
-    </select>
-
-    <!-- 운동기록 목록 조회 -->
-    <select id="findAllByMemberIdOrderByExerciseDatetimeDesc" >
-        SELECT exerciselog_id, exercise_id, exercise_duration, exercise_kcal, effort_level, exercise_datetime
-        FROM exerciselog
-        WHERE member_no = #{memberId}
-        ORDER BY exercise_datetime DESC
-        LIMIT #{startIdx}, #{size}
 
     </select>
 
@@ -40,16 +43,16 @@
     </select>
 
     <!--    운동 목록 수정 -->
-    <update id="modifyByExerciselogId">
-        UPDATE exerciselog
-        SET exercise_id = #{exerciseId}
-        , exercise_datetime = #{exerciseDatetime}
-        , exercise_kcal = #{exerciseKcal}
-        , exercise_duration = #{exerciseDuration}
-        , effort_level = #{effortLevel}
-        WHERE exerciselog_id = #{exerciselogId}
-        AND member_no = #{memberId}
-    </update>
+<!--    <update id="modifyByExerciselogId">-->
+<!--        UPDATE exerciselog-->
+<!--        SET exercise_id = #{exerciseId}-->
+<!--        , exercise_datetime = #{exerciseDatetime}-->
+<!--        , exercise_kcal = #{exerciseKcal}-->
+<!--        , exercise_duration = #{exerciseDuration}-->
+<!--        , effort_level = #{effortLevel}-->
+<!--        WHERE exerciselog_id = #{exerciselogId}-->
+<!--        AND member_no = #{memberId}-->
+<!--    </update>-->
 
     <!--    운동기록삭제-->
     <delete id="deleteByExerciselogId">

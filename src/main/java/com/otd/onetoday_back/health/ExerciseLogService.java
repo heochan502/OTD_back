@@ -34,27 +34,31 @@ public class ExerciseLogService {
     }
 
 //    운동기록 목록조회
-    public List<GetExerciseLogRes> getExerciseLogList(GetExerciseLogDto dto) {
-        return exerciseLogMapper.findAllByMemberIdOrderByExerciseDatetimeDesc(dto);
+    public List<GetExerciseLogRes> getExerciseLogList(int memberId) {
+        return exerciseLogMapper.findByMemberId(memberId);
     }
+//    수정중
+//    public List<GetExerciseLogRes> getExerciseLogList(GetExerciseLogDto dto) {
+//        return exerciseLogMapper.findByMemberId(dto);
+//    }
 
 //    운동종목
     public List<GetExerciseRes> findAllExercise() {
         return exerciseLogMapper.findAllByExercise();
     }
-//    운동기록 수정
-    public int modifyByExerciselogId(PutExerciseLogReq req, int logginedMemberId) {
-        PutExerciseLogDto putExerciseLogDto = PutExerciseLogDto.builder()
-                .exerciselogId(req.getExerciseId())
-                .exerciseId(req.getExerciseId())
-                .exerciseKcal(req.getExerciseKcal())
-                .exerciseDatetime(req.getExerciseDatetime())
-                .exerciseDuration(req.getExerciseDuration())
-                .effortLevel(req.getEffortLevel())
-                .memberId(logginedMemberId)
-                .build();
-        return exerciseLogMapper.modifyByExerciselogId(putExerciseLogDto);
-    }
+////    운동기록 수정
+//    public int modifyByExerciselogId(PutExerciseLogReq req, int logginedMemberId) {
+//        PutExerciseLogDto putExerciseLogDto = PutExerciseLogDto.builder()
+//                .exerciselogId(req.getExerciseId())
+//                .exerciseId(req.getExerciseId())
+//                .exerciseKcal(req.getExerciseKcal())
+//                .exerciseDatetime(req.getExerciseDatetime())
+//                .exerciseDuration(req.getExerciseDuration())
+//                .effortLevel(req.getEffortLevel())
+//                .memberId(logginedMemberId)
+//                .build();
+//        return exerciseLogMapper.modifyByExerciselogId(putExerciseLogDto);
+//    }
 
 //    운동기록 삭제
     public int deleteByExerciselogId(GetExerciseLogDetailReq req) {

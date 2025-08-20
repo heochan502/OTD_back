@@ -45,19 +45,29 @@ public class ExerciseLogController {
     }
 
 //    운동기록 목록조회
-    @GetMapping("/elog")
-    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetExerciseLogReq req) {
-        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+//    @GetMapping("/elog")
+//    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetExerciseLogReq req) {
+//        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+//
+//        GetExerciseLogDto getExerciseLogDto = GetExerciseLogDto.builder()
+//                .memberId(logginedMemberId)
+//                .size(req.getRowPerPage())
+////                .size(SIZE)
+//                .startIdx((req.getPage()-1) * req.getRowPerPage())
+////                .startIdx(START_INDEX)
+//                .build();
+//        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(getExerciseLogDto);
+//        log.info("resultSize:{}", result.size());
+//        return ResponseEntity.ok(result);
+//    }
 
-        GetExerciseLogDto getExerciseLogDto = GetExerciseLogDto.builder()
-                .memberId(logginedMemberId)
-                .size(req.getRowPerPage())
-                .startIdx((req.getPage()-1) * req.getRowPerPage())
-                .build();
-        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(getExerciseLogDto);
-        log.info("운동기록dto:{}", getExerciseLogDto);
+    @GetMapping("/elog")
+    public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
+        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(logginedMemberId);
         return ResponseEntity.ok(result);
     }
+
 
 //    운동종목
     @GetMapping
@@ -68,14 +78,14 @@ public class ExerciseLogController {
 
 
 //    운동기록 수정
-    @PutMapping("/elog")
-    public ResponseEntity<?> update(HttpServletRequest httpReq, @RequestBody PutExerciseLogReq req) {
-        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        log.info("req:{}", req);
-        int result = exerciseLogService.modifyByExerciselogId(req, logginedMemberId);
-        log.info("result:{}", result);
-        return ResponseEntity.ok(result);
-    }
+//    @PutMapping("/elog")
+//    public ResponseEntity<?> update(HttpServletRequest httpReq, @RequestBody PutExerciseLogReq req) {
+//        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+//        log.info("req:{}", req);
+//        int result = exerciseLogService.modifyByExerciselogId(req, logginedMemberId);
+//        log.info("result:{}", result);
+//        return ResponseEntity.ok(result);
+//    }
 
 //    운동기록 삭제
     @DeleteMapping("/elog")
