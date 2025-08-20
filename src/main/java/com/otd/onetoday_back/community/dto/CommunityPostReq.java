@@ -18,5 +18,5 @@ public class CommunityPostReq {
     private LocalDateTime updatedAt;
     private int viewCount;
     private int like;
-    private MultipartFile file;
+    private org.springframework.web.multipart.MultipartFile[] files;
 }

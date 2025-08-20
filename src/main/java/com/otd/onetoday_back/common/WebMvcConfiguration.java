@@ -20,24 +20,33 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private final String uploadPath;
 
     public WebMvcConfiguration(@Value("${constants.file.directory}") String uploadPath) {
+        if (uploadPath.endsWith("/") || uploadPath.endsWith("\\")) {
+            uploadPath = uploadPath.substring(0, uploadPath.length() - 1);
+        }
         this.uploadPath = uploadPath;
-        log.info("Upload Path: {}", uploadPath);
+        log.info("[WebMvcConfiguration] Upload Base Path = {}", this.uploadPath);
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/pic/**")
-                .addResourceLocations("file:" + uploadPath);
+        // 커뮤니티 첨부 이미지: /files/community/** → {uploadPath}/community/**
+        //   (FileStorageService가 {uploadPath}/community/{postId}/{uuid.ext}로 저장한다고 가정)
+        registry.addResourceHandler("/files/community/**")
+                .addResourceLocations("file:" + uploadPath + "/community/");
 
+        // 기존 일기 탭 등에서 쓰던 경로 유지: /pic/** → {uploadPath}/
+        registry.addResourceHandler("/pic/**")
+                .addResourceLocations("file:" + uploadPath + "/");
+
+        //  더 구체적인 패턴(/files/**, /pic/**)이 우선 매칭되므로 충돌 없음
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver() {
                     @Override
-                    protected Resource getResource(String resourcecPath, Resource location) throws IOException {
-                        Resource resource = location.createRelative(resourcecPath);
-
-                        if(resource.exists() && resource.isReadable()) {
+                    protected Resource getResource(String resourcePath, Resource location) throws IOException {
+                        Resource resource = location.createRelative(resourcePath);
+                        if (resource.exists() && resource.isReadable()) {
                             return resource;
                         }
                         return new ClassPathResource("/static/index.html");
@@ -45,14 +54,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 });
     }
 
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("*");
     }
-
-
-
 }

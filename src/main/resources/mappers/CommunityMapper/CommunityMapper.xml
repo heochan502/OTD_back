@@ -5,7 +5,6 @@
 
 <mapper namespace="com.otd.onetoday_back.community.mapper.CommunityMapper">
 
-    <!-- ✅ resultMap -->
     <resultMap id="CommunityPostResMap" type="com.otd.onetoday_back.community.dto.CommunityPostRes">
         <id property="postId" column="post_id"/>
         <result property="memberNoLogin" column="member_no_login"/>
@@ -18,10 +17,11 @@
         <result property="viewCount" column="view_count"/>
         <result property="like" column="like"/>
         <result property="isDeleted" column="is_deleted"/>
+        <result property="commentCount" column="comment_count"/>
     </resultMap>
 
     <!-- 게시글 저장 -->
-    <insert id="save" parameterType="com.otd.onetoday_back.community.domain.Community"
+    <insert id="save" parameterType="com.otd.onetoday_back.community.dto.CommunityPostReq"
             useGeneratedKeys="true" keyProperty="postId">
         INSERT INTO community_post (
         member_no_login, title, content, file_path,
@@ -29,15 +29,6 @@
         ) VALUES (
         #{memberNoLogin}, #{title}, #{content}, #{filePath},
         #{createdAt}, #{updatedAt}, #{viewCount}, #{like}
-        )
-    </insert>
-
-    <!-- 게시글 첨부파일 저장 -->
-    <insert id="saveFile"  parameterType="com.otd.onetoday_back.community.domain.Community">
-        INSERT INTO community_postfile (
-        post_id, member_no_login, file_name, file_path, file_type, uploaded_at
-        ) VALUES (
-        #{postId}, #{memberNoLogin}, #{fileName}, #{filePath}, #{fileType}, #{uploadedAt}
         )
     </insert>
 
@@ -60,9 +51,14 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
-        JOIN member m ON p.member_no_login = m.member_no_login
+        LEFT JOIN member m ON p.member_no_login = m.member_no_login
         <where>
             <if test="searchText != null and searchText != ''">
                 (p.title LIKE CONCAT('%', #{searchText}, '%')
@@ -91,16 +87,24 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
-        JOIN member m ON p.member_no_login = m.member_no_login
+        LEFT JOIN member m ON p.member_no_login = m.member_no_login
         WHERE p.post_id = #{postId}
+        LIMIT 1
     </select>
 
     <!-- 게시글 수정 -->
-    <update id="modify" parameterType="com.otd.onetoday_back.community.domain.Community">
+    <update id="modify">
         UPDATE community_post
-        SET title = #{title}, content = #{content}, updated_at = #{updatedAt}
+        SET title = #{title},
+        content = #{content},
+        updated_at = #{updatedAt}
         WHERE post_id = #{postId}
     </update>
 
@@ -111,9 +115,11 @@
         WHERE post_id = #{postId}
     </update>
 
-    <!-- 단건 조회 (사용 안 할 가능성 높음) -->
+    <!-- 단건 조회 -->
     <select id="findPostById" resultMap="CommunityPostResMap">
-        SELECT * FROM community_post WHERE post_id = #{postId}
+        SELECT *
+        FROM community_post
+        WHERE post_id = #{postId}
     </select>
 
     <!-- 삭제 안 된 게시글 목록 -->
@@ -127,7 +133,12 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
         WHERE p.is_deleted = FALSE
         ORDER BY p.created_at DESC
@@ -142,7 +153,7 @@
         )
     </insert>
 
-    <!-- 댓글 목록 조회 -->
+    <!-- 댓글 목록 -->
     <select id="findCommentsByPostId" resultType="com.otd.onetoday_back.community.dto.MentRes">
         SELECT
         c.comment_id,
@@ -153,9 +164,9 @@
         c.content,
         c.updated_at
         FROM community_comment c
-        JOIN member m ON c.member_no_login = m.member_no_login
+        LEFT JOIN member m ON c.member_no_login = m.member_no_login
         WHERE c.post_id = #{postId}
-        ORDER BY c.updated_at ASC
+        ORDER BY c.updated_at DESC
     </select>
 
     <!-- 페이징 포함 목록 -->
@@ -177,33 +188,56 @@
         p.created_at,
         p.view_count,
         p.`like`,
-        p.is_deleted
+        p.is_deleted,
+        (
+        SELECT COUNT(*)
+        FROM community_comment c
+        WHERE c.post_id = p.post_id
+        ) AS comment_count
         FROM community_post p
-        JOIN member m ON p.member_no_login = m.member_no_login
+        LEFT JOIN member m ON p.member_no_login = m.member_no_login
         <where>
             p.is_deleted = FALSE
             <if test="searchText != null and searchText != ''">
-                AND (p.title LIKE CONCAT('%', #{searchText}, '%') OR p.content LIKE CONCAT('%', #{searchText}, '%'))
+                AND (p.title LIKE CONCAT('%', #{searchText}, '%')
+                OR p.content LIKE CONCAT('%', #{searchText}, '%'))
             </if>
         </where>
         ORDER BY p.post_id DESC
         LIMIT #{size} OFFSET #{offset}
     </select>
 
-    <!-- 좋아요 업데이트 -->
+    <!-- 좋아요 수 업데이트 -->
     <update id="updateLikeCount">
         UPDATE community_post
         SET `like` = #{likeCount}
         WHERE post_id = #{postId}
     </update>
 
+    <!-- 대표이미지 경로 업데이트 (유지) -->
+    <update id="updatePostFilePath">
+        UPDATE community_post
+        SET file_path = #{filePath}, updated_at = NOW()
+        WHERE post_id = #{postId}
+    </update>
+
     <!-- 총 개수 -->
     <select id="countAll" resultType="int">
-        SELECT COUNT(*) FROM community_post
+        SELECT COUNT(*)
+        FROM community_post
         WHERE is_deleted = FALSE
         <if test="searchText != null and searchText != ''">
-            AND (title LIKE CONCAT('%', #{searchText}, '%') OR content LIKE CONCAT('%', #{searchText}, '%'))
+            AND (title LIKE CONCAT('%', #{searchText}, '%')
+            OR content LIKE CONCAT('%', #{searchText}, '%'))
         </if>
+    </select>
+
+    <select id="findFilesByPostId"
+            resultType="com.otd.onetoday_back.community.domain.CommunityPostFile">
+        SELECT post_id, member_no_login, file_name, file_path, file_type, uploaded_at
+        FROM community_postfile
+        WHERE post_id = #{postId}
+        ORDER BY uploaded_at ASC
     </select>
 
 </mapper>
