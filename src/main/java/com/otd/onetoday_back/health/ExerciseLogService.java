@@ -66,4 +66,9 @@ public class ExerciseLogService {
         return exerciseLogMapper.deleteByExerciselogId(req);
     }
 
+//    운동기록 달력
+    public List<ExerciseLogCalendarGetRes> getExerciseLogDate(ExerciseLogCalendarGetReq req) {
+        return exerciseLogMapper.findAllByExerciseDatetime(req);
+    }
+
 }

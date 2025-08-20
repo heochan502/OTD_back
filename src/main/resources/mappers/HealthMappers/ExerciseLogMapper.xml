@@ -16,15 +16,23 @@
     </insert>
 
     <!--    운동기록 목록 조회 -->
-    <select id="findByMemberId">
-        SELECT exerciselog_id, exercise_id, exercise_duration, exercise_kcal, effort_level, exercise_datetime
-        FROM exerciselog
-        WHERE member_no = #{memberId}
-        ORDER BY exercise_datetime DESC
-<!--       <if test="startIdx != null and size != null">-->
-<!--        LIMIT #{startIdx}, #{size}-->
-<!--       </if>-->
+<!--    <select id="findByMemberId">-->
+<!--        SELECT exerciselog_id, exercise_id, exercise_duration, exercise_kcal, effort_level, exercise_datetime-->
+<!--        FROM exerciselog-->
+<!--        WHERE member_no = #{memberId}-->
+<!--        ORDER BY exercise_datetime DESC-->
+<!--&lt;!&ndash;       <if test="startIdx != null and size != null">&ndash;&gt;-->
+<!--&lt;!&ndash;        LIMIT #{startIdx}, #{size}&ndash;&gt;-->
+<!--&lt;!&ndash;       </if>&ndash;&gt;-->
 
+<!--    </select>-->
+
+<!--    운동기록 달력 -->
+    <select id="findAllByExerciseDatetime">
+        SELECT exercise_datetime
+        FROM exerciselog
+        WHERE exercise_datetime
+        BETWEEN #{start} AND #{end}
     </select>
 
     <!-- 운동기록 상세 조회 -->
