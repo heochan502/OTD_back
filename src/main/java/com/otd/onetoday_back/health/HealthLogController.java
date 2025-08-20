@@ -3,10 +3,7 @@ package com.otd.onetoday_back.health;
 
 import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.util.HttpUtils;
-import com.otd.onetoday_back.health.model.GetHealthLogDetailReq;
-import com.otd.onetoday_back.health.model.GetHealthLogDetailRes;
-import com.otd.onetoday_back.health.model.GetHealthLogRes;
-import com.otd.onetoday_back.health.model.PostHealthLogReq;
+import com.otd.onetoday_back.health.model.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +47,22 @@ public class HealthLogController {
         List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(logginedMemberId);
         return ResponseEntity.ok(result);
     }
+
+    //    건강기록 달력 날짜
+    @GetMapping("calendar")
+    public ResponseEntity<?> getHealthlogCalendar(HttpServletRequest httpReq, @ModelAttribute HealthLogCalendarGetReq req) {
+        log.info("req:{}", req);
+        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        CalendarDto dto = CalendarDto.builder()
+                .memberId(logginedMemberId)
+                .start(req.getStart())
+                .end(req.getEnd())
+                .build();
+        List<HealthLogCalendarGetRes> result = healthLogService.getHealthLogDate(dto);
+        log.info("result:{}", result);
+        return ResponseEntity.ok(result);
+    }
+
 
 //    건강기록 삭제
     @DeleteMapping

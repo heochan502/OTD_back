@@ -1,9 +1,6 @@
 package com.otd.onetoday_back.health;
 
-import com.otd.onetoday_back.health.model.GetHealthLogDetailReq;
-import com.otd.onetoday_back.health.model.GetHealthLogDetailRes;
-import com.otd.onetoday_back.health.model.GetHealthLogRes;
-import com.otd.onetoday_back.health.model.PostHealthLogDto;
+import com.otd.onetoday_back.health.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -14,4 +11,8 @@ int saveHealthLog(PostHealthLogDto dto);
 GetHealthLogDetailRes findByHealthlogId(GetHealthLogDetailReq req);
 List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(int memberNo);
 int deleteByHealthlogId(GetHealthLogDetailReq req);
+
+// 건강기록 달력용 날짜
+    List<HealthLogCalendarGetRes> findAllByHealthLogDatetime(CalendarDto dto);
+
 }

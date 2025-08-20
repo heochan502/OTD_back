@@ -41,6 +41,11 @@ public class HealthLogService {
 
     }
 
+//    건강기록 달력 날짜
+    public List<HealthLogCalendarGetRes> getHealthLogDate(CalendarDto dto) {
+        return healthLogMapper.findAllByHealthLogDatetime(dto);
+    }
+
 //    건강기록 삭제
     public int deleteByHealthlogId(GetHealthLogDetailReq req) {
         return healthLogMapper.deleteByHealthlogId(req);

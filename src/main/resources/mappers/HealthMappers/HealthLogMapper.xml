@@ -32,6 +32,14 @@
         ORDER BY healthlog_datetime DESC
     </select>
 
+<!--    건강기록 달력 날짜 -->
+    <select id="findAllByHealthLogDatetime">
+        SELECT healthlog_datetime
+        FROM healthlog
+        WHERE member_no = #{memberId}
+        AND healthlog_datetime BETWEEN #{start} AND #{end}
+    </select>
+
     <!--    건강기록 삭제-->
     <delete id="deleteByHealthlogId">
         DELETE FROM healthlog

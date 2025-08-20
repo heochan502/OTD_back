@@ -61,18 +61,19 @@ public class ExerciseLogController {
 //        return ResponseEntity.ok(result);
 //    }
 
-//    @GetMapping("/elog")
-//    public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
-//        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-//        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(logginedMemberId);
-//        return ResponseEntity.ok(result);
-//    }
+    @GetMapping("/elog")
+    public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
+        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(logginedMemberId);
+        return ResponseEntity.ok(result);
+    }
 
 // 달력(년, 월)
 @GetMapping("/elog/calendar")
-public ResponseEntity<?> getCalendar(@ModelAttribute ExerciseLogCalendarGetReq req) {
-    log.info("req:{}", req);
-    List<ExerciseLogCalendarGetRes> result = exerciseLogService.getExerciseLogDate(req);
+public ResponseEntity<?> getEexerciselogCalendar(HttpServletRequest httpReq, @ModelAttribute ExerciseLogCalendarGetReq req) {
+    int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+
+    List<ExerciseLogCalendarGetRes> result = exerciseLogService.getExerciseLogDate(logginedMemberId, req);
     log.info("result:{}", result);
     return ResponseEntity.ok(result);
 }

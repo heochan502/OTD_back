@@ -16,5 +16,5 @@ public interface ExerciseLogMapper {
     List<GetExerciseRes> findAllByExercise();
 //    int modifyByExerciselogId(PutExerciseLogDto dto);
     int deleteByExerciselogId(GetExerciseLogDetailReq req);
-    List<ExerciseLogCalendarGetRes> findAllByExerciseDatetime(ExerciseLogCalendarGetReq req);
+    List<ExerciseLogCalendarGetRes> findAllByExerciseDatetime(CalendarDto dto);
 }
