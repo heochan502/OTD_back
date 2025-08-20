@@ -1,9 +1,6 @@
 package com.otd.onetoday_back.health;
 
-import com.otd.onetoday_back.health.model.GetHealthLogDetailReq;
-import com.otd.onetoday_back.health.model.GetHealthLogDetailRes;
-import com.otd.onetoday_back.health.model.GetHealthLogRes;
-import com.otd.onetoday_back.health.model.PostHealthLogDto;
+import com.otd.onetoday_back.health.model.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -12,6 +9,6 @@ import java.util.List;
 public interface HealthLogMapper {
 int saveHealthLog(PostHealthLogDto dto);
 GetHealthLogDetailRes findByHealthlogId(GetHealthLogDetailReq req);
-List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(int memberNo);
+List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(GetHealthLogReq req);
 int deleteByHealthlogId(GetHealthLogDetailReq req);
 }

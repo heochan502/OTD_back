@@ -44,11 +44,11 @@ public class HealthLogController {
     @GetMapping
     public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetHealthLogReq req ) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-
+        req.setMemberId(logginedMemberId);
        log.info("여기여기여기여기"+logginedMemberId + "데이터 " + req);
 
-//        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(logginedMemberId);
-        return ResponseEntity.ok(null);
+        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(req);
+        return ResponseEntity.ok(result);
     }
 
 //    건강기록 삭제
