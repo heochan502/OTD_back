@@ -40,7 +40,7 @@ public class HealthLogController {
         return ResponseEntity.ok(result);
     }
 
-    //    건강기록 목록조회
+    //  건강기록 목록조회
     @GetMapping
     public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetHealthLogReq req ) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
