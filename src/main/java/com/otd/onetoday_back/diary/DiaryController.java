@@ -27,7 +27,7 @@ public class DiaryController {
 
     private final DiaryService diaryService;
 
-    private final String uploadDir = "/home/download";
+    private final String uploadDir = "D://BOK/upload/diary";
 
     private int getLoginMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);

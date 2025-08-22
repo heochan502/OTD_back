@@ -19,7 +19,7 @@ public class DiaryService {
 
     private final DiaryMapper diaryMapper;
 
-    private final String uploadDir = "/home/download";
+    private final String uploadDir = "D://BOK/upload/diary";
 
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
