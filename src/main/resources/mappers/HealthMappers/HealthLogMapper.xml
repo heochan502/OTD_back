@@ -24,12 +24,23 @@
         AND member_no = #{memberId}
     </select>
 
-    <!--    건강기록 목록 조회-->
+    <!--    건강기록 조회-->
     <select id="findAllByMemberIdOrderByhealthlogDatetimeDesc">
         SELECT *
         FROM healthlog
         WHERE member_no = #{memberId} AND healthlog_datetime BETWEEN #{startDate} AND #{endDate}
         ORDER BY healthlog_datetime DESC
+    </select>
+
+<!--    건강기록 리스트 조회 -->
+    <select id="findByLimitTo">
+    SELECT healthlog_datetime
+    FROM healthlog
+    WHERE member_no = #{memberId}
+    ORDER BY healthlog_datetime DESC
+    <if test="startIdx != null and size != null">
+        LIMIT #{startIdx}, #{size}
+    </if>
     </select>
 
 <!--    건강기록 달력 날짜 -->
@@ -39,6 +50,8 @@
         WHERE member_no = #{memberId}
         AND healthlog_datetime BETWEEN #{start} AND #{end}
     </select>
+
+
 
     <!--    건강기록 삭제-->
     <delete id="deleteByHealthlogId">

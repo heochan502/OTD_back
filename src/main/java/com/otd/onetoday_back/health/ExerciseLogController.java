@@ -3,7 +3,6 @@ package com.otd.onetoday_back.health;
 import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.util.HttpUtils;
 import com.otd.onetoday_back.health.model.*;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,7 @@ import java.util.List;
 @RequestMapping("/api/OTD/health")
 public class ExerciseLogController {
     private final ExerciseLogService exerciseLogService;
-    private final int SIZE = 7;
-    private final int START_INDEX = 0;
+
 
     //    운동기록 생성
     @PostMapping("/elog")
@@ -44,27 +42,22 @@ public class ExerciseLogController {
     return ResponseEntity.ok(result);
     }
 
-//    운동기록 목록조회
-//    @GetMapping("/elog")
-//    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetExerciseLogReq req) {
-//        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-//
-//        GetExerciseLogDto getExerciseLogDto = GetExerciseLogDto.builder()
-//                .memberId(logginedMemberId)
-//                .size(req.getRowPerPage())
-////                .size(SIZE)
-//                .startIdx((req.getPage()-1) * req.getRowPerPage())
-////                .startIdx(START_INDEX)
-//                .build();
-//        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(getExerciseLogDto);
-//        log.info("resultSize:{}", result.size());
-//        return ResponseEntity.ok(result);
-//    }
 
+//  운동기록 조회
     @GetMapping("/elog")
     public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(logginedMemberId);
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogAll(logginedMemberId);
+        return ResponseEntity.ok(result);
+    }
+
+    // 페이징
+    @GetMapping("/elog/list")
+    public ResponseEntity<?> getExerciseLogList(HttpServletRequest httpReq, @ModelAttribute GetExerciseLogReq req) {
+        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        log.info("req:{}", req);
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(logginedMemberId, req);
+        log.info("exerciseLogList_result:{}", result);
         return ResponseEntity.ok(result);
     }
 
@@ -78,7 +71,6 @@ public ResponseEntity<?> getEexerciselogCalendar(HttpServletRequest httpReq, @Mo
     return ResponseEntity.ok(result);
 }
 
-//    페이징따로
 
 //    운동종목
     @GetMapping

@@ -34,19 +34,29 @@ public class ExerciseLogService {
     }
 
 //    운동기록 목록조회
-    public List<GetExerciseLogRes> getExerciseLogList(int memberId) {
+    public List<GetExerciseLogRes> getExerciseLogAll(int memberId) {
         return exerciseLogMapper.findByMemberId(memberId);
     }
-//    수정중
-//    public List<GetExerciseLogRes> getExerciseLogList(GetExerciseLogDto dto) {
-//        return exerciseLogMapper.findByMemberId(dto);
-//    }
+
+//    페이징
+    public List<GetExerciseLogRes> getExerciseLogList(int memberId, GetExerciseLogReq req) {
+        GetExerciseLogDto dto = GetExerciseLogDto.builder()
+                .memberId(memberId)
+                .size(req.getRowPerPage())
+                .startIdx((req.getPage()-1) * req.getRowPerPage())
+                .build();
+
+        return exerciseLogMapper.findByLimitTo(dto);
+
+
+    }
 
 //    운동종목
     public List<GetExerciseRes> findAllExercise() {
         return exerciseLogMapper.findAllByExercise();
     }
-////    운동기록 수정
+
+    ////    운동기록 수정
 //    public int modifyByExerciselogId(PutExerciseLogReq req, int logginedMemberId) {
 //        PutExerciseLogDto putExerciseLogDto = PutExerciseLogDto.builder()
 //                .exerciselogId(req.getExerciseId())

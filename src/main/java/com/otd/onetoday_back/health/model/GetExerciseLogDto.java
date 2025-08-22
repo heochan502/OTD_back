@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetExerciseLogDto {
-    private int startIdx;
-    private int size;
+    private Integer startIdx;
+    private Integer size;
     private int memberId;
 }
