@@ -18,7 +18,7 @@ public class ReminderGetRes {
     private String title;
     private String content;
     private String created;
-    private String date;
+    private String startDate;
     private boolean repeat;
     private boolean alarm;
     private List<Integer> repeatDow;
