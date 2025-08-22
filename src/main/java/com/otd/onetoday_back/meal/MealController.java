@@ -107,8 +107,7 @@ public class MealController {
     {
         Integer memberNoLogin = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         //들어오는 날짜 데이터 변조
-        log.info("foodInfo: {}", mealInfo);
-
+//        log.info("여기여기여기 foodInfo: {}", mealInfo);
 //        return ResponseEntity.ok(res);
         int result = mealService.modifyMeal( memberNoLogin,mealInfo);
         log.info("result: {}", result);

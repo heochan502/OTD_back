@@ -9,7 +9,7 @@ import java.util.List;
 public interface HealthLogMapper {
 int saveHealthLog(PostHealthLogDto dto);
 GetHealthLogDetailRes findByHealthlogId(GetHealthLogDetailReq req);
-List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(int memberNo);
+List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(GetHealthLogReq req);
 int deleteByHealthlogId(GetHealthLogDetailReq req);
 
 // 건강기록 달력용 날짜

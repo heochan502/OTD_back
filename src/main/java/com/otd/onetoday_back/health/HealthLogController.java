@@ -40,11 +40,14 @@ public class HealthLogController {
         return ResponseEntity.ok(result);
     }
 
-    //    건강기록 목록조회
+    //  건강기록 목록조회
     @GetMapping
-    public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
+    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetHealthLogReq req ) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(logginedMemberId);
+        req.setMemberId(logginedMemberId);
+       log.info("여기여기여기여기"+logginedMemberId + "데이터 " + req);
+
+        List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(req);
         return ResponseEntity.ok(result);
     }
 
