@@ -51,15 +51,11 @@ public class HealthLogController {
     //    건강기록 달력 날짜
     @GetMapping("calendar")
     public ResponseEntity<?> getHealthlogCalendar(HttpServletRequest httpReq, @ModelAttribute HealthLogCalendarGetReq req) {
-        log.info("req:{}", req);
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        CalendarDto dto = CalendarDto.builder()
-                .memberId(logginedMemberId)
-                .start(req.getStart())
-                .end(req.getEnd())
-                .build();
-        List<HealthLogCalendarGetRes> result = healthLogService.getHealthLogDate(dto);
+
+        List<HealthLogCalendarGetRes> result = healthLogService.getHealthLogDate(logginedMemberId, req);
         log.info("result:{}", result);
+
         return ResponseEntity.ok(result);
     }
 

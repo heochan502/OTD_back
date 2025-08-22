@@ -10,8 +10,6 @@ public interface ExerciseLogMapper {
     int saveExerciseLog(PostExerciseLogDto dto);  // 운동기록생성
     GetExerciseLogDetailRes findByExerciselogId(GetExerciseLogDetailReq req);  // 운동기록상세조회
     List<GetExerciseLogRes> findByMemberId(int memberId);
-//    수정중
-//    List<GetExerciseLogRes> findByMemberId(GetExerciseLogDto dto);
 
     List<GetExerciseRes> findAllByExercise();
 //    int modifyByExerciselogId(PutExerciseLogDto dto);

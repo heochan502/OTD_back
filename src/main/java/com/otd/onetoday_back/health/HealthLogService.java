@@ -42,7 +42,13 @@ public class HealthLogService {
     }
 
 //    건강기록 달력 날짜
-    public List<HealthLogCalendarGetRes> getHealthLogDate(CalendarDto dto) {
+    public List<HealthLogCalendarGetRes> getHealthLogDate(int memberId, HealthLogCalendarGetReq req) {
+        CalendarDto dto = CalendarDto.builder()
+                .memberId(memberId)
+                .start(req.getStart())
+                .end(req.getEnd())
+                .build();
+
         return healthLogMapper.findAllByHealthLogDatetime(dto);
     }
 
