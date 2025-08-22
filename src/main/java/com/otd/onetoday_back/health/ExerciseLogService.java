@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -69,7 +68,7 @@ public class ExerciseLogService {
 
 //    운동기록 달력
     public List<ExerciseLogCalendarGetRes> getExerciseLogDate(int memberId, ExerciseLogCalendarGetReq req) {
-        CalendarDto dto = CalendarDto.builder()
+        MonthRangeDto dto = MonthRangeDto.builder()
                 .memberId(memberId)
                 .start(req.getStart())
                 .end(req.getEnd())

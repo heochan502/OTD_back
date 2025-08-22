@@ -13,6 +13,6 @@ List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(GetHealthLog
 int deleteByHealthlogId(GetHealthLogDetailReq req);
 
 // 건강기록 달력용 날짜
-    List<HealthLogCalendarGetRes> findAllByHealthLogDatetime(CalendarDto dto);
+    List<HealthLogCalendarGetRes> findAllByHealthLogDatetime(MonthRangeDto dto);
 
 }

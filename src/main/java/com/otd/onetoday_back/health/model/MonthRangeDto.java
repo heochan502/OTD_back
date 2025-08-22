@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CalendarDto {
+public class MonthRangeDto {
     private int memberId;
     private String start;
     private String end;

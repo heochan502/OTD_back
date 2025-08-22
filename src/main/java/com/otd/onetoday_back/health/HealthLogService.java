@@ -43,7 +43,7 @@ public class HealthLogService {
 
 //    건강기록 달력 날짜
     public List<HealthLogCalendarGetRes> getHealthLogDate(int memberId, HealthLogCalendarGetReq req) {
-        CalendarDto dto = CalendarDto.builder()
+        MonthRangeDto dto = MonthRangeDto.builder()
                 .memberId(memberId)
                 .start(req.getStart())
                 .end(req.getEnd())
