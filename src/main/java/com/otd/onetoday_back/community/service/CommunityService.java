@@ -6,6 +6,7 @@ import com.otd.onetoday_back.community.domain.CommunityPostFile;
 import com.otd.onetoday_back.community.dto.CommunityListRes;
 import com.otd.onetoday_back.community.dto.CommunityPostReq;
 import com.otd.onetoday_back.community.dto.CommunityPostRes;
+import com.otd.onetoday_back.community.dto.PostFileDto;
 import com.otd.onetoday_back.community.mapper.CommunityLikeMapper;
 import com.otd.onetoday_back.community.mapper.CommunityMapper;
 import com.otd.onetoday_back.community.mapper.CommunityPostFileMapper;
@@ -17,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;   // [ADDED]
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -30,7 +31,9 @@ public class CommunityService {
     private final CommunityPostFileMapper postFileMapper;   // 첨부파일 전담 매퍼
     private final FileStorageService fileStorageService;
 
-    // 게시글 등록 (파일 포함)
+    /* =========================
+       게시글 등록 (파일 포함)
+       ========================= */
     @Transactional
     public void createPost(CommunityPostReq req) {
         req.setCreatedAt(LocalDateTime.now());
@@ -46,7 +49,7 @@ public class CommunityService {
 
         // 2) 파일 업로드 처리
         String firstFilePath = null;
-        MultipartFile[] files = req.getFiles(); // DTO: MultipartFile[] files
+        MultipartFile[] files = req.getFiles();
         log.info("createPost: upload files count={}", (files == null ? 0 : files.length));
 
         if (files != null) {
@@ -56,7 +59,7 @@ public class CommunityService {
                     // 2-1) 디스크 저장 → 정적 접근 경로 리턴
                     String urlPath = fileStorageService.savePostFile(postId, req.getMemberNoLogin(), mf);
 
-                    // 2-2) 파일 메타 DB 저장 (community_postfile)
+                    // 2-2) 파일 메타 DB 저장
                     CommunityPostFile meta = CommunityPostFile.builder()
                             .postId(postId)
                             .memberNoLogin(req.getMemberNoLogin())
@@ -66,7 +69,7 @@ public class CommunityService {
                             .uploadedAt(LocalDateTime.now())
                             .build();
 
-                    postFileMapper.insert(meta);
+                    postFileMapper.insert(meta); // useGeneratedKeys로 PK 세팅되는지 확인
 
                     if (firstFilePath == null) firstFilePath = urlPath;
                 } catch (IOException e) {
@@ -85,7 +88,9 @@ public class CommunityService {
         }
     }
 
-    // 게시글에 첨부파일 추가
+    /* =========================
+       게시글에 첨부파일 추가 (엔티티 반환 - 기존)
+       ========================= */
     @Transactional
     public List<CommunityPostFile> addPostFiles(int postId, int memberNoLogin, MultipartFile[] files) {
         if (files == null || files.length == 0) return List.of();
@@ -132,7 +137,18 @@ public class CommunityService {
         return saved;
     }
 
-    // 첨부파일 삭제
+    /* =========================
+       게시글에 첨부파일 추가 (DTO 반환 - 컨트롤러에서 사용)
+       ========================= */
+    @Transactional
+    public List<PostFileDto> addPostFilesDto(int postId, int memberNoLogin, MultipartFile[] files) {
+        List<CommunityPostFile> saved = addPostFiles(postId, memberNoLogin, files);
+        return saved.stream().map(this::toDto).toList();
+    }
+
+    /* =========================
+       첨부파일 삭제
+       ========================= */
     @Transactional
     public void deletePostFile(int fileId, int memberNoLogin) {
         CommunityPostFile file = postFileMapper.findById(fileId);
@@ -152,10 +168,13 @@ public class CommunityService {
             communityMapper.updatePostFilePath(post.getPostId(), newRep);
         }
 
+        // 물리 파일 삭제를 사용할 경우:
         // fileStorageService.deletePhysicalFile(file.getFilePath());
     }
 
-    // 좋아요 토글 및 반영
+    /* =========================
+       좋아요 토글 및 반영
+       ========================= */
     public void toggleLike(int postId, int memberNoLogin) {
         if (likeMapper.exists(postId, memberNoLogin) > 0) {
             likeMapper.unlike(postId, memberNoLogin);
@@ -211,9 +230,57 @@ public class CommunityService {
         return new CommunityListRes(posts, totalCount);
     }
 
-    // 게시물 한 개의 첨부 이미지 목록
+    /* =========================
+       첨부 이미지 목록 (엔티티)
+       ========================= */
     @Transactional(readOnly = true)
     public List<CommunityPostFile> getPostImages(int postId) {
-        return communityMapper.findFilesByPostId(postId); // 또는 postFileMapper.findByPostId(postId);
+        // 기존 communityMapper.findFilesByPostId(postId) 대신 파일 전담 매퍼 사용 권장
+        return postFileMapper.findByPostId(postId);
+    }
+
+    /* =========================
+       첨부 이미지 목록 (DTO) - 컨트롤러에서 사용
+       ========================= */
+    @Transactional(readOnly = true)
+    public List<PostFileDto> getPostFilesDto(int postId) {
+        List<CommunityPostFile> entities = postFileMapper.findByPostId(postId);
+        return entities.stream().map(this::toDto).toList();
+    }
+
+    /* =========================
+       매핑 유틸
+       ========================= */
+    private PostFileDto toDto(CommunityPostFile f) {
+        Integer id = extractFileId(f);
+        return PostFileDto.builder()
+                .fileId(id)
+                .filePath(f.getFilePath())
+                .fileName(f.getFileName()) // 컬럼/게터명이 originalName이면 변경
+                .build();
+    }
+
+    /**
+     * 엔티티의 PK 필드명이 구현마다 다를 수 있어 안전하게 추출
+     * - getFileId(), getPostFileId() 둘 다 시도
+     */
+    private Integer extractFileId(CommunityPostFile f) {
+        try {
+            // 가장 흔한 이름
+            var m1 = CommunityPostFile.class.getMethod("getFileId");
+            Object v1 = m1.invoke(f);
+            if (v1 instanceof Number) return ((Number) v1).intValue();
+        } catch (Exception ignore) {}
+
+        try {
+            // 대안: postFileId
+            var m2 = CommunityPostFile.class.getMethod("getPostFileId");
+            Object v2 = m2.invoke(f);
+            if (v2 instanceof Number) return ((Number) v2).intValue();
+        } catch (Exception ignore) {}
+
+        // 마지막 대안: 매퍼에서 useGeneratedKeys로 insert 후 id 필드 세팅 확인 필요
+        log.warn("CommunityPostFile PK를 찾지 못했습니다. 엔티티 PK 게터명을 확인하세요. entity={}", f);
+        return null;
     }
 }

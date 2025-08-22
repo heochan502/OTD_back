@@ -2,16 +2,16 @@ package com.otd.onetoday_back.community.controller;
 
 import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.util.HttpUtils;
-import com.otd.onetoday_back.community.domain.CommunityPostFile;
 import com.otd.onetoday_back.community.dto.CommunityListRes;
 import com.otd.onetoday_back.community.dto.CommunityPostReq;
 import com.otd.onetoday_back.community.dto.CommunityPostRes;
+import com.otd.onetoday_back.community.dto.PostFileDto;
 import com.otd.onetoday_back.community.service.CommunityService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType; // [ADD] 누락된 import
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +27,7 @@ public class CommunityController {
     private final CommunityService communityService;
 
     // 게시글 등록 (파일 포함)
-    @PostMapping(value = "/create", consumes = "multipart/form-data")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createPost(HttpServletRequest req,
                                         @ModelAttribute CommunityPostReq reqDto) {
         try {
@@ -102,14 +102,14 @@ public class CommunityController {
         return ResponseEntity.ok(res);
     }
 
-    // 게시물 한 개의 첨부 이미지 목록
+    // 게시물 한 개의 첨부 이미지 목록 (DTO로 반환)
     @GetMapping("/files/{postId}")
-    public ResponseEntity<List<CommunityPostFile>> getPostFiles(@PathVariable int postId) {
-        List<CommunityPostFile> files = communityService.getPostImages(postId);
+    public ResponseEntity<List<PostFileDto>> getPostFiles(@PathVariable int postId) {
+        List<PostFileDto> files = communityService.getPostFilesDto(postId);
         return ResponseEntity.ok(files);
     }
 
-    // 첨부 이미지 추가 업로드
+    // 첨부 이미지 추가 업로드 (DTO로 반환)
     @PostMapping(value = "/files/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addFiles(@PathVariable int postId,
                                       @RequestParam("files") MultipartFile[] files,
@@ -122,7 +122,7 @@ public class CommunityController {
             return ResponseEntity.badRequest().body("업로드할 파일이 없습니다.");
         }
         try {
-            List<CommunityPostFile> saved = communityService.addPostFiles(postId, loginId, files);
+            List<PostFileDto> saved = communityService.addPostFilesDto(postId, loginId, files);
             return ResponseEntity.status(HttpStatus.CREATED).body(saved);
         } catch (Exception e) {
             log.error("파일 추가 업로드 실패: postId={}, memberNo={}", postId, loginId, e);

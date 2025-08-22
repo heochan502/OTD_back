@@ -25,4 +25,15 @@
     <delete id="deleteByPostId">
         DELETE FROM community_postfile WHERE post_id = #{postId}
     </delete>
+
+    <select id="findDtoByPostId" resultType="com.otd.onetoday_back.community.dto.PostFileDto">
+        SELECT
+        post_file_id AS fileId,
+        file_path AS filePath,
+        file_name AS fileName
+        FROM community_postfile
+        WHERE post_id = #{postId}
+        ORDER BY uploaded_at ASC
+    </select>
+
 </mapper>
