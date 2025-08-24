@@ -34,7 +34,7 @@
 
 <!--    건강기록 리스트 조회 -->
     <select id="findByLimitTo">
-    SELECT healthlog_datetime
+    SELECT *
     FROM healthlog
     WHERE member_no = #{memberId}
     ORDER BY healthlog_datetime DESC

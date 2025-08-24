@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetExerciseLogDto {
+public class PagingDto {
     private Integer startIdx;
     private Integer size;
     private int memberId;

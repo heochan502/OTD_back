@@ -7,10 +7,11 @@ import java.util.List;
 
 @Mapper
 public interface HealthLogMapper {
-int saveHealthLog(PostHealthLogDto dto);
-GetHealthLogDetailRes findByHealthlogId(GetHealthLogDetailReq req);
-List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(GetHealthLogReq req);
-int deleteByHealthlogId(GetHealthLogDetailReq req);
+    int saveHealthLog(PostHealthLogDto dto);
+    GetHealthLogDetailRes findByHealthlogId(GetHealthLogDetailReq req);
+    List<GetHealthLogRes> findAllByMemberIdOrderByhealthlogDatetimeDesc(GetHealthLogReq req);
+    List<GetHealthLogRes> findByLimitTo(PagingDto dto);
+    int deleteByHealthlogId(GetHealthLogDetailReq req);
 
 // 건강기록 달력용 날짜
     List<HealthLogCalendarGetRes> findAllByHealthLogDatetime(MonthRangeDto dto);

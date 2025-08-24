@@ -39,8 +39,8 @@ public class ExerciseLogService {
     }
 
 //    페이징
-    public List<GetExerciseLogRes> getExerciseLogList(int memberId, GetExerciseLogReq req) {
-        GetExerciseLogDto dto = GetExerciseLogDto.builder()
+    public List<GetExerciseLogRes> getExerciseLogList(int memberId, PagingReq req) {
+        PagingDto dto = PagingDto.builder()
                 .memberId(memberId)
                 .size(req.getRowPerPage())
                 .startIdx((req.getPage()-1) * req.getRowPerPage())

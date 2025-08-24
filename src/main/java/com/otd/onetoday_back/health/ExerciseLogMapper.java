@@ -11,7 +11,7 @@ public interface ExerciseLogMapper {
     GetExerciseLogDetailRes findByExerciselogId(GetExerciseLogDetailReq req);  // 운동기록상세조회
 
     List<GetExerciseLogRes> findByMemberId(int memberId);
-    List<GetExerciseLogRes> findByLimitTo(GetExerciseLogDto dto); // 페이징 중
+    List<GetExerciseLogRes> findByLimitTo(PagingDto dto); // 페이징 중
 
     List<GetExerciseRes> findAllByExercise();
 //    int modifyByExerciselogId(PutExerciseLogDto dto);

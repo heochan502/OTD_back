@@ -40,6 +40,15 @@ public class HealthLogService {
         return healthLogMapper.findAllByMemberIdOrderByhealthlogDatetimeDesc(req);
 
     }
+//    건강기록 리스트 페이징
+    public List<GetHealthLogRes> getHealthLogList(int memberId, PagingReq req){
+        PagingDto dto = PagingDto.builder()
+                .memberId(memberId)
+                .size(req.getRowPerPage())
+                .startIdx((req.getPage()-1) * req.getRowPerPage())
+                .build();
+        return healthLogMapper.findByLimitTo(dto);
+    }
 
 //    건강기록 달력 날짜
     public List<HealthLogCalendarGetRes> getHealthLogDate(int memberId, HealthLogCalendarGetReq req) {

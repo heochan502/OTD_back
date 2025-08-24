@@ -53,7 +53,7 @@ public class ExerciseLogController {
 
     // 페이징
     @GetMapping("/elog/list")
-    public ResponseEntity<?> getExerciseLogList(HttpServletRequest httpReq, @ModelAttribute GetExerciseLogReq req) {
+    public ResponseEntity<?> getExerciseLogList(HttpServletRequest httpReq, @ModelAttribute PagingReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         log.info("req:{}", req);
         List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(logginedMemberId, req);
