@@ -11,5 +11,4 @@ public class ReminderGetReq {
   private int memberId;
   private String year;
   private String month;
-  private String day;
 }

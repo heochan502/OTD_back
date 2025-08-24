@@ -16,6 +16,7 @@ public class ReminderPostPutReq {
     private String title;
     private String content;
     private String startDate;
+    private String endDate;
     private boolean repeat;
     private boolean alarm;
     private List<Integer> repeatDow;

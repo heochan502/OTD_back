@@ -8,10 +8,11 @@
         re_title = #{title},
         re_content = #{content},
         `re_repeat` = #{repeat},
-        re_alarm = #{alarm}
-        <if test="startDate != null and startDate != ''">
-            , re_start_date = #{startDate}
-        </if>
+        re_alarm = #{alarm},
+        re_start_date = #{startDate}
+        <if test="endDate != null and endDate != ''">
+        , re_end_date = #{endDate}
+    </if>
     </insert>
     <insert id="postDow">
         INSERT INTO reminder_repeat(re_id, rr_dow)
@@ -27,18 +28,19 @@
             r.re_content AS content,
             r.re_created AS created,
             r.re_start_date AS startDate,
+            r.re_end_date AS endDate,
             r.re_alarm AS alarm,
             r.re_repeat AS `repeat`,
             GROUP_CONCAT(rr.rr_dow) AS repeatDow
         FROM reminder r
         LEFT JOIN reminder_repeat rr ON r.re_id = rr.re_id
         WHERE(
-            (r.re_start_date IS NOT NULL
+            (r.re_repeat = 0
             AND YEAR(r.re_start_date) = #{year}
             AND MONTH(r.re_start_date) = #{month})
         OR
             (r.re_repeat = 1
-            AND r.re_created &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d')))
+            AND r.re_start_date &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d')))
         AND r.member_no_login = #{memberId}
         GROUP BY r.re_id
     </select>
@@ -48,9 +50,10 @@
         re_title = #{title},
         re_content = #{content},
         re_repeat = #{repeat},
-        re_alarm = #{alarm}
-        <if test="startDate != null and startDate != ''">
-            , re_start_date = #{startDate}
+        re_alarm = #{alarm},
+        re_start_date = #{startDate}
+        <if test="endDate != null and endDate != ''">
+        , re_end_date = #{endDate}
         </if>
         WHERE re_id = #{id}
     </update>
