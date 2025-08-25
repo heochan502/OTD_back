@@ -34,32 +34,56 @@ public class ExerciseLogService {
     }
 
 //    운동기록 목록조회
-    public List<GetExerciseLogRes> findAllByMemberIdOrderByExerciseDatetimeDesc(int loggindMemberId) {
-        return exerciseLogMapper.findAllByMemberIdOrderByExerciseDatetimeDesc(loggindMemberId);
+    public List<GetExerciseLogRes> getExerciseLogAll(int memberId) {
+        return exerciseLogMapper.findByMemberId(memberId);
+    }
+
+//    페이징
+    public List<GetExerciseLogRes> getExerciseLogList(int memberId, PagingReq req) {
+        PagingDto dto = PagingDto.builder()
+                .memberId(memberId)
+                .size(req.getRowPerPage())
+                .startIdx((req.getPage()-1) * req.getRowPerPage())
+                .build();
+
+        return exerciseLogMapper.findByLimitTo(dto);
+
+
     }
 
 //    운동종목
     public List<GetExerciseRes> findAllExercise() {
         return exerciseLogMapper.findAllByExercise();
     }
-//    운동기록 수정
-    public int modifyByExerciselogId(PutExerciseLogReq req, int logginedMemberId) {
-        PutExerciseLogDto putExerciseLogDto = PutExerciseLogDto.builder()
-                .exerciselogId(req.getExerciseId())
-                .exerciseId(req.getExerciseId())
-                .exerciseKcal(req.getExerciseKcal())
-                .exerciseDatetime(req.getExerciseDatetime())
-                .exerciseDuration(req.getExerciseDuration())
-                .effortLevel(req.getEffortLevel())
-                .memberId(logginedMemberId)
-                .build();
-        return exerciseLogMapper.modifyByExerciselogId(putExerciseLogDto);
-    }
+
+    ////    운동기록 수정
+//    public int modifyByExerciselogId(PutExerciseLogReq req, int logginedMemberId) {
+//        PutExerciseLogDto putExerciseLogDto = PutExerciseLogDto.builder()
+//                .exerciselogId(req.getExerciseId())
+//                .exerciseId(req.getExerciseId())
+//                .exerciseKcal(req.getExerciseKcal())
+//                .exerciseDatetime(req.getExerciseDatetime())
+//                .exerciseDuration(req.getExerciseDuration())
+//                .effortLevel(req.getEffortLevel())
+//                .memberId(logginedMemberId)
+//                .build();
+//        return exerciseLogMapper.modifyByExerciselogId(putExerciseLogDto);
+//    }
 
 //    운동기록 삭제
     public int deleteByExerciselogId(GetExerciseLogDetailReq req) {
 
         return exerciseLogMapper.deleteByExerciselogId(req);
+    }
+
+//    운동기록 달력
+    public List<ExerciseLogCalendarGetRes> getExerciseLogDate(int memberId, ExerciseLogCalendarGetReq req) {
+        MonthRangeDto dto = MonthRangeDto.builder()
+                .memberId(memberId)
+                .start(req.getStart())
+                .end(req.getEnd())
+                .build();
+        return exerciseLogMapper.findAllByExerciseDatetime(dto);
     }
 
 }

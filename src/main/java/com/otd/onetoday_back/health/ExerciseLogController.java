@@ -18,6 +18,7 @@ import java.util.List;
 public class ExerciseLogController {
     private final ExerciseLogService exerciseLogService;
 
+
     //    운동기록 생성
     @PostMapping("/elog")
     public ResponseEntity<?> save(HttpServletRequest httpReq, @RequestBody PostExerciseLogReq req) {
@@ -41,15 +42,35 @@ public class ExerciseLogController {
     return ResponseEntity.ok(result);
     }
 
-//    운동기록 목록조회
+
+//  운동기록 조회
     @GetMapping("/elog")
     public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-
-        log.info("logginedMemberId:{}", logginedMemberId);
-        List<GetExerciseLogRes> result = exerciseLogService.findAllByMemberIdOrderByExerciseDatetimeDesc(logginedMemberId);
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogAll(logginedMemberId);
         return ResponseEntity.ok(result);
     }
+
+    // 페이징
+    @GetMapping("/elog/list")
+    public ResponseEntity<?> getExerciseLogList(HttpServletRequest httpReq, @ModelAttribute PagingReq req) {
+        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        log.info("req:{}", req);
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogList(logginedMemberId, req);
+        log.info("exerciseLogList_result:{}", result);
+        return ResponseEntity.ok(result);
+    }
+
+// 달력(년, 월)
+@GetMapping("/elog/calendar")
+public ResponseEntity<?> getEexerciselogCalendar(HttpServletRequest httpReq, @ModelAttribute ExerciseLogCalendarGetReq req) {
+    int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+
+    List<ExerciseLogCalendarGetRes> result = exerciseLogService.getExerciseLogDate(logginedMemberId, req);
+    log.info("result:{}", result);
+    return ResponseEntity.ok(result);
+}
+
 
 //    운동종목
     @GetMapping
@@ -60,14 +81,14 @@ public class ExerciseLogController {
 
 
 //    운동기록 수정
-    @PutMapping("/elog")
-    public ResponseEntity<?> update(HttpServletRequest httpReq, @RequestBody PutExerciseLogReq req) {
-        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        log.info("req:{}", req);
-        int result = exerciseLogService.modifyByExerciselogId(req, logginedMemberId);
-        log.info("result:{}", result);
-        return ResponseEntity.ok(result);
-    }
+//    @PutMapping("/elog")
+//    public ResponseEntity<?> update(HttpServletRequest httpReq, @RequestBody PutExerciseLogReq req) {
+//        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+//        log.info("req:{}", req);
+//        int result = exerciseLogService.modifyByExerciselogId(req, logginedMemberId);
+//        log.info("result:{}", result);
+//        return ResponseEntity.ok(result);
+//    }
 
 //    운동기록 삭제
     @DeleteMapping("/elog")
