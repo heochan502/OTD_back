@@ -8,9 +8,8 @@ import lombok.ToString;
 @Getter
 @ToString
 public class ReminderExceptionDto {
-  private int memberId;
   private int id;
-  private String endDate;
   private String exceptionDate;
+  private String endDate;
 
 }

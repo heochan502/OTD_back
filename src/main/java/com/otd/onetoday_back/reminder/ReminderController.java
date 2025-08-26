@@ -27,12 +27,20 @@ public class ReminderController {
         Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         req.setMemberId(memberId);
         log.info("memberId:{}", memberId);
-        int result = reminderService.postReminder(req);
+        int result = reminderService.post(req);
 
         if(req.isRepeat()){
         int result2 = reminderService.postDow(req);
         return ResponseEntity.ok(result + result2);
         }
+        log.info("result:{}", result);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/exception")
+    public ResponseEntity<?> exceptionFutureReminder(@RequestBody ReminderExceptionDto dto){
+        log.info("dto:{}", dto);
+        int result = reminderService.postExceptionById(dto);
         log.info("result:{}", result);
         return ResponseEntity.ok(result);
     }
@@ -49,11 +57,9 @@ public class ReminderController {
     }
 
     @PutMapping
-    public ResponseEntity<?> putReminder(HttpServletRequest httpReq, @RequestBody ReminderPostPutReq req){
+    public ResponseEntity<?> putReminder(@RequestBody ReminderPostPutReq req){
         log.info("req:{}", req);
-        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        req.setMemberId(memberId);
-        log.info("memberId:{}", memberId);
+
         int result = reminderService.modify(req);
         if(req.isRepeat()){
             int result2 = reminderService.modifyDow(req);
@@ -63,14 +69,11 @@ public class ReminderController {
     }
 
     @PutMapping("/exception")
-    public ResponseEntity<?> putReminder(HttpServletRequest httpReq, @RequestBody ReminderExceptionDto dto){
+    public ResponseEntity<?> exceptionOneReminder(@RequestBody ReminderExceptionDto dto){
         log.info("dto:{}", dto);
-        Integer memberId = (Integer) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        dto.setMemberId(memberId);
-        log.info("memberId:{}", memberId);
-        int result = reminderService.modify(dto);
+
+        int result = reminderService.putExceptionDateById(dto);
         return ResponseEntity.ok(result);
-        // todo: post작업까지 하기
     }
 
     @DeleteMapping("/{id}")

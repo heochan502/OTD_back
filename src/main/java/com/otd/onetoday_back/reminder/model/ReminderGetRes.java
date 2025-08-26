@@ -23,13 +23,23 @@ public class ReminderGetRes {
     private boolean repeat;
     private boolean alarm;
     private List<Integer> repeatDow;
+    private List<String> exceptionDate;
 
     public void setRepeatDow(String repeatDowStr) {
         if (repeatDowStr == null || repeatDowStr.isEmpty()) {
             this.repeatDow = new ArrayList<>();
         } else {
             this.repeatDow = Arrays.stream(repeatDowStr.split(","))
-                    .map(Integer::parseInt)
+                    .map(Integer::parseInt) // int로 형변환
+                    .collect(Collectors.toList());
+        }
+    }
+
+    public void setExceptionDate(String exceptionDateStr) {
+        if(exceptionDateStr == null || exceptionDateStr.isEmpty()) {
+            this.exceptionDate = new ArrayList<>();
+        }else{
+            this.exceptionDate = Arrays.stream(exceptionDateStr.split(","))
                     .collect(Collectors.toList());
         }
     }

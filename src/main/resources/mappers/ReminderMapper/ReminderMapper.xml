@@ -14,6 +14,22 @@
         , re_end_date = #{endDate}
     </if>
     </insert>
+
+    <insert id="postDow">
+        INSERT INTO reminder_repeat(re_id, rr_dow)
+        VALUES
+        <foreach collection="repeatDow" item="dow" separator=",">
+            (#{id}, #{dow})
+        </foreach>
+    </insert>
+
+    <insert id="postExceptionById">
+        INSERT INTO reminder_exception
+        SET
+        re_id = #{id},
+        rx_exception_date = #{exceptionDate}
+    </insert>
+
     <select id="findByYearAndMonth">
         SELECT r.member_no_login AS memberId,
             r.re_id AS id,
@@ -24,19 +40,24 @@
             r.re_end_date AS endDate,
             r.re_alarm AS alarm,
             r.re_repeat AS `repeat`,
-            GROUP_CONCAT(rr.rr_dow) AS repeatDow
+            GROUP_CONCAT(DISTINCT rr.rr_dow) AS repeatDow,
+            GROUP_CONCAT(DISTINCT rx.rx_exception_date) AS exception_date
         FROM reminder r
         LEFT JOIN reminder_repeat rr ON r.re_id = rr.re_id
+        LEFT JOIN reminder_exception rx ON r.re_id = rx.re_id
+                                        AND YEAR(rx.rx_exception_date) = #{year}
+                                        AND MONTH(rx.rx_exception_date) = #{month}
         WHERE(
             (r.re_repeat = 0
             AND YEAR(r.re_start_date) = #{year}
             AND MONTH(r.re_start_date) = #{month})
         OR
             (r.re_repeat = 1
-            AND r.re_start_date &lt; DATE_FORMAT(DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH), '%Y-%m-%d')))
+            AND r.re_start_date &lt; DATE_ADD(CONCAT(#{year}, '-', #{month}, '-01'), INTERVAL 1 MONTH)))
         AND r.member_no_login = #{memberId}
         GROUP BY r.re_id
     </select>
+
     <update id="modify">
         UPDATE reminder
         SET
@@ -50,18 +71,20 @@
         </if>
         WHERE re_id = #{id}
     </update>
+
+    <update id="putExceptionDateById">
+        UPDATE reminder
+        SET
+        re_end_date = #{endDate}
+        WHERE re_id = #{id}
+    </update>
+
     <delete id="deleteDow">
         DELETE
         FROM reminder_repeat
         WHERE re_id = #{id}
     </delete>
-    <insert id="postDow">
-        INSERT INTO reminder_repeat(re_id, rr_dow)
-        VALUES
-        <foreach collection="repeatDow" item="dow" separator=",">
-            (#{id}, #{dow})
-        </foreach>
-    </insert>
+
     <delete id="deleteById">
         DELETE
         FROM reminder
