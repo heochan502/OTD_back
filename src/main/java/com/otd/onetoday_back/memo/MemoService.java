@@ -27,7 +27,7 @@ public class MemoService {
     public void adjustUploadPathForWindows() {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win") && uploadDir.startsWith("/home")) {
-            uploadDir = "C:/2025_swstudy/upload";
+            uploadDir = "C:/2025_swstudy/upload/memo" + uploadDir.substring("/home".length());
             log.warn("Windows 환경 감지됨. uploadDir을 {} 로 강제 설정합니다.", uploadDir);
         } else {
             log.info("uploadDir 설정값: {}", uploadDir);
@@ -37,7 +37,6 @@ public class MemoService {
     public MemoListRes findAll(MemoGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
         req.setOffset(offset);
-
         List<MemoGetRes> memoList = memoMapper.findAll(req);
         int totalCount = memoMapper.getTotalCount(req);
         return new MemoListRes(memoList, totalCount);

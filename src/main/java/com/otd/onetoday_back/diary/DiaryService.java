@@ -2,6 +2,7 @@ package com.otd.onetoday_back.diary;
 
 import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.diary.model.*;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,19 @@ public class DiaryService {
 
     private final DiaryMapper diaryMapper;
 
-    private final String uploadDir = "D://BOK/upload/diary";
+    @Value("${constants.file.directory}")
+    private String uploadDir;
+
+    @PostConstruct
+    public void adjustUploadPathForWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        if(os.contains("win") && uploadDir.startsWith("/home")) {
+            uploadDir = "C:/2025_swstudy/upload/diary" + uploadDir.substring("/home".length());
+            log.warn("Windows 환경 감지됨. uploadDir을 {} 로 강제 설정합니다.", uploadDir);
+            } else {
+            log.info("uploadDir 설정값: {}", uploadDir);
+        }
+    }
 
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
@@ -30,17 +43,16 @@ public class DiaryService {
     }
 
     public DiaryGetRes findById(int diaryId, int memberId) {
-        Map<String, Object> params = Map.of(
-                "diaryId", diaryId,
-                "memberNoLogin", memberId
-        );
+        Map<String, Object> param = new HashMap<>();
+        param.put("diaryId", diaryId);
+        param.put("memberNoLogin", memberId);
 
-        DiaryGetRes diary = diaryMapper.findById(params);
+        DiaryGetRes diary = diaryMapper.findById(param);
         if (diary == null) {
-            throw new CustomException("존재하지 않거나 권한이 없는 다이어리입니다.", 401);
+            throw new CustomException("존재하지 않거나 접근 권한이 없습니다.", 404);
         }
         return diary;
-    }
+        }
 
     public DiaryPostAndUploadRes save(DiaryPostReq req, MultipartFile diaryImage) {
         if (req.getMemberNoLogin() <= 0) {
