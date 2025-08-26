@@ -9,7 +9,8 @@ import java.util.List;
 
 @Data
 public class MemoPostReq {
-    private int memberNoLogin;
+    private Integer memberNoLogin;
+    private int memoId;
     private String memoName;
     private String memoContent;
     private String memoImage;

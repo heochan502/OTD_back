@@ -73,6 +73,7 @@ public class DiaryService {
 
         return new DiaryPostAndUploadRes(
                 req.getMemberNoLogin(),
+                req.getDiaryId(),
                 req.getDiaryName(),
                 req.getDiaryContent(),
                 req.getDiaryImage()
@@ -107,6 +108,7 @@ public class DiaryService {
 
         diaryMapper.update(req);
         return new DiaryPostAndUploadRes(
+                req.getMemberNoLogin(),
                 req.getDiaryId(),
                 req.getDiaryName(),
                 req.getDiaryContent(),

@@ -73,6 +73,7 @@ public class MemoService {
 
         return new MemoPostAnduploadRes(
                 req.getMemberNoLogin(),
+                req.getMemoId(),
                 req.getMemoName(),
                 req.getMemoContent(),
                 req.getMemoImage()
@@ -109,6 +110,7 @@ public class MemoService {
 
         return new MemoPostAnduploadRes(
                 req.getMemoId(),
+                req.getMemberNoLogin(),
                 req.getMemoName(),
                 req.getMemoContent(),
                 req.getMemoImage()

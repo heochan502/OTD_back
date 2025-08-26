@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class DiaryPostAndUploadRes {
+    private Integer memberNoLogin;
     private int diaryId;
     private String diaryName;
     private String diaryContent;
