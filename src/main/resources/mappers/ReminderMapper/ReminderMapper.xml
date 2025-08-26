@@ -14,13 +14,6 @@
         , re_end_date = #{endDate}
     </if>
     </insert>
-    <insert id="postDow">
-        INSERT INTO reminder_repeat(re_id, rr_dow)
-        VALUES
-        <foreach collection="repeatDow" item="dow" separator=",">
-            (#{id}, #{dow})
-        </foreach>
-    </insert>
     <select id="findByYearAndMonth">
         SELECT r.member_no_login AS memberId,
             r.re_id AS id,
@@ -62,9 +55,17 @@
         FROM reminder_repeat
         WHERE re_id = #{id}
     </delete>
+    <insert id="postDow">
+        INSERT INTO reminder_repeat(re_id, rr_dow)
+        VALUES
+        <foreach collection="repeatDow" item="dow" separator=",">
+            (#{id}, #{dow})
+        </foreach>
+    </insert>
     <delete id="deleteById">
         DELETE
         FROM reminder
         WHERE re_id = #{id}
     </delete>
+
 </mapper>
