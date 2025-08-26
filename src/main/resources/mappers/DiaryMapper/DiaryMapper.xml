@@ -44,7 +44,7 @@
           AND member_no_login = #{memberNoLogin}
     </select>
 
-    <insert id="insert"
+    <insert id="save"
             parameterType="com.otd.onetoday_back.diary.model.DiaryPostReq"
             useGeneratedKeys="true"
             keyProperty="diaryId">

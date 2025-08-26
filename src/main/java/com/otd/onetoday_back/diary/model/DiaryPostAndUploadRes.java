@@ -11,5 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class DiaryPostAndUploadRes {
     private int diaryId;
+    private String diaryName;
+    private String diaryContent;
     private String diaryImage;
 }

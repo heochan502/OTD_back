@@ -54,12 +54,18 @@ public class MemoService {
         return memo;
     }
 
-    public MemoPostAnduploadRes saveMemoAndHandleUpload(int memberId, MemoPostReq req) {
-        req.setMemberNoLogin(memberId);
+    public MemoPostAnduploadRes save(MemoPostReq req, MultipartFile memoImage) {
+        if (req.getMemberNoLogin() <= 0) {
+            throw new CustomException("로그인이 필요합니다.", 403);
+        }
+        if (memoImage != null && !memoImage.isEmpty()) {
+            String fileName = saveImage(memoImage);
+            req.setMemoImage(fileName);
+        }
 
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            String fileName = saveFile(imageFiles.get(0));
+            String fileName = saveImage(imageFiles.get(0));
             req.setMemoImage(fileName);
         }
 
@@ -73,19 +79,23 @@ public class MemoService {
         );
     }
 
-    public MemoPostAnduploadRes updateMemo(MemoPutReq req, int memberId) {
+    public MemoPostAnduploadRes update(MemoPutReq req, MultipartFile memoImage) {
+        if(req.getMemberNoLogin() <= 0){
+            throw new CustomException("로그인이 필요합니다.", 401);
+        }
+
         Map<String, Object> param = new HashMap<>();
         param.put("memoId", req.getMemoId());
-        param.put("memberNoLogin", memberId);
+        param.put("memberNoLogin", req.getMemberNoLogin());
 
         MemoGetRes existing = memoMapper.findById(param);
         if (existing == null) {
-            throw new CustomException("수정할 메모가 존재하지 않습니다.", 404);
+            throw new CustomException("존재하지 않거나 수정 권한이 없습니다.", 403);
         }
 
         List<MultipartFile> imageFiles = req.getMemoImageFiles();
         if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            String fileName = saveFile(imageFiles.get(0));
+            String fileName = saveImage(imageFiles.get(0));
             req.setMemoImage(fileName);
 
             if (existing.getMemoImage() != null) {
@@ -105,39 +115,54 @@ public class MemoService {
         );
     }
 
-    public void deleteMemo(int memoId, int memberId) {
-        Map<String, Object> param = new HashMap<>();
-        param.put("memoId", memoId);
-        param.put("memberNoLogin", memberId);
+    public void delete(int memoId, int memberId) {
+        if(memberId <= 0){
+            throw new CustomException("로그인이 필요합니다.", 401);
+        }
 
-        MemoGetRes existing = memoMapper.findById(param);
+        Map<String, Object> params = new HashMap<>();
+        params.put("memoId", memoId);
+        params.put("memberNoLogin", memberId);
+
+        MemoGetRes existing = memoMapper.findById(params);
         if (existing == null) {
-            throw new CustomException("삭제할 메모가 존재하지 않습니다.", 404);
+            throw new CustomException("존재하지 않거나 삭제 권한이 없습니다.", 403);
         }
 
         if (existing.getMemoImage() != null) {
             deleteFileIfExists(existing.getMemoImage());
         }
-
-        memoMapper.delete(param);
+        memoMapper.delete(params);
     }
 
-    private String saveFile(MultipartFile file) {
+    private String saveImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new CustomException("빈 파일은 저장할 수 없습니다.", 400);
+        }
+        if (uploadDir == null || uploadDir.trim().isEmpty()) {
+            throw new CustomException("업로드 경로가 설정되지 않았습니다.", 500);
+        }
+        String originalFilename = file.getOriginalFilename();
+        String ext = (originalFilename != null && originalFilename.contains("."))
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : ".bin";
+        String safeFileName = UUID.randomUUID().toString() + ext;
+
+        Path baseDir = Paths.get(uploadDir.trim()).normalize();
+        Path target = Paths.get(uploadDir.trim()).resolve(safeFileName).normalize();
+
+        if (!target.startsWith(baseDir)) {
+            throw new CustomException("잘못된 파일 경로입니다.", 400);
+        }
+
         try {
-            String originalFilename = file.getOriginalFilename();
-            String ext = (originalFilename != null && originalFilename.contains("."))
-                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
-                    : ".bin";
-            String safeFileName = UUID.randomUUID().toString() + ext;
-
-            Path target = Paths.get(uploadDir.trim()).resolve(safeFileName).normalize();
-            Files.createDirectories(target.getParent());
+            Files.createDirectories(baseDir);
             file.transferTo(target.toFile());
-
+            log.info("✅ 이미지 저장 완료: {}", safeFileName);
             return safeFileName;
         } catch (IOException e) {
-            log.error("파일 저장 실패: {}", e.getMessage());
-            throw new CustomException("파일 저장 중 오류가 발생했습니다.", 500);
+            log.error("❌ 이미지 저장 실패", e);
+            throw new CustomException("파일 저장 중 오류가 발생했습니다.: " + e.getMessage(), 500);
         }
     }
 
@@ -148,5 +173,10 @@ public class MemoService {
         } catch (IOException e) {
             log.warn("파일 삭제 실패: {}", fileName);
         }
+    }
+
+    private String getExtension(String originalFilename) {
+        if (originalFilename == null || !originalFilename.contains(".")) return "jpg";
+        return originalFilename.substring(originalFilename.lastIndexOf('.') + 1);
     }
 }

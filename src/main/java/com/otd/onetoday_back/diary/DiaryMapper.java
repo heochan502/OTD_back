@@ -13,7 +13,7 @@ public interface DiaryMapper {
 
     DiaryGetRes findById(Map<String, Object> params);
 
-    void insert(DiaryPostReq req);
+    void save(DiaryPostReq req);
     void update(DiaryPutReq req);
     void delete(Map<String, Object> params);
 }
