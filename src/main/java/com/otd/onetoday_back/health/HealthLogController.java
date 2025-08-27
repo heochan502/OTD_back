@@ -42,16 +42,38 @@ public class HealthLogController {
 
     //  건강기록 목록조회
     @GetMapping
-    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetHealthLogReq req ) {
+    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetHealthLogReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
         req.setMemberId(logginedMemberId);
-       log.info("여기여기여기여기"+logginedMemberId + "데이터 " + req);
+        log.info("여기여기여기여기" + logginedMemberId + "데이터 " + req);
 
         List<GetHealthLogRes> result = healthLogService.findAllByMemberIdOrderByhealthlogDatetimeDesc(req);
         return ResponseEntity.ok(result);
     }
 
-//    건강기록 삭제
+    //    페이징
+    @GetMapping("/list")
+    public ResponseEntity<?> getExerciseLogList(HttpServletRequest httpReq, @ModelAttribute PagingReq req) {
+        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+        log.info("req:{}", req);
+        List<GetHealthLogRes> result = healthLogService.getHealthLogList(logginedMemberId, req);
+        log.info("exerciseLogList_result:{}", result);
+        return ResponseEntity.ok(result);
+    }
+
+    //    건강기록 달력 날짜
+    @GetMapping("calendar")
+    public ResponseEntity<?> getHealthlogCalendar(HttpServletRequest httpReq, @ModelAttribute HealthLogCalendarGetReq req) {
+        int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
+
+        List<HealthLogCalendarGetRes> result = healthLogService.getHealthLogDate(logginedMemberId, req);
+        log.info("result:{}", result);
+
+        return ResponseEntity.ok(result);
+    }
+
+
+    //    건강기록 삭제
     @DeleteMapping
     public ResponseEntity<?> delete(HttpServletRequest httpReq, @RequestParam("healthlog_id") int healthlogId) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
