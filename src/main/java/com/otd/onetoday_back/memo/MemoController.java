@@ -30,7 +30,7 @@ public class MemoController {
 
     private final MemoService memoService;
 
-    private final String uploadDir = "D://BOK/upload/memo";
+    private final String uploadDir = "C://home/download";
 
     private Integer getLoggedInMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);

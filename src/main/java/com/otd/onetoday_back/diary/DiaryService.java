@@ -27,7 +27,7 @@ public class DiaryService {
     public void adjustUploadPathForWindows() {
         String os = System.getProperty("os.name").toLowerCase();
         if(os.contains("win") && uploadDir.startsWith("/home")) {
-            uploadDir = "C:/2025_swstudy/upload/diary" + uploadDir.substring("/home".length());
+            uploadDir = "C://home/download" + uploadDir.substring("/home".length());
             log.warn("Windows 환경 감지됨. uploadDir을 {} 로 강제 설정합니다.", uploadDir);
             } else {
             log.info("uploadDir 설정값: {}", uploadDir);
