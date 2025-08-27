@@ -33,8 +33,13 @@ public class AccountController {
                 || !StringUtils.hasLength(req.getMemberPw())
                 || !StringUtils.hasLength(req.getEmail())
                 || !StringUtils.hasLength(req.getName())
-                || !StringUtils.hasLength(req.getMemberNick())) {
-            return ResponseEntity.badRequest().build(); //state: 400
+                || !StringUtils.hasLength(req.getMemberNick())
+                || !StringUtils.hasLength(req.getGender())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (!"M".equals(req.getGender()) && !"F".equals(req.getGender())) {
+            return ResponseEntity.badRequest().build();
         }
         log.info(" changed  : {}", req.getMemberNick());
         int result = accountService.join(req);
@@ -101,24 +106,25 @@ public class AccountController {
 
 
     @GetMapping("/check/id/{memberId}")
-    public ResponseEntity<?> checkMemberId(@PathVariable String memberId) {
-        boolean exists = accountService.existsByMemberId(memberId);
-        Map<String, Object> response = new HashMap<>();
-        response.put("available", !exists);
-        response.put("message", exists ? "이미 사용중인 아이디입니다." : "사용 가능한 아이디입니다.");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Map<String, Boolean>> checkMemberId(@PathVariable String memberId) {
+        boolean available = !accountService.existsByMemberId(memberId);
+        return ResponseEntity.ok(Map.of("available", available));
     }
 
     @GetMapping("/check/email/{email}")
-    public ResponseEntity<?> checkEmail(@PathVariable String email) {
-        boolean exists = accountService.existsByEmail(email);
-        Map<String, Object> response = new HashMap<>();
-        response.put("available", !exists);
-        response.put("message", exists ? "이미 사용중인 이메일입니다." : "사용 가능한 이메일입니다.");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@PathVariable String email) {
+        boolean available = !accountService.existsByEmail(email);
+        return ResponseEntity.ok(Map.of("available", available));
     }
 
-    @PutMapping("/password")
+    @GetMapping("/check/nickname/{nickname}")
+    public ResponseEntity<Map<String, Boolean>> checkNickname(@PathVariable String nickname) {
+        boolean available = !accountService.existsByMemberNick(nickname);
+        return ResponseEntity.ok(Map.of("available", available));
+    }
+
+
+    @PutMapping("/profile/password")
     public ResponseEntity<?> changePassword(
             HttpServletRequest httpReq,
             @RequestBody PasswordChangeDto dto) {
@@ -144,14 +150,6 @@ public class AccountController {
         }
     }
 
-    @GetMapping("/check/nickname/{nickname}")
-    public ResponseEntity<?> checkNickname(@PathVariable String nickname) {
-        boolean exists = accountService.existsByMemberNick(nickname);
-        Map<String, Object> response = new HashMap<>();
-        response.put("available", !exists);
-        response.put("message", exists ? "이미 사용중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
-        return ResponseEntity.ok(response);
-    }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest httpReq) {

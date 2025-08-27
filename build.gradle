@@ -48,6 +48,11 @@ dependencies {
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+//    더미데이터 라이브러리
+    // https://mvnrepository.com/artifact/net.datafaker/datafaker
+    testImplementation 'net.datafaker:datafaker:2.4.3'
+    
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

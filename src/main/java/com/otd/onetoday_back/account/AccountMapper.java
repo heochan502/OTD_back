@@ -1,8 +1,10 @@
 package com.otd.onetoday_back.account;
 
 import com.otd.onetoday_back.account.model.*;
-import org.apache.catalina.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Map;
 
 @Mapper
 public interface AccountMapper {
@@ -15,7 +17,7 @@ public interface AccountMapper {
     int existsByEmail(String email);
     int existsByMemberNick(String memberNick);
     String findPasswordByMemberNo(int memberNoLogin);
-    int updatePassword(int memberNoLogin, String newPassword);
+    int updatePassword(Map<String, Object> params);
     int deleteById(int memberNoLogin);
     int deleteMemberLocationByMemberId(int memberNoLogin);
 

@@ -22,7 +22,7 @@ public class AccountJoinReq {
     private String name;
     private String birthDate;
     private String memberNick;
-
+    private String gender;
 
 
 }

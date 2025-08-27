@@ -1,6 +1,7 @@
 constants:
   file:
-    directory : C://home/download
+    directory : /home/download/
+
   # weather api
   feign-client:
     weather-api:
