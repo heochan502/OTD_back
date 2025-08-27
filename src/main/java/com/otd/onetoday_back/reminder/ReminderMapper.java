@@ -10,9 +10,12 @@ import java.util.List;
 @Mapper
 public interface ReminderMapper {
     int post(ReminderPostPutReq req);
-    int postDow(ReminderPostPutReq req);
+    int postExceptionById(ReminderExceptionDto dto);
     List<ReminderGetRes> findByYearAndMonth(ReminderGetReq req);
     int modify(ReminderPostPutReq req);
+    int postDow(ReminderPostPutReq req);
     int deleteDow(int id);
+    int putExceptionDateById(ReminderExceptionDto dto);
     int deleteById(int id);
+
 }
