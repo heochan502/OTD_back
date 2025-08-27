@@ -15,12 +15,16 @@ import java.util.List;
 public class ReminderService {
     private final ReminderMapper reminderMapper;
 
-    public int postReminder(ReminderPostPutReq req){
+    public int post(ReminderPostPutReq req){
         return reminderMapper.post(req);
-
     }
+
     public int postDow(ReminderPostPutReq req){
         return reminderMapper.postDow(req);
+    }
+
+    public int postExceptionById(ReminderExceptionDto dto){
+        return reminderMapper.postExceptionById(dto);
     }
 
     public List<ReminderGetRes> findByYearAndMonth(ReminderGetReq req){
@@ -35,6 +39,10 @@ public class ReminderService {
         int result = reminderMapper.deleteDow(req.getId());
         int result2 = reminderMapper.postDow(req);
         return result + result2;
+    }
+
+    public int putExceptionDateById(ReminderExceptionDto dto){
+        return reminderMapper.putExceptionDateById(dto);
     }
 
     public int deleteById(int id){

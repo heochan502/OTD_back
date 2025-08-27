@@ -7,8 +7,9 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
-public class ReminderGetReq {
-  private int memberId;
-  private String year;
-  private String month;
+public class ReminderExceptionDto {
+  private int id;
+  private String exceptionDate;
+  private String endDate;
+
 }
