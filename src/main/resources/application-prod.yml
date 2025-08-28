@@ -1,7 +1,7 @@
 
 constants:
   file:
-    directory : C://home/download
+    directory : /home/download/
 
 
 

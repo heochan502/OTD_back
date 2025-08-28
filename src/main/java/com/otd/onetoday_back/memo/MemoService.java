@@ -27,11 +27,19 @@ public class MemoService {
     public void adjustUploadPathForWindows() {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win") && uploadDir.startsWith("/home")) {
-            uploadDir = "C://home/download" + uploadDir.substring("/home".length());
-            log.warn("Windows 환경 감지됨. uploadDir을 {} 로 강제 설정합니다.", uploadDir);
-        } else {
-            log.info("uploadDir 설정값: {}", uploadDir);
+            String subFolder = uploadDir.substring("/home/download/".length());
+            String userHome = System.getProperty("user.home");
+            Path baseDownload = Paths.get(userHome, "Downloads").resolve(subFolder);
+            uploadDir = baseDownload.toAbsolutePath().normalize().toString();
+            log.warn("Windows 환경 감지. uploadDir을 {}로 변경합니다.", uploadDir);
         }
+        try {
+            Files.createDirectories(Paths.get(uploadDir));
+        } catch (IOException e) {
+            log.error("저장 경로 생성 실패: {}", e.getMessage(), e);
+            throw new CustomException("저장 경로 생성 중 오류 발생", 500);
+        }
+        log.info("실제 사용될 uploadDir 경로: {}", uploadDir);
     }
 
     public MemoListRes findAll(MemoGetReq req) {
@@ -150,8 +158,9 @@ public class MemoService {
                 : ".bin";
         String safeFileName = UUID.randomUUID().toString() + ext;
 
-        Path baseDir = Paths.get(uploadDir.trim()).normalize();
-        Path target = Paths.get(uploadDir.trim()).resolve(safeFileName).normalize();
+        String cleanedDir = uploadDir.trim().replaceAll("\\\\", "/");
+        Path baseDir = Paths.get(cleanedDir).normalize();
+        Path target = baseDir.resolve(safeFileName).normalize();
 
         if (!target.startsWith(baseDir)) {
             throw new CustomException("잘못된 파일 경로입니다.", 400);
