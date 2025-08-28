@@ -23,11 +23,14 @@ public class DiaryService {
     @Value("${constants.file.directory}")
     private String uploadDir;
 
+    @Value("${upload.base-path}")
+    private String basePath;
+
     @PostConstruct
     public void adjustUploadPathForWindows() {
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win") && uploadDir.startsWith("/home")) {
-            String subFolder = uploadDir.substring("/home/download/".length());
+        if (os.contains("win") && uploadDir.startsWith(basePath)) {
+            String subFolder = uploadDir.substring(basePath.length());
             String userHome = System.getProperty("user.home");
             Path baseDownload = Paths.get(userHome, "Downloads").resolve(subFolder);
             uploadDir = baseDownload.toAbsolutePath().normalize().toString();
