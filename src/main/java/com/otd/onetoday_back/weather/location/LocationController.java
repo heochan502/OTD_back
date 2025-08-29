@@ -1,6 +1,7 @@
 package com.otd.onetoday_back.weather.location;
 
 import com.otd.onetoday_back.weather.location.model.LocationDto;
+import com.otd.onetoday_back.weather.location.model.SearchDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/OTD/location")
 public class LocationController {
-
+    private final LocationSearchService locationSearchService;
     private final LocationService locationService;
 
     @PostMapping("/save")
@@ -54,4 +55,8 @@ public class LocationController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/search-api")
+    public List<SearchDto> search(@RequestParam String keyword) throws Exception {
+        return locationSearchService.search(keyword);
+    }
 }

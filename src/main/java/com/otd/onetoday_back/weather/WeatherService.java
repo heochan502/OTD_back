@@ -61,8 +61,8 @@ public class WeatherService {
         try {
             // FeignClient 초단기실황 호출
             String ncstResponse = weatherFeignClient.getUltraSrtNcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     base[0],
                     base[1],
                     location.getNx(),
@@ -87,8 +87,8 @@ public class WeatherService {
 
             // FeignClient 단기예보 호출
             String villageTMN = weatherFeignClient.getVilageFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     baseV[0],
                     "0200",
                     location.getNx(),
@@ -98,8 +98,8 @@ public class WeatherService {
             );
 
             String villageTMX = weatherFeignClient.getVilageFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     baseV[0],
                     "1100",
                     location.getNx(),
@@ -174,8 +174,8 @@ public class WeatherService {
         String baseDate = formatString(yesterday);
         try {
             String dailyWeather = weatherFeignClient.getVilageFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     baseDate,
                     "2300",
                     location.getNx(),
