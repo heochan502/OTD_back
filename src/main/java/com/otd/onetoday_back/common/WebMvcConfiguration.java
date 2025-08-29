@@ -37,12 +37,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .addResourceLocations("file:" + uploadPath + "/community/");
 
         // memo, diary 첨부 이미지
-        registry
-                .addResourceHandler("/api/OTD/memoAndDiary/memo/image/**")
-                .addResourceLocations("file:" + uploadDir + "/memo/");
-        registry
-                .addResourceHandler("/api/OTD/memoAndDiary/diary/image/**")
-                .addResourceLocations("file:" + uploadDir + "/diary/");
+        registry.addResourceHandler("/api/OTD/memoAndDiary/memo/image/**")
+                .addResourceLocations("file:///" + uploadDir + "/memo/");
+
+        registry.addResourceHandler("/api/OTD/memoAndDiary/diary/image/**")
+                .addResourceLocations("file:///" + uploadDir + "/diary/");
 
         // 기존 일기 탭 등에서 쓰던 경로 유지: /pic/** → {uploadPath}/
         registry.addResourceHandler("/pic/**")
