@@ -61,7 +61,6 @@ public class DiaryService {
         Map<String, Object> param = new HashMap<>();
         param.put("diaryId", diaryId);
         param.put("memberNoLogin", memberId);
-
         DiaryGetRes diary = diaryMapper.findById(param);
         if (diary == null) {
             throw new CustomException("존재하지 않거나 접근 권한이 없습니다.", 404);
@@ -146,21 +145,20 @@ public class DiaryService {
     }
 
     private String saveImage(MultipartFile file) {
-        if(file == null || file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             throw new CustomException("빈 파일은 저장할 수 없습니다.", 400);
         }
-
         if (uploadDir == null || uploadDir.trim().isEmpty()) {
             throw new CustomException("업로드 경로가 설정되지 않았습니다.", 500);
         }
 
         String originalFilename = file.getOriginalFilename();
         String ext = (originalFilename != null && originalFilename.contains("."))
-                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
-                    : ".bin";
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : ".bin";
         String safeFileName = UUID.randomUUID().toString() + ext;
 
-        Path baseDir = Paths.get(uploadDir.trim()).normalize();
+        Path baseDir = Paths.get(uploadDir.trim(), "diary").normalize();
         Path target = baseDir.resolve(safeFileName).normalize();
 
         if (!target.startsWith(baseDir)) {
@@ -173,18 +171,19 @@ public class DiaryService {
             log.info("✅ 이미지 저장 완료: {}", safeFileName);
             return safeFileName;
         } catch (IOException e) {
-          log.error("❌ 이미지 저장 실패", e);
-          throw new CustomException("파일 저장 중 오류가 발생했습니다.: " + e.getMessage(), 500);
+            log.error("❌ 이미지 저장 실패", e);
+            throw new CustomException("파일 저장 중 오류가 발생했습니다.: " + e.getMessage(), 500);
         }
     }
 
-    private void deleteFileIfExists(String filename) {
-        if (filename == null || filename.isEmpty()) return;
+    private void deleteFileIfExists(String fileName) {
+        if (fileName == null || fileName.isEmpty()) return;
         try {
-            Path filePath = Paths.get(uploadDir, filename);
+            Path filePath = Paths.get(uploadDir, "diary", fileName);
             Files.deleteIfExists(filePath);
+            log.info("🗑️ 이미지 삭제 완료: {}", filePath.toAbsolutePath());
         } catch (IOException e) {
-            log.warn("이미지 삭제 실패: {}", filename);
+            log.warn("⚠️ 이미지 삭제 실패: {}", fileName);
         }
     }
 

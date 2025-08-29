@@ -153,13 +153,14 @@ public class MemoService {
         if (uploadDir == null || uploadDir.trim().isEmpty()) {
             throw new CustomException("업로드 경로가 설정되지 않았습니다.", 500);
         }
+
         String originalFilename = file.getOriginalFilename();
         String ext = (originalFilename != null && originalFilename.contains("."))
                 ? originalFilename.substring(originalFilename.lastIndexOf("."))
                 : ".bin";
         String safeFileName = UUID.randomUUID().toString() + ext;
 
-        Path baseDir = Paths.get(uploadDir.trim()).normalize();
+        Path baseDir = Paths.get(uploadDir.trim(), "memo").normalize();
         Path target = baseDir.resolve(safeFileName).normalize();
 
         if (!target.startsWith(baseDir)) {
@@ -180,10 +181,11 @@ public class MemoService {
     private void deleteFileIfExists(String fileName) {
         if (fileName == null || fileName.isEmpty()) return;
         try {
-            Path filePath = Paths.get(uploadDir, fileName);
+            Path filePath = Paths.get(uploadDir, "memo", fileName);
             Files.deleteIfExists(filePath);
+            log.info("🗑️ 이미지 삭제 완료: {}", filePath.toAbsolutePath());
         } catch (IOException e) {
-            log.warn("파일 삭제 실패: {}", fileName);
+            log.warn("⚠️ 이미지 삭제 실패: {}", fileName);
         }
     }
 
