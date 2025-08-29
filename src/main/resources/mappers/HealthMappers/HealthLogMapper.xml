@@ -28,7 +28,8 @@
     <select id="findAllByMemberIdOrderByhealthlogDatetimeDesc">
         SELECT *
         FROM healthlog
-        WHERE member_no = #{memberId} AND healthlog_datetime BETWEEN #{startDate} AND #{endDate}
+        WHERE member_no = #{memberId}
+        AND healthlog_datetime BETWEEN #{startDate} AND #{endDate}
         ORDER BY healthlog_datetime DESC
     </select>
 
@@ -38,9 +39,7 @@
     FROM healthlog
     WHERE member_no = #{memberId}
     ORDER BY healthlog_datetime DESC
-    <if test="startIdx != null and size != null">
         LIMIT #{startIdx}, #{size}
-    </if>
     </select>
 
 <!--    건강기록 달력 날짜 -->

@@ -45,9 +45,9 @@ public class ExerciseLogController {
 
 //  운동기록 조회
     @GetMapping("/elog")
-    public ResponseEntity<?> getAll(HttpServletRequest httpReq) {
+    public ResponseEntity<?> getAll(HttpServletRequest httpReq, @ModelAttribute GetExerciseLogReq req) {
         int logginedMemberId = (int) HttpUtils.getSessionValue(httpReq, AccountConstants.MEMBER_ID_NAME);
-        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogAll(logginedMemberId);
+        List<GetExerciseLogRes> result = exerciseLogService.getExerciseLogAll(logginedMemberId, req);
         return ResponseEntity.ok(result);
     }
 
