@@ -23,21 +23,25 @@ public class DiaryService {
     @Value("${constants.file.directory}")
     private String uploadDir;
 
-    @Value("${upload.base-path}")
+    @Value("${upload.base-path:/home/download/diary}")
     private String basePath;
 
     @PostConstruct
     public void adjustUploadPathForWindows() {
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win") && uploadDir.startsWith(basePath)) {
-            String subFolder = uploadDir.substring(basePath.length());
-            String userHome = System.getProperty("user.home");
-            Path baseDownload = Paths.get(userHome, "Downloads").resolve(subFolder);
-            uploadDir = baseDownload.toAbsolutePath().normalize().toString();
+        String userHome = System.getProperty("user.home");
+
+        if (os.contains("win") && uploadDir != null &&  uploadDir.startsWith("/home/download/")) {
+            String subFolder = uploadDir.substring("/home/download/".length());
+            Path baseDownload = Paths.get(userHome, "Downloads", subFolder).toAbsolutePath().normalize();
+            uploadDir = baseDownload.toString();
             log.warn("Windows 환경 감지. uploadDir을 {}로 변경합니다.", uploadDir);
         }
+        Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
+        uploadDir = path.toString();
+
         try {
-            Files.createDirectories(Paths.get(uploadDir));
+            Files.createDirectories(path);
         } catch (IOException e) {
             log.error("저장 경로 생성 실패: {}", e.getMessage(), e);
             throw new CustomException("저장 경로 생성 중 오류 발생", 500);
@@ -73,13 +77,6 @@ public class DiaryService {
             String fileName = saveImage(diaryImage);
             req.setDiaryImage(fileName);
         }
-
-        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
-        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            String fileName = saveImage(imageFiles.get(0));
-            req.setDiaryImage(fileName);
-        }
-
         diaryMapper.save(req);
 
         return new DiaryPostAndUploadRes(
@@ -105,9 +102,8 @@ public class DiaryService {
             throw new CustomException("존재하지 않거나 수정 권한이 없습니다.", 403);
         }
 
-        List<MultipartFile> imageFiles = req.getDiaryImageFiles();
-        if (diaryImage != null && !diaryImage.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            String fileName = saveImage(imageFiles.get(0));
+        if (diaryImage != null && !diaryImage.isEmpty()) {
+            String fileName = saveImage(diaryImage);
             req.setDiaryImage(fileName);
 
             if (existing.getDiaryImage() != null) {
@@ -118,6 +114,7 @@ public class DiaryService {
         }
 
         diaryMapper.update(req);
+
         return new DiaryPostAndUploadRes(
                 req.getMemberNoLogin(),
                 req.getDiaryId(),
@@ -145,9 +142,6 @@ public class DiaryService {
             deleteFileIfExists(existing.getDiaryImage());
         }
 
-        if (existing.getDiaryImage() != null) {
-            deleteFileIfExists(existing.getDiaryImage());
-        }
         diaryMapper.delete(params);
     }
 
@@ -155,17 +149,18 @@ public class DiaryService {
         if(file == null || file.isEmpty()) {
             throw new CustomException("빈 파일은 저장할 수 없습니다.", 400);
         }
+
         if (uploadDir == null || uploadDir.trim().isEmpty()) {
             throw new CustomException("업로드 경로가 설정되지 않았습니다.", 500);
         }
+
         String originalFilename = file.getOriginalFilename();
         String ext = (originalFilename != null && originalFilename.contains("."))
                     ? originalFilename.substring(originalFilename.lastIndexOf("."))
                     : ".bin";
         String safeFileName = UUID.randomUUID().toString() + ext;
 
-        String cleanedDir = uploadDir.trim().replaceAll("\\\\", "/");
-        Path baseDir = Paths.get(cleanedDir).normalize();
+        Path baseDir = Paths.get(uploadDir.trim()).normalize();
         Path target = baseDir.resolve(safeFileName).normalize();
 
         if (!target.startsWith(baseDir)) {

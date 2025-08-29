@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,11 @@ public class DiaryController {
 
     private final DiaryService diaryService;
 
-    private final String uploadDir = "C://home/download";
+    @Value("${constants.file.directory}")
+    private String uploadDir;
+
+    @Value("${upload.base-path:/home/download/diary}")
+    private String basePath;
 
     private int getLoginedMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
@@ -90,10 +95,10 @@ public class DiaryController {
         String location = "/api/OTD/memoAndDiary/diary/" + diaryId;
         return ResultResponse.success("삭제 완료", location);
     }
-    @GetMapping("/image/{filename:.+}")
+    @GetMapping("/image/{filename}")
     public ResponseEntity<Resource> getDiaryImage(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
+            Path filePath = Paths.get(uploadDir, "diary").resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
@@ -106,6 +111,7 @@ public class DiaryController {
             }
 
             return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                     .contentType(MediaType.parseMediaType(contentType))
                     .body(resource);
 

@@ -53,8 +53,8 @@
             diary_name,
             diary_content,
             diary_image,
-            created_at,
-            mood
+            mood,
+            created_at
         ) VALUES (
             #{memberNoLogin},
             #{diaryName},

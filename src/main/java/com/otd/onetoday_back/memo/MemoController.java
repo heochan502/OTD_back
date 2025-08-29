@@ -3,13 +3,14 @@ package com.otd.onetoday_back.memo;
 import com.otd.onetoday_back.account.etc.AccountConstants;
 import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.common.model.ResultResponse;
-import com.otd.onetoday_back.diary.model.DiaryPostAndUploadRes;
 import com.otd.onetoday_back.memo.model.*;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,7 +30,11 @@ public class MemoController {
 
     private final MemoService memoService;
 
-    private final String uploadDir = "C://home/download";
+    @Value("${constants.file.directory}")
+    private String uploadDir;
+
+    @Value("${upload.base-path:/home/download/memo}")
+    private String basePath;
 
     private Integer getLoggedInMemberId(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute(AccountConstants.MEMBER_ID_NAME);
@@ -50,12 +54,10 @@ public class MemoController {
     }
 
     @GetMapping("/{memoId}")
-    public ResultResponse<?> findById(@PathVariable int memoId, HttpSession session) {
+    public ResultResponse<MemoGetRes> findById(@PathVariable int memoId, HttpSession session) {
         int memberId = getLoggedInMemberId(session);
-        return ResultResponse.success(
-                memoService.findById(memoId, memberId),
-                "/api/OTD/memoAndDiary/memo/" + memoId
-        );
+        MemoGetRes result = memoService.findById(memoId, memberId);
+        return ResultResponse.success(result, "/api/OTD/memoAndDiary/memo/" + memoId);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -75,12 +77,12 @@ public class MemoController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultResponse<MemoPostAnduploadRes> update(
             @RequestPart("memoData") MemoPutReq req,
-            @RequestPart(value = "memoImageFiles", required = false) MultipartFile imageFile,
+            @RequestPart(value = "memoImage", required = false) MultipartFile memoImage,
             HttpSession session)
     {
         int memberId = getLoggedInMemberId(session);
         req.setMemberNoLogin(memberId);
-        MemoPostAnduploadRes res = memoService.update(req, imageFile);
+        MemoPostAnduploadRes res = memoService.update(req, memoImage);
         String location = "/api/OTD/memoAndDiary/memo/" + res.getMemoId();
         return ResultResponse.success(res, location);
     }
@@ -91,10 +93,10 @@ public class MemoController {
         String location = "/api/OTD/memoAndDiary/memo/" + memoId;
         return ResultResponse.success("삭제 완료", location);
     }
-    @GetMapping("/image/{filename:.+}")
+    @GetMapping("/image/{filename}")
     public ResponseEntity<Resource> getMemoImage(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get(uploadDir).resolve(filename).normalize();
+            Path filePath = Paths.get(uploadDir, "memo").resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
@@ -107,6 +109,7 @@ public class MemoController {
             }
 
             return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                     .contentType(MediaType.parseMediaType(contentType))
                     .body(resource);
 

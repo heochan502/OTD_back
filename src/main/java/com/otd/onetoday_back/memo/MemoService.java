@@ -23,21 +23,25 @@ public class MemoService {
     @Value("${constants.file.directory}")
     private String uploadDir;
 
-    @Value("${upload.base-path}")
+    @Value("${upload.base-path:/home/download/memo}")
     private String basePath;
 
     @PostConstruct
     public void adjustUploadPathForWindows() {
         String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("win") && uploadDir.startsWith(basePath)) {
-            String subFolder = uploadDir.substring(basePath.length());
-            String userHome = System.getProperty("user.home");
-            Path baseDownload = Paths.get(userHome, "Downloads").resolve(subFolder);
-            uploadDir = baseDownload.toAbsolutePath().normalize().toString();
+        String userHome = System.getProperty("user.home");
+
+        if (os.contains("win") && uploadDir != null &&  uploadDir.startsWith("/home/download/")) {
+            String subFolder = uploadDir.substring("/home/download/".length());
+            Path baseDownload = Paths.get(userHome, "Downloads", subFolder).toAbsolutePath().normalize();
+            uploadDir = baseDownload.toString();
             log.warn("Windows 환경 감지. uploadDir을 {}로 변경합니다.", uploadDir);
         }
+        Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
+        uploadDir = path.toString();
+
         try {
-            Files.createDirectories(Paths.get(uploadDir));
+            Files.createDirectories(path);
         } catch (IOException e) {
             log.error("저장 경로 생성 실패: {}", e.getMessage(), e);
             throw new CustomException("저장 경로 생성 중 오류 발생", 500);
@@ -69,14 +73,9 @@ public class MemoService {
         if (req.getMemberNoLogin() <= 0) {
             throw new CustomException("로그인이 필요합니다.", 403);
         }
+
         if (memoImage != null && !memoImage.isEmpty()) {
             String fileName = saveImage(memoImage);
-            req.setMemoImage(fileName);
-        }
-
-        List<MultipartFile> imageFiles = req.getMemoImageFiles();
-        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            String fileName = saveImage(imageFiles.get(0));
             req.setMemoImage(fileName);
         }
 
@@ -105,9 +104,8 @@ public class MemoService {
             throw new CustomException("존재하지 않거나 수정 권한이 없습니다.", 403);
         }
 
-        List<MultipartFile> imageFiles = req.getMemoImageFiles();
-        if (imageFiles != null && !imageFiles.isEmpty() && !imageFiles.get(0).isEmpty()) {
-            String fileName = saveImage(imageFiles.get(0));
+        if (memoImage != null && !memoImage.isEmpty()) {
+            String fileName = saveImage(memoImage);
             req.setMemoImage(fileName);
 
             if (existing.getMemoImage() != null) {
@@ -161,8 +159,7 @@ public class MemoService {
                 : ".bin";
         String safeFileName = UUID.randomUUID().toString() + ext;
 
-        String cleanedDir = uploadDir.trim().replaceAll("\\\\", "/");
-        Path baseDir = Paths.get(cleanedDir).normalize();
+        Path baseDir = Paths.get(uploadDir.trim()).normalize();
         Path target = baseDir.resolve(safeFileName).normalize();
 
         if (!target.startsWith(baseDir)) {
@@ -181,9 +178,10 @@ public class MemoService {
     }
 
     private void deleteFileIfExists(String fileName) {
-        Path path = Paths.get(uploadDir.trim()).resolve(fileName).normalize();
+        if (fileName == null || fileName.isEmpty()) return;
         try {
-            Files.deleteIfExists(path);
+            Path filePath = Paths.get(uploadDir, fileName);
+            Files.deleteIfExists(filePath);
         } catch (IOException e) {
             log.warn("파일 삭제 실패: {}", fileName);
         }
