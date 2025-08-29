@@ -33,7 +33,7 @@ public class MemoController {
     @Value("${constants.file.directory}")
     private String uploadDir;
 
-    @Value("${upload.base-path:/home/download/memo}")
+    @Value("${upload.base-path:/home/download}")
     private String basePath;
 
     private Integer getLoggedInMemberId(HttpSession session) {

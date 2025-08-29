@@ -33,7 +33,7 @@ public class DiaryController {
     @Value("${constants.file.directory}")
     private String uploadDir;
 
-    @Value("${upload.base-path:/home/download/diary}")
+    @Value("${upload.base-path:/home/download}")
     private String basePath;
 
     private int getLoginedMemberId(HttpSession session) {
