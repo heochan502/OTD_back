@@ -131,6 +131,7 @@ public class WeatherService {
                     villageMap.put(category, item.getFcstValue());
                 }
             }
+
             log.info("villageItems = {}", villageMap);
 
             // 값 저장

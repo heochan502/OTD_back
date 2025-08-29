@@ -10,7 +10,7 @@
         LIMIT 1
     </select>
     <select id="getNickName">
-        SELECT member_nick
+        SELECT member_nick, join_date AS birthDate
         FROM member
         WHERE member_no_login = #{memberId}
     </select>
