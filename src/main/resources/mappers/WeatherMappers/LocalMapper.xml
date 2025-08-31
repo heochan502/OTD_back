@@ -3,10 +3,17 @@
 <mapper namespace="com.otd.onetoday_back.weather.location.LocationMapper">
     <insert id="insertAddress">
         INSERT INTO member_location_address
-        (member_id, title, road_address, parcel_address, lat, lon)
+        (member_id, title, road_address, parcel_address, lat, lon, nx, ny)
         VALUES
-        (#{memberId}, #{title}, #{roadAddress}, #{parcelAddress}, #{lat}, #{lon})
+        (#{memberId}, #{title}, #{roadAddress}, #{parcelAddress}, #{lat}, #{lon}, #{nx}, #{ny})
     </insert>
+    <select id="findSelectedAddressByMemberId">
+        SELECT id AS addressId, member_id, title, road_address, parcel_address, lat, lon, nx, ny
+        FROM member_location_address
+        WHERE member_id = #{memberId}
+        AND is_selected = TRUE
+        LIMIT 1
+    </select>
     <select id="existsAddress">
         SELECT COUNT(*)
         FROM member_location_address
@@ -24,4 +31,16 @@
         WHERE id = #{id}
         AND member_id = #{memberId}
     </delete>
+    <update id="clearSelectedAddress">
+        UPDATE member_location_address
+        SET is_selected = FALSE
+        WHERE member_id = #{memberId}
+    </update>
+
+    <update id="updateSelectedAddress">
+        UPDATE member_location_address
+        SET is_selected = TRUE
+        WHERE id = #{addressId}
+        AND member_id = #{memberId}
+    </update>
 </mapper>
