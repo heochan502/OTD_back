@@ -2,12 +2,15 @@ package com.otd.onetoday_back.weather.location;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otd.onetoday_back.weather.config.constants.ConstSearch;
+import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.location.model.PostAddressReq;
 import com.otd.onetoday_back.weather.location.model.SearchDto;
 import com.otd.onetoday_back.weather.location.model.json.VWorldResponse;
+import com.otd.onetoday_back.weather.util.GeoTrans;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -67,7 +70,10 @@ public class LocationService {
     }
 
     public void saveAddress(PostAddressReq req) {
-        // 중복확인
+        // 좌표변환
+        GeoTrans.LatXLngY grid = GeoTrans.convertGRID_GPS(req.getLat(), req.getLon());
+        req.setNx(grid.nx);
+        req.setNy(grid.ny);
         int e = locationMapper.existsAddress(req);
         if (e > 0) {
             throw new IllegalStateException("이미 저장된 주소입니다.");
@@ -81,5 +87,18 @@ public class LocationService {
 
     public  int removeAddress(int id, int memberId) {
         return locationMapper.deleteAddress(id, memberId);
+    }
+
+    @Transactional
+    public void selectAddress(int memberId, int addressId) {
+        int clear = locationMapper.clearSelectedAddress(memberId);
+        int update = locationMapper.updateSelectedAddress(memberId, addressId);
+        if (update == 0){
+            throw new IllegalStateException("수정 실패");
+        }
+    }
+
+    public LocationDto getSelectedAddress(int memberId) {
+        return locationMapper.findSelectedAddressByMemberId(memberId);
     }
 }

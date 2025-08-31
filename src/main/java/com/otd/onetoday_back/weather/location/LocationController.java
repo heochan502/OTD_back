@@ -1,5 +1,6 @@
 package com.otd.onetoday_back.weather.location;
 
+import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.location.model.PostAddressReq;
 import com.otd.onetoday_back.weather.location.model.SearchDto;
 import jakarta.servlet.http.HttpSession;
@@ -52,5 +53,18 @@ public class LocationController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("삭제에 실패했습니다");
         }
+    }
+
+    @PutMapping("/select/{addressId}")
+    public ResponseEntity<?> selectAddress(@PathVariable int addressId, HttpSession session) {
+        Integer memberId = (Integer) session.getAttribute("memberId");
+        locationSearchService.selectAddress(memberId, addressId);
+        return ResponseEntity.ok("선택 성공");
+    }
+    @GetMapping("/selected")
+    public ResponseEntity<LocationDto> getSelectedAddress(HttpSession session) {
+        Integer memberId = (Integer) session.getAttribute("memberId");
+        LocationDto dto = locationSearchService.getSelectedAddress(memberId);
+        return ResponseEntity.ok(dto);
     }
 }

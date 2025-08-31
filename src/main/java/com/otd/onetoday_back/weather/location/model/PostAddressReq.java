@@ -11,4 +11,6 @@ public class PostAddressReq {
     private String parcelAddress;
     private double lat;
     private double lon;
+    private int nx;
+    private int ny;
 }

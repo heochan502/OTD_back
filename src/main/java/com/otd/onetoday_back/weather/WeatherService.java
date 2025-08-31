@@ -3,6 +3,8 @@ package com.otd.onetoday_back.weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otd.onetoday_back.account.model.memberUpdateDto;
 import com.otd.onetoday_back.weather.config.constants.ConstKma;
+import com.otd.onetoday_back.weather.location.LocationMapper;
+import com.otd.onetoday_back.weather.location.LocationService;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.model.DailyWeather;
 import com.otd.onetoday_back.weather.model.WeatherDto;
@@ -25,6 +27,8 @@ import java.util.*;
 @Slf4j
 public class WeatherService {
 
+    private final LocationService locationService;
+    private final LocationMapper locationMapper;
     private final WeatherMapper weatherMapper;
     private final WeatherFeignClient weatherFeignClient;
     private final ConstKma constKma;
@@ -136,9 +140,7 @@ public class WeatherService {
 
             // 값 저장
             LocationDto local = new LocationDto();
-            local.setCity(location.getCity());
-            local.setCounty(location.getCounty());
-            local.setTown(location.getTown());
+            local.setTitle(location.getTitle());
 
             WeatherDto dto = WeatherDto.builder()
                     .baseTime(base[0] + " " + base[1])
@@ -152,7 +154,7 @@ public class WeatherService {
                     .villagePop(villageMap.get("POP"))
                     .villageSky(Sky(villageMap.get("SKY")))
 
-                    .localName(local.getCity() + " " + local.getCounty() + " "+ local.getTown())
+                    .localName(local.getTitle())
                     .build();
             log.info("dto = {}", dto);
 
