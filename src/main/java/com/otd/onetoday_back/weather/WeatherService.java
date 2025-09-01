@@ -27,8 +27,6 @@ import java.util.*;
 @Slf4j
 public class WeatherService {
 
-    private final LocationService locationService;
-    private final LocationMapper locationMapper;
     private final WeatherMapper weatherMapper;
     private final WeatherFeignClient weatherFeignClient;
     private final ConstKma constKma;
@@ -141,6 +139,8 @@ public class WeatherService {
             // 값 저장
             LocationDto local = new LocationDto();
             local.setTitle(location.getTitle());
+            local.setRoadAddress(location.getRoadAddress());
+            local.setParcelAddress(location.getParcelAddress());
 
             WeatherDto dto = WeatherDto.builder()
                     .baseTime(base[0] + " " + base[1])
@@ -155,6 +155,8 @@ public class WeatherService {
                     .villageSky(Sky(villageMap.get("SKY")))
 
                     .localName(local.getTitle())
+                    .roadAddress(local.getRoadAddress())
+                    .parcelAddress(local.getParcelAddress())
                     .build();
             log.info("dto = {}", dto);
 

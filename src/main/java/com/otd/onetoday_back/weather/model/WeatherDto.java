@@ -24,4 +24,6 @@ public class WeatherDto {
     private String villageSky; // 하늘 상태
 
     private String localName; // 지역명
+    private String roadAddress; // 도로명주소
+    private String parcelAddress; // 구주소
 }
