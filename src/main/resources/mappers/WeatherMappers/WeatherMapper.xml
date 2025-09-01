@@ -3,7 +3,7 @@
 <mapper namespace="com.otd.onetoday_back.weather.WeatherMapper">
     <select id="findLocalByMemberId">
         SELECT id AS addressId, member_id, title, road_address, parcel_address, lat, lon, nx, ny
-        FROM member_location_address
+        FROM member_location
         WHERE member_id = #{memberId}
         AND is_selected = TRUE
     </select>

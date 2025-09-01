@@ -2,43 +2,43 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.otd.onetoday_back.weather.location.LocationMapper">
     <insert id="insertAddress">
-        INSERT INTO member_location_address
+        INSERT INTO member_location
         (member_id, title, road_address, parcel_address, lat, lon, nx, ny)
         VALUES
         (#{memberId}, #{title}, #{roadAddress}, #{parcelAddress}, #{lat}, #{lon}, #{nx}, #{ny})
     </insert>
     <select id="findSelectedAddressByMemberId">
         SELECT id AS addressId, member_id, title, road_address, parcel_address, lat, lon, nx, ny
-        FROM member_location_address
+        FROM member_location
         WHERE member_id = #{memberId}
         AND is_selected = TRUE
         LIMIT 1
     </select>
     <select id="existsAddress">
         SELECT COUNT(*)
-        FROM member_location_address
+        FROM member_location
         WHERE member_id = #{memberId}
         AND road_address = #{roadAddress}
         AND parcel_address = #{parcelAddress}
     </select>
     <select id="addressList">
         SELECT id, member_id, title, road_address, parcel_address
-        FROM member_location_address
+        FROM member_location
         WHERE member_id = #{memberId}
     </select>
     <delete id="deleteAddress">
-        DELETE FROM member_location_address
+        DELETE FROM member_location
         WHERE id = #{id}
         AND member_id = #{memberId}
     </delete>
     <update id="clearSelectedAddress">
-        UPDATE member_location_address
+        UPDATE member_location
         SET is_selected = FALSE
         WHERE member_id = #{memberId}
     </update>
 
     <update id="updateSelectedAddress">
-        UPDATE member_location_address
+        UPDATE member_location
         SET is_selected = TRUE
         WHERE id = #{addressId}
         AND member_id = #{memberId}
