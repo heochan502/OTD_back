@@ -34,8 +34,13 @@ public class ExerciseLogService {
     }
 
 //    운동기록 목록조회
-    public List<GetExerciseLogRes> getExerciseLogAll(int memberId) {
-        return exerciseLogMapper.findByMemberId(memberId);
+    public List<GetExerciseLogRes> getExerciseLogAll(int memberId, GetExerciseLogReq req) {
+        GetExerciseLogDto dto = GetExerciseLogDto.builder()
+                .memberId(memberId)
+                .startDate(req.getStartDate())
+                .endDate(req.getEndDate())
+                .build();
+        return exerciseLogMapper.findByMemberId(dto);
     }
 
 //    페이징
