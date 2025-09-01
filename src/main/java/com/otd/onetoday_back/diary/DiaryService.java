@@ -2,6 +2,7 @@ package com.otd.onetoday_back.diary;
 
 import com.otd.onetoday_back.common.model.CustomException;
 import com.otd.onetoday_back.diary.model.*;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,34 @@ public class DiaryService {
 
     private final DiaryMapper diaryMapper;
 
-    private final String uploadDir = "/home/download";
+    @Value("${constants.file.directory}")
+    private String uploadDir;
+
+    @Value("${upload.base-path:/home/download}")
+    private String basePath;
+
+    @PostConstruct
+    public void adjustUploadPathForWindows() {
+        String os = System.getProperty("os.name").toLowerCase();
+        String userHome = System.getProperty("user.home");
+
+        if (os.contains("win") && uploadDir != null && uploadDir.startsWith("/home/download/")) {
+            String subFolder = uploadDir.substring("/home/download/".length());
+            Path baseDownload = Paths.get(userHome, "Downloads", subFolder).toAbsolutePath().normalize();
+            uploadDir = Paths.get("C:/home/download", subFolder).toString();
+            log.warn("Windows 환경 감지. uploadDir을 {}로 변경합니다.", uploadDir);
+        }
+        Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
+        uploadDir = path.toString();
+
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            log.error("저장 경로 생성 실패: {}", e.getMessage(), e);
+            throw new CustomException("저장 경로 생성 중 오류 발생", 500);
+        }
+        log.info("실제 사용될 uploadDir 경로: {}", uploadDir);
+    }
 
     public DiaryListRes findAll(DiaryGetReq req) {
         int offset = (req.getCurrentPage() - 1) * req.getPageSize();
@@ -30,14 +58,12 @@ public class DiaryService {
     }
 
     public DiaryGetRes findById(int diaryId, int memberId) {
-        Map<String, Object> params = Map.of(
-                "diaryId", diaryId,
-                "memberNoLogin", memberId
-        );
-
-        DiaryGetRes diary = diaryMapper.findById(params);
+        Map<String, Object> param = new HashMap<>();
+        param.put("diaryId", diaryId);
+        param.put("memberNoLogin", memberId);
+        DiaryGetRes diary = diaryMapper.findById(param);
         if (diary == null) {
-            throw new CustomException("존재하지 않거나 권한이 없는 다이어리입니다.", 401);
+            throw new CustomException("존재하지 않거나 접근 권한이 없습니다.", 404);
         }
         return diary;
     }
@@ -46,14 +72,19 @@ public class DiaryService {
         if (req.getMemberNoLogin() <= 0) {
             throw new CustomException("로그인이 필요합니다.", 403);
         }
-
-        if (diaryImage != null && !diaryImage.isEmpty()) {
+        if(diaryImage != null && !diaryImage.isEmpty()) {
             String fileName = saveImage(diaryImage);
             req.setDiaryImage(fileName);
         }
+        diaryMapper.save(req);
 
-        diaryMapper.insert(req);
-        return new DiaryPostAndUploadRes(req.getDiaryId(), req.getDiaryImage());
+        return new DiaryPostAndUploadRes(
+                req.getMemberNoLogin(),
+                req.getDiaryId(),
+                req.getDiaryName(),
+                req.getDiaryContent(),
+                req.getDiaryImage()
+        );
     }
 
     public DiaryPostAndUploadRes update(DiaryPutReq req, MultipartFile diaryImage) {
@@ -61,26 +92,35 @@ public class DiaryService {
             throw new CustomException("로그인이 필요합니다.", 401);
         }
 
-        Map<String, Object> params = Map.of(
-                "diaryId", req.getDiaryId(),
-                "memberNoLogin", req.getMemberNoLogin()
-        );
+        Map<String, Object> param = new HashMap<>();
+        param.put("diaryId", req.getDiaryId());
+        param.put("memberNoLogin", req.getMemberNoLogin());
 
-        DiaryGetRes existing = diaryMapper.findById(params);
+        DiaryGetRes existing = diaryMapper.findById(param);
         if (existing == null) {
             throw new CustomException("존재하지 않거나 수정 권한이 없습니다.", 403);
         }
 
         if (diaryImage != null && !diaryImage.isEmpty()) {
-            deleteImageFile(existing.getDiaryImage());
             String fileName = saveImage(diaryImage);
             req.setDiaryImage(fileName);
+
+            if (existing.getDiaryImage() != null) {
+                deleteFileIfExists(existing.getDiaryImage());
+            }
         } else {
             req.setDiaryImage(existing.getDiaryImage());
         }
 
         diaryMapper.update(req);
-        return new DiaryPostAndUploadRes(req.getDiaryId(), req.getDiaryImage());
+
+        return new DiaryPostAndUploadRes(
+                req.getMemberNoLogin(),
+                req.getDiaryId(),
+                req.getDiaryName(),
+                req.getDiaryContent(),
+                req.getDiaryImage()
+        );
     }
 
     public void delete(int diaryId, int memberId) {
@@ -88,51 +128,64 @@ public class DiaryService {
             throw new CustomException("로그인이 필요합니다.", 401);
         }
 
-        Map<String, Object> params = Map.of(
-                "diaryId", diaryId,
-                "memberNoLogin", memberId
-        );
+        Map<String, Object> params = new HashMap<>();
+        params.put("diaryId", diaryId);
+        params.put("memberNoLogin", memberId);
 
         DiaryGetRes existing = diaryMapper.findById(params);
         if (existing == null) {
             throw new CustomException("존재하지 않거나 삭제 권한이 없습니다.", 403);
         }
 
-        deleteImageFile(existing.getDiaryImage());
+        if (existing.getDiaryImage() != null) {
+            deleteFileIfExists(existing.getDiaryImage());
+        }
+
         diaryMapper.delete(params);
     }
 
     private String saveImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new CustomException("빈 파일은 저장할 수 없습니다.", 400);
+        }
+        if (uploadDir == null || uploadDir.trim().isEmpty()) {
+            throw new CustomException("업로드 경로가 설정되지 않았습니다.", 500);
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String ext = (originalFilename != null && originalFilename.contains("."))
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : ".bin";
+        String safeFileName = UUID.randomUUID().toString() + ext;
+
+        Path baseDir = Paths.get(uploadDir.trim(), "diary").normalize();
+        Path target = baseDir.resolve(safeFileName).normalize();
+        log.info("🧪 저장될 실제 파일 경로: {}", target.toAbsolutePath());
+        log.warn("이미지 저장 시 originalFilename: {}", file.getOriginalFilename());
+
+        if (!target.startsWith(baseDir)) {
+            throw new CustomException("잘못된 파일 경로입니다.", 400);
+        }
+
         try {
-            String originalFilename = file.getOriginalFilename();
-            String ext = "." + getExtension(originalFilename);
-            String newFileName = UUID.randomUUID() + ext;
-
-            Path directoryPath = Paths.get(uploadDir);
-            Files.createDirectories(directoryPath);
-            Path filePath = directoryPath.resolve(newFileName);
-
-            log.info("📁 저장할 경로: {}", filePath.toAbsolutePath());
-            log.info("📎 업로드 파일명: {}", originalFilename);
-
-            Files.write(filePath, file.getBytes());
-
-            log.info("✅ 이미지 저장 완료: {}", newFileName);
-
-            return newFileName;
+            Files.createDirectories(baseDir);
+            file.transferTo(target.toFile());
+            log.info("✅ 이미지 저장 완료: {}", safeFileName);
+            return safeFileName;
         } catch (IOException e) {
             log.error("❌ 이미지 저장 실패", e);
-            throw new CustomException("이미지 업로드 실패: " + e.getMessage(), 500);
+            throw new CustomException("파일 저장 중 오류가 발생했습니다.: " + e.getMessage(), 500);
         }
     }
 
-    private void deleteImageFile(String filename) {
-        if (filename == null || filename.isEmpty()) return;
+    private void deleteFileIfExists(String fileName) {
+        if (fileName == null || fileName.isEmpty()) return;
         try {
-            Path filePath = Paths.get(uploadDir, filename);
+            Path filePath = Paths.get(uploadDir, "diary", fileName);
             Files.deleteIfExists(filePath);
+            log.info("🗑️ 이미지 삭제 완료: {}", filePath.toAbsolutePath());
         } catch (IOException e) {
-            log.warn("이미지 삭제 실패: {}", filename);
+            log.warn("⚠️ 이미지 삭제 실패: {}", fileName);
         }
     }
 
