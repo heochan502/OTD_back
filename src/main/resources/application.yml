@@ -8,7 +8,13 @@ constants:
       url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
       service-key: fte7et4WjQ2QQTSP51SJ6VZ%2FXA3aDUYv054aZFUsGdrVOKFJxQnmrKJGh%2Box%2FcnwsvpeJmLazXr4je1K01Uoow%3D%3D
       data-type: json
-
+    search-api:
+      url: https://api.vworld.kr/req/search
+      key: 4B54C134-DE17-3427-8A47-1778B7BA29C4
+      service: search
+      request: search
+      type: place
+      format: json
 Spring:
   application:
     name: On_Two_Day

@@ -20,6 +20,7 @@
         SELECT exerciselog_id, exercise_id, exercise_duration, exercise_kcal, effort_level, exercise_datetime
         FROM exerciselog
         WHERE member_no = #{memberId}
+        AND exercise_datetime BETWEEN #{startDate} AND #{endDate}
         ORDER BY exercise_datetime DESC
     </select>
 
@@ -29,9 +30,7 @@
         FROM exerciselog
         WHERE member_no = #{memberId}
         ORDER BY exercise_datetime DESC
-       <if test="startIdx != null and size != null">
         LIMIT #{startIdx}, #{size}
-       </if>
     </select>
 
 

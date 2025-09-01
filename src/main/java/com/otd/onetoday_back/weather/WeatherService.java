@@ -3,6 +3,8 @@ package com.otd.onetoday_back.weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otd.onetoday_back.account.model.memberUpdateDto;
 import com.otd.onetoday_back.weather.config.constants.ConstKma;
+import com.otd.onetoday_back.weather.location.LocationMapper;
+import com.otd.onetoday_back.weather.location.LocationService;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.model.DailyWeather;
 import com.otd.onetoday_back.weather.model.WeatherDto;
@@ -25,6 +27,8 @@ import java.util.*;
 @Slf4j
 public class WeatherService {
 
+    private final LocationService locationService;
+    private final LocationMapper locationMapper;
     private final WeatherMapper weatherMapper;
     private final WeatherFeignClient weatherFeignClient;
     private final ConstKma constKma;
@@ -61,8 +65,8 @@ public class WeatherService {
         try {
             // FeignClient 초단기실황 호출
             String ncstResponse = weatherFeignClient.getUltraSrtNcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     base[0],
                     base[1],
                     location.getNx(),
@@ -87,8 +91,8 @@ public class WeatherService {
 
             // FeignClient 단기예보 호출
             String villageTMN = weatherFeignClient.getVilageFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     baseV[0],
                     "0200",
                     location.getNx(),
@@ -98,8 +102,8 @@ public class WeatherService {
             );
 
             String villageTMX = weatherFeignClient.getVilageFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     baseV[0],
                     "1100",
                     location.getNx(),
@@ -131,13 +135,12 @@ public class WeatherService {
                     villageMap.put(category, item.getFcstValue());
                 }
             }
+
             log.info("villageItems = {}", villageMap);
 
             // 값 저장
             LocationDto local = new LocationDto();
-            local.setCity(location.getCity());
-            local.setCounty(location.getCounty());
-            local.setTown(location.getTown());
+            local.setTitle(location.getTitle());
 
             WeatherDto dto = WeatherDto.builder()
                     .baseTime(base[0] + " " + base[1])
@@ -151,7 +154,7 @@ public class WeatherService {
                     .villagePop(villageMap.get("POP"))
                     .villageSky(Sky(villageMap.get("SKY")))
 
-                    .localName(local.getCity() + " " + local.getCounty() + " "+ local.getTown())
+                    .localName(local.getTitle())
                     .build();
             log.info("dto = {}", dto);
 
@@ -173,8 +176,8 @@ public class WeatherService {
         String baseDate = formatString(yesterday);
         try {
             String dailyWeather = weatherFeignClient.getVilageFcst(
-                    constKma.getServiceKey(),
-                    constKma.getDataType(),
+                    constKma.serviceKey,
+                    constKma.dataType,
                     baseDate,
                     "2300",
                     location.getNx(),

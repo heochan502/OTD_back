@@ -1,40 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.otd.onetoday_back.weather.location.LocationMapper">
-    <insert id="insertMemberLocation">
-        INSERT INTO member_location
-        SET local_member_id = #{memberId}
-        ,   local_id = #{localId}
+    <insert id="insertAddress">
+        INSERT INTO member_location_address
+        (member_id, title, road_address, parcel_address, lat, lon, nx, ny)
+        VALUES
+        (#{memberId}, #{title}, #{roadAddress}, #{parcelAddress}, #{lat}, #{lon}, #{nx}, #{ny})
     </insert>
-    <select id="getLocalList" parameterType="com.otd.onetoday_back.weather.location.model.LocationDto"
-            resultType="com.otd.onetoday_back.weather.location.model.LocationDto">
-        SELECT local_id, city, county, town
-        FROM locallist
-        WHERE REPLACE(CONCAT(city, county, town), ' ', '')
-        LIKE CONCAT('%', REPLACE(#{keyword}, ' ', ''), '%')
+    <select id="findSelectedAddressByMemberId">
+        SELECT id AS addressId, member_id, title, road_address, parcel_address, lat, lon, nx, ny
+        FROM member_location_address
+        WHERE member_id = #{memberId}
+        AND is_selected = TRUE
+        LIMIT 1
     </select>
-    <select id="getLocalListByMemberId">
-        SELECT l.*
-        FROM locallist l
-        JOIN member_location m ON l.local_id = m.local_id
-        WHERE m.local_member_id = #{memberId}
+    <select id="existsAddress">
+        SELECT COUNT(*)
+        FROM member_location_address
+        WHERE member_id = #{memberId}
+        AND road_address = #{roadAddress}
+        AND parcel_address = #{parcelAddress}
     </select>
-    <!-- 전체 선택 해제 -->
-    <update id="unselectAllByMemberId">
-        UPDATE member_location
-        SET is_selected = FALSE
-        WHERE local_member_id = #{memberId}
-    </update>
-    <!-- 지역 선택 -->
-    <update id="updateSelectedLocation">
-        UPDATE member_location
-        SET is_selected = TRUE
-        WHERE local_member_id = #{memberId}
-        AND local_id = #{localId}
-    </update>
-    <delete id="deleteLocation">
-        DELETE FROM member_location
-        WHERE local_member_id = #{memberId}
-        AND local_id = #{localId}
+    <select id="addressList">
+        SELECT id, member_id, title, road_address, parcel_address
+        FROM member_location_address
+        WHERE member_id = #{memberId}
+    </select>
+    <delete id="deleteAddress">
+        DELETE FROM member_location_address
+        WHERE id = #{id}
+        AND member_id = #{memberId}
     </delete>
+    <update id="clearSelectedAddress">
+        UPDATE member_location_address
+        SET is_selected = FALSE
+        WHERE member_id = #{memberId}
+    </update>
+
+    <update id="updateSelectedAddress">
+        UPDATE member_location_address
+        SET is_selected = TRUE
+        WHERE id = #{addressId}
+        AND member_id = #{memberId}
+    </update>
 </mapper>
