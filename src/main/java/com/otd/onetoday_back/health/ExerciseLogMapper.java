@@ -10,11 +10,11 @@ public interface ExerciseLogMapper {
     int saveExerciseLog(PostExerciseLogDto dto);  // 운동기록생성
     GetExerciseLogDetailRes findByExerciselogId(GetExerciseLogDetailReq req);  // 운동기록상세조회
 
-    List<GetExerciseLogRes> findByMemberId(int memberId);
+    List<GetExerciseLogRes> findByMemberId(GetExerciseLogDto dto);
     List<GetExerciseLogRes> findByLimitTo(PagingDto dto); // 페이징 중
 
     List<GetExerciseRes> findAllByExercise();
-//    int modifyByExerciselogId(PutExerciseLogDto dto);
+
     int deleteByExerciselogId(GetExerciseLogDetailReq req);
     List<ExerciseLogCalendarGetRes> findAllByExerciseDatetime(MonthRangeDto dto);
 }
