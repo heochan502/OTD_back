@@ -31,10 +31,10 @@ public class DiaryService {
         String os = System.getProperty("os.name").toLowerCase();
         String userHome = System.getProperty("user.home");
 
-        if (os.contains("win") && uploadDir != null &&  uploadDir.startsWith("/home/download/")) {
+        if (os.contains("win") && uploadDir != null && uploadDir.startsWith("/home/download/")) {
             String subFolder = uploadDir.substring("/home/download/".length());
             Path baseDownload = Paths.get(userHome, "Downloads", subFolder).toAbsolutePath().normalize();
-            uploadDir = baseDownload.toString();
+            uploadDir = Paths.get("C:/home/download", subFolder).toString();
             log.warn("Windows 환경 감지. uploadDir을 {}로 변경합니다.", uploadDir);
         }
         Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
@@ -160,6 +160,8 @@ public class DiaryService {
 
         Path baseDir = Paths.get(uploadDir.trim(), "diary").normalize();
         Path target = baseDir.resolve(safeFileName).normalize();
+        log.info("🧪 저장될 실제 파일 경로: {}", target.toAbsolutePath());
+        log.warn("이미지 저장 시 originalFilename: {}", file.getOriginalFilename());
 
         if (!target.startsWith(baseDir)) {
             throw new CustomException("잘못된 파일 경로입니다.", 400);

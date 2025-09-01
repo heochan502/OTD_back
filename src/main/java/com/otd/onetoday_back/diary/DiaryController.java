@@ -56,10 +56,8 @@ public class DiaryController {
     @GetMapping("/{diaryId}")
     public ResultResponse<DiaryGetRes> findById(@PathVariable int diaryId, HttpSession session) {
         int memberId = getLoginedMemberId(session);
-        return ResultResponse.success(
-                diaryService.findById(diaryId, memberId),
-                "/api/OTD/memoAndDiary/diary/" + diaryId
-        );
+        DiaryGetRes result = diaryService.findById(diaryId, memberId);
+        return ResultResponse.success(result, "/api/OTD/memoAndDiary/diary/" + diaryId);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -78,12 +76,12 @@ public class DiaryController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultResponse<DiaryPostAndUploadRes> update(
             @RequestPart("diaryData") DiaryPutReq req,
-            @RequestPart(value = "diaryImage", required = false) MultipartFile imageFile,
+            @RequestPart(value = "diaryImage", required = false) MultipartFile diaryImage,
             HttpSession session)
     {
         int memberId = getLoginedMemberId(session);
         req.setMemberNoLogin(memberId);
-        DiaryPostAndUploadRes res = diaryService.update(req, imageFile);
+        DiaryPostAndUploadRes res = diaryService.update(req, diaryImage);
         String location = "/api/OTD/memoAndDiary/diary/" + res.getDiaryId();
         return ResultResponse.success(res, location);
     }
@@ -95,10 +93,19 @@ public class DiaryController {
         String location = "/api/OTD/memoAndDiary/diary/" + diaryId;
         return ResultResponse.success("삭제 완료", location);
     }
+
     @GetMapping("/image/{filename}")
     public ResponseEntity<Resource> getDiaryImage(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get(uploadDir, "diary").resolve(filename).normalize();
+            String os = System.getProperty("os.name").toLowerCase();
+            String actualUploadDir = "C:/home/download";
+
+            if(os.contains("win") && uploadDir != null &&  uploadDir.startsWith("C:/home/download/")) {
+                actualUploadDir = uploadDir.substring("/home/download/".length());
+            }
+            Path filePath = Paths.get(actualUploadDir, "diary").resolve(filename).normalize();
+            log.warn("이미지 요청 - 실제 찾는 경로: {}", filePath.toAbsolutePath());
+
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {

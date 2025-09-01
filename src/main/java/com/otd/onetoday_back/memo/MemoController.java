@@ -96,7 +96,15 @@ public class MemoController {
     @GetMapping("/image/{filename}")
     public ResponseEntity<Resource> getMemoImage(@PathVariable String filename) {
         try {
-            Path filePath = Paths.get(uploadDir, "memo").resolve(filename).normalize();
+            String os = System.getProperty("os.name").toLowerCase();
+            String actualUploadDir = "C:/home/download";
+
+            if(os.contains("win") && uploadDir != null &&  uploadDir.startsWith("C:/home/download/")) {
+                actualUploadDir = uploadDir.substring("/home/download/".length());
+            }
+            Path filePath = Paths.get(actualUploadDir, "memo").resolve(filename).normalize();
+            log.warn("이미지 요청 - 실제 찾는 경로: {}", filePath.toAbsolutePath());
+
             Resource resource = new UrlResource(filePath.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {

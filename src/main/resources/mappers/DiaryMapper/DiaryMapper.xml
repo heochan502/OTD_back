@@ -5,25 +5,28 @@
 
 <mapper namespace="com.otd.onetoday_back.diary.DiaryMapper">
 
+    <resultMap id="DiaryResultMap" type="com.otd.onetoday_back.diary.model.DiaryGetRes">
+        <id property="diaryId" column="diary_id"/>
+        <result property="diaryName" column="diary_name"/>
+        <result property="diaryContent" column="diary_content"/>
+        <result property="diaryImage" column="diary_image"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="mood" column="mood"/>
+    </resultMap>
+
     <select id="findAll"
-            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes"
-            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq">
-        SELECT
-            diary_id AS diaryId,
-            diary_name AS diaryName,
-            diary_content AS diaryContent,
-            diary_image AS diaryImage,
-            created_at AS createdAt,
-            mood
+            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq"
+            resultMap="DiaryResultMap">
+        SELECT *
         FROM diary
         WHERE member_no_login = #{memberNoLogin}
         ORDER BY created_at DESC
-        LIMIT #{offset}, #{pageSize}
+            LIMIT #{offset}, #{pageSize}
     </select>
 
     <select id="getTotalCount"
-            resultType="int"
-            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq">
+            parameterType="com.otd.onetoday_back.diary.model.DiaryGetReq"
+            resultType="int">
         SELECT COUNT(*)
         FROM diary
         WHERE member_no_login = #{memberNoLogin}
@@ -31,14 +34,8 @@
 
     <select id="findById"
             parameterType="map"
-            resultType="com.otd.onetoday_back.diary.model.DiaryGetRes">
-        SELECT
-            diary_id AS diaryId,
-            diary_name AS diaryName,
-            diary_content AS diaryContent,
-            diary_image AS diaryImage,
-            created_at AS createdAt,
-            mood
+            resultMap="DiaryResultMap">
+        SELECT *
         FROM diary
         WHERE diary_id = #{diaryId}
           AND member_no_login = #{memberNoLogin}
@@ -56,13 +53,13 @@
             mood,
             created_at
         ) VALUES (
-            #{memberNoLogin},
-            #{diaryName},
-            #{diaryContent},
-            #{diaryImage},
-            #{mood},
-            NOW()
-        )
+                     #{memberNoLogin},
+                     #{diaryName},
+                     #{diaryContent},
+                     #{diaryImage},
+                     #{mood},
+                     NOW()
+                 )
     </insert>
 
     <update id="update"
