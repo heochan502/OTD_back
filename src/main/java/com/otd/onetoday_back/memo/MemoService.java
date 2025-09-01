@@ -162,6 +162,7 @@ public class MemoService {
 
         Path baseDir = Paths.get(uploadDir.trim(), "memo").normalize();
         Path target = baseDir.resolve(safeFileName).normalize();
+        log.info("🧪 저장될 실제 파일 경로: {}", target.toAbsolutePath());
 
         if (!target.startsWith(baseDir)) {
             throw new CustomException("잘못된 파일 경로입니다.", 400);
