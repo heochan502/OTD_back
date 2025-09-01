@@ -21,15 +21,16 @@ public class VWorldResponse {
 
     @Data
     public static class VWorldItem {
-        private String title;
         private VWorldAddress address;
         private VWorldPoint point;
+        private String title; // place title
     }
 
     @Data
     public static class VWorldAddress {
-        private String road;
-        private String parcel;
+        private String road; // 신주소
+        private String parcel; // 구주소
+        private String bldnm; // address title
     }
 
     @Data

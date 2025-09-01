@@ -9,6 +9,6 @@ public class ConstSearch {
     public final String key;
     public final String service;
     public final String request;
-    public final String type;
+    public final String category;
     public final String format;
 }

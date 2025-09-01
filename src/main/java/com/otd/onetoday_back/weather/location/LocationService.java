@@ -33,7 +33,7 @@ public class LocationService {
                 constSearch.key,
                 constSearch.service,
                 constSearch.request,
-                constSearch.type,
+                "place",
                 keyword,
                 constSearch.format,
                 1,
@@ -41,11 +41,32 @@ public class LocationService {
         );
 
         VWorldResponse response = objectMapper.readValue(result, VWorldResponse.class);
+        List<VWorldResponse.VWorldItem> items = null;
+        if (response.getResponse() != null && response.getResponse().getResult() != null) {
+            items = response.getResponse().getResult().getItems();
+        }
+
+        if (items == null || items.isEmpty()) {
+            String result2 = searchFeignClient.searchAddress(
+                    constSearch.key,
+                    constSearch.service,
+                    constSearch.request,
+                    "address",
+                    constSearch.category,
+                    keyword,
+                    constSearch.format,
+                    1,
+                    100
+            );
+            VWorldResponse response2 = objectMapper.readValue(result2, VWorldResponse.class);
+            items = response2.getResponse().getResult().getItems();
+            log.info(items.toString());
+        }
 
         List<SearchDto> list = new ArrayList<>();
         Set<String> uniqueCheck = new HashSet<>();
 
-        for (VWorldResponse.VWorldItem item : response.getResponse().getResult().getItems()) {
+        for (VWorldResponse.VWorldItem item : items) {
             String road = item.getAddress().getRoad();
             String parcel = item.getAddress().getParcel();
 
@@ -58,6 +79,7 @@ public class LocationService {
             }
                 uniqueCheck.add(unique);
 
+            if (item.getTitle() != null) {
                 list.add(SearchDto.builder()
                         .title(item.getTitle())
                         .road(item.getAddress().getRoad())
@@ -65,6 +87,24 @@ public class LocationService {
                         .lat(Double.parseDouble(item.getPoint().getY()))
                         .lon(Double.parseDouble(item.getPoint().getX()))
                         .build());
+            }
+            if (item.getAddress().getBldnm() == null ||
+                        item.getAddress().getBldnm().isBlank()) {
+                list.add(SearchDto.builder()
+                        .title(item.getAddress().getRoad())
+                        .parcel(item.getAddress().getParcel())
+                        .lat(Double.parseDouble(item.getPoint().getY()))
+                        .lon(Double.parseDouble(item.getPoint().getX()))
+                        .build());
+            } else {
+            list.add(SearchDto.builder()
+                    .title(item.getAddress().getBldnm())
+                    .road(item.getAddress().getRoad())
+                    .parcel(item.getAddress().getParcel())
+                    .lat(Double.parseDouble(item.getPoint().getY()))
+                    .lon(Double.parseDouble(item.getPoint().getX()))
+                    .build());
+            }
         }
         return list;
     }

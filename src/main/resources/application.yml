@@ -13,8 +13,8 @@ constants:
       key: 4B54C134-DE17-3427-8A47-1778B7BA29C4
       service: search
       request: search
-      type: place
       format: json
+      category: road
 Spring:
   application:
     name: On_Two_Day

@@ -19,4 +19,17 @@ public interface SearchFeignClient {
             @RequestParam("page") int page,
             @RequestParam("size") int size
     );
+
+    @GetMapping
+    String searchAddress(
+            @RequestParam("key") String key,
+            @RequestParam("service") String service,
+            @RequestParam("request") String request,
+            @RequestParam("type") String type,
+            @RequestParam("category") String category,
+            @RequestParam("query") String query,
+            @RequestParam("format") String format,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    );
 }
