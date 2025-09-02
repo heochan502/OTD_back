@@ -39,7 +39,7 @@ public class LocationController {
     @GetMapping("/list")
     public ResponseEntity<?> getAddressList(HttpSession session) {
         Integer memberId = (Integer) session.getAttribute("memberId");
-
+        log.info("<UNK> <UNK> <UNK> <UNK> <UNK> <UNK> {}", memberId);
         return ResponseEntity.ok(locationSearchService.getAddressList(memberId));
     }
 
