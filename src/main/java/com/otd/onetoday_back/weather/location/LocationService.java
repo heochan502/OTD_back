@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.otd.onetoday_back.weather.config.constants.ConstSearch;
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.location.model.PostAddressReq;
+import com.otd.onetoday_back.weather.location.model.PutTitleReq;
 import com.otd.onetoday_back.weather.location.model.SearchDto;
 import com.otd.onetoday_back.weather.location.model.json.VWorldResponse;
 import com.otd.onetoday_back.weather.util.GeoTrans;
@@ -92,6 +93,7 @@ public class LocationService {
                         item.getAddress().getBldnm().isBlank()) {
                 list.add(SearchDto.builder()
                         .title(item.getAddress().getRoad())
+                        .road(item.getAddress().getRoad())
                         .parcel(item.getAddress().getParcel())
                         .lat(Double.parseDouble(item.getPoint().getY()))
                         .lon(Double.parseDouble(item.getPoint().getX()))
@@ -140,5 +142,9 @@ public class LocationService {
 
     public LocationDto getSelectedAddress(int memberId) {
         return locationMapper.findSelectedAddressByMemberId(memberId);
+    }
+
+    public int modifyTitle(PutTitleReq req) {
+        return locationMapper.modifyAddress(req);
     }
 }

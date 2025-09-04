@@ -2,6 +2,7 @@ package com.otd.onetoday_back.weather.location;
 
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.location.model.PostAddressReq;
+import com.otd.onetoday_back.weather.location.model.PutTitleReq;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,4 +17,5 @@ public interface LocationMapper {
     int updateSelectedAddress(int memberId, int addressId);
     int clearSelectedAddress(int memberId);
     LocationDto findSelectedAddressByMemberId(int memberId);
+    int modifyAddress(PutTitleReq req);
 }

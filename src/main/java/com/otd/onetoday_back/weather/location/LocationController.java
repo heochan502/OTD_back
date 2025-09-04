@@ -2,6 +2,7 @@ package com.otd.onetoday_back.weather.location;
 
 import com.otd.onetoday_back.weather.location.model.LocationDto;
 import com.otd.onetoday_back.weather.location.model.PostAddressReq;
+import com.otd.onetoday_back.weather.location.model.PutTitleReq;
 import com.otd.onetoday_back.weather.location.model.SearchDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -66,5 +67,13 @@ public class LocationController {
         Integer memberId = (Integer) session.getAttribute("memberId");
         LocationDto dto = locationSearchService.getSelectedAddress(memberId);
         return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<?> modifyTitle(@RequestBody PutTitleReq req, HttpSession session) {
+        Integer memberId = (Integer) session.getAttribute("memberId");
+        req.setMemberId(memberId);
+        int result = locationSearchService.modifyTitle(req);
+        return ResponseEntity.ok(result);
     }
 }

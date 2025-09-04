@@ -25,6 +25,7 @@
         SELECT id, member_id, title, road_address, parcel_address
         FROM member_location
         WHERE member_id = #{memberId}
+        ORDER BY created_at DESC
     </select>
     <delete id="deleteAddress">
         DELETE FROM member_location
@@ -41,6 +42,12 @@
         UPDATE member_location
         SET is_selected = TRUE
         WHERE id = #{addressId}
+        AND member_id = #{memberId}
+    </update>
+    <update id="modifyAddress">
+        UPDATE member_location
+        SET title = #{keyword}
+        WHERE id = #{id}
         AND member_id = #{memberId}
     </update>
 </mapper>
