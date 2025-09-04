@@ -112,7 +112,7 @@ public class LocationService {
     }
 
     public void saveAddress(PostAddressReq req) {
-        // 좌표변환
+
         GeoTrans.LatXLngY grid = GeoTrans.convertGRID_GPS(req.getLat(), req.getLon());
         req.setNx(grid.nx);
         req.setNy(grid.ny);
