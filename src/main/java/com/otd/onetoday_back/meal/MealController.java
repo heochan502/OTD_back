@@ -23,7 +23,7 @@ import java.util.List;
 public class MealController {
     private final MealService mealService;
 
-
+//음식 찾기
     @GetMapping()
     public ResponseEntity<?> findFood(HttpServletRequest httpReq, @ModelAttribute FindFoodNameReq foodInfo)
     {
@@ -55,6 +55,7 @@ public class MealController {
         return ResponseEntity.ok(result);
     }
 
+    //  주간 칼로리 데이터
  @GetMapping("/statsMeal")
  public ResponseEntity<?> eatenFood(HttpServletRequest httpReq, @ModelAttribute GetMealStatisticReq weekly)
  {
@@ -71,7 +72,7 @@ public class MealController {
  }
 
 
-
+// 먹은 음식 저장
     @PostMapping ("/saveMeal")
     public ResponseEntity<?> mealCalculation(HttpServletRequest httpReq, @RequestBody findFoodDetailInfoReq mealInfo)
     {
@@ -86,6 +87,7 @@ public class MealController {
         return ResponseEntity.ok(1);
     }
 
+    // 해당요일의 해당 시점에 먹은 음식 칼로리 검색
     @GetMapping("/getMeal")
     public ResponseEntity<?> getMealList (HttpServletRequest httpReq, @ModelAttribute GetMealListReq getData)
     {
@@ -102,6 +104,7 @@ public class MealController {
         return ResponseEntity.ok(result);
 
     }
+    // 음식 수정
     @PutMapping("/modifyMeal")
     public ResponseEntity<?> modifyMeal(HttpServletRequest httpReq, @RequestBody findFoodDetailInfoReq mealInfo)
     {
